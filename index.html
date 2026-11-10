@@ -145,6 +145,20 @@ table.run tr:last-child td{border-bottom:none}
 footer{margin-top:64px;background:#111827;color:#94a3b8;padding:30px 0;font-size:14px;text-align:center}
 footer b{color:#e2e8f0}
 .top-link{display:block;text-align:right;font-size:13px;margin-bottom:8px}
+
+/* ===== exam prep ===== */
+.qa .item{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin-bottom:10px;font-size:15px}
+.qa .q{font-family:'Kanit';font-weight:600;margin-bottom:4px}
+.qa .q .qn{color:#94a3b8;margin-right:6px}
+.qa .a{color:#334155}
+.qa .a .mono{font-size:13px;background:#f1f5f9;padding:1px 6px;border-radius:5px}
+.check{margin-left:20px;font-size:15px;columns:2;column-gap:32px}
+.check li{margin-bottom:7px;break-inside:avoid}
+@media(max-width:880px){.check{columns:1}}
+details.sql{background:#0f172a;border-radius:12px;margin:12px 0;overflow:hidden;border:1px solid #1e293b}
+details.sql summary{cursor:pointer;padding:13px 18px;font-family:'Kanit';font-weight:600;color:#93c5fd;font-size:15px;list-style-position:inside}
+details.sql summary:hover{color:#bfdbfe}
+details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height:1.65;color:#e2e8f0;font-family:'JetBrains Mono',monospace}
 </style>
 </head>
 <body>
@@ -169,6 +183,7 @@ footer b{color:#e2e8f0}
     <a href="#ba" class="nav-ba">งาน BA (อ.อู๊ด)</a>
     <a href="#se" class="nav-se">งาน SE (อ.ผึ้ง)</a>
     <a href="#exam">วันสอบ + Script ตรวจสอบ</a>
+    <a href="#prep">เตรียมสอบ (Q&A)</a>
   </div>
 </nav>
 
@@ -761,6 +776,572 @@ footer b{color:#e2e8f0}
       </div>
       <div class="note" style="margin-top:14px"><b>ข้อควรรู้:</b> Script ต้นฉบับของอาจารย์ใช้ <span class="mono">USER_TABLES.OWNER</span> ซึ่งไม่มีอยู่จริงใน Data Dictionary (ORA-00904) — ไฟล์ Verify.txt แก้เป็น <span class="mono">USER AS OWNER</span> แล้ว พร้อมอธิบายเหตุผลหน้างานได้</div>
     </div>
+  </div>
+</section>
+
+<!-- ================= EXAM PREP ================= -->
+<section id="prep">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="kicker gen">Exam Prep</span>
+      <h2>เตรียมสอบ — เกณฑ์ของอาจารย์ + Q&amp;A ซักถาม</h2>
+      <p class="sub">สรุปจากโจทย์ของอาจารย์ทั้งสองท่าน — ทำงานแบบ Agile team ตอบรายบุคคลตามกลุ่ม คะแนนน้อยที่สุดของกลุ่ม = คะแนนส่วนนำเสนอ ใช้ AI เป็นเครื่องมือได้ แต่ต้องอธิบายตามคำถามหน้างานและปรับแก่งการทำงานตามคำถามได้</p>
+    </div>
+
+    <div class="card" style="margin-bottom:28px">
+      <h3 style="font-size:17px;margin-bottom:10px">เกณฑ์ที่อาจารย์กำหนด (ทำครบทั้ง 2 งาน — แยกส่วนการทำงานของอาจารย์แต่ละท่าน)</h3>
+      <ul style="margin-left:20px;font-size:15px">
+        <li><b>1) DDL Script</b> ตาม Entity/Relationship Diagram แล้วสั่งประมวลผลบน Oracle DBMS (KMITL Database server หรือ Localhost-Docker)</li>
+        <li><b>2) DML Script</b> ตาม ER Diagram แล้วประมวลผลบน Oracle DBMS</li>
+        <li><b>3) Stored Procedure (PL/SQL)</b> ตามโจทย์หลักของระบบงาน (Transaction Processing)</li>
+        <li><b>4) รายงานซับซ้อนแบบ JOIN หลายตาราง</b> (ใช้ Transaction tables / Master tables) — ได้ Dataset จาก SQL Script แล้วนำเสนอ เช่น การยืมหนังสือ การจองสินค้า การทำสัญญา การขนส่ง เป็นต้น</li>
+        <li><b>5) Agile team</b> — การตอบคำถามรายบุคคลตามกลุ่ม คะแนนน้อยที่สุดของกลุ่ม = คะแนนการนำเสนอของกลุ่ม</li>
+        <li><b>6) ใช้ AI ได้</b> แต่ต้องอธิบายตามคำถามหน้างาน โดยต้องปรับแก่งการทำงานตามคำถามได้</li>
+        <li><b>7) Deployment ต่อหน้าอาจารย์</b> บน KMITL Database server ตาม Database user ที่อาจารย์สร้างให้รายกลุ่ม — DROP ทุกตารางแล้วสร้างใหม่ Face-to-face แล้วตอบข้อซักถาม</li>
+        <li>ตรวจผลงานด้วย <b>SQL แสดง Object ประเภท TABLE + Constraint</b> ที่ Database User เป็นเจ้าของ (USER_TABLES LEFT JOIN USER_CONSTRAINTS)</li>
+      </ul>
+    </div>
+
+    <h3 style="margin:0 0 14px">คำถามที่อาจารย์มักถาม (17 ข้อ — ทุกคนในกลุ่มต้องตอบได้)</h3>
+    <div class="qa">
+      <div class="item"><div class="q"><span class="qn">Q1</span>CONSTRAINT_TYPE ในผล Script ตรวจสอบหมายความว่าอะไร?</div><div class="a">P = Primary Key, R = Foreign Key, U = Unique, C = Check/NOT NULL และชื่อ <span class="mono">SYS_Cxxxx</span> คือ NOT NULL ที่ Oracle ตั้งให้อัตโนมัติ</div></div>
+      <div class="item"><div class="q"><span class="qn">Q2</span>Script ตรวจสอบต้นฉบับของอาจารย์รันไม่ได้?</div><div class="a">จริง — <span class="mono">USER_TABLES.OWNER</span> / <span class="mono">CONSTRAINTS.OWNER</span> ไม่มีอยู่จริง (ORA-00904) เพราะ OWNER มีเฉพาะ ALL_TABLES/DBA_TABLES ที่ต้องสิทธิ์สูง → แก้เป็น <span class="mono">USER AS OWNER</span> (ไฟล์ Verify.txt แก้ไว้แล้ว แต่ต้องอธิบายเหตุผลหน้างานได้)</div></div>
+      <div class="item"><div class="q"><span class="qn">Q3</span>(BA) ทำไมต้องมีตาราง DOCUMENT_DETAIL แยกจาก DOCUMENT?</div><div class="a">1 เอกสารมีได้หลายรายละเอียด/หลายรอบการแจ้ง (1:M Identifying Relationship — Weak Entity) รายละเอียดเก็บ SLA, สถานะ, กลุ่มเป้าหมาย ซึ่งเปลี่ยนต่อรอบ ไม่ใช่ข้อมูลหัวเอกสาร</div></div>
+      <div class="item"><div class="q"><span class="qn">Q4</span>(BA) PRAGMA AUTONOMOUS_TRANSACTION ใน SP_LOG_NOTIFICATION_SENT ทำอะไร?</div><div class="a">ทำให้ transaction ของการบันทึก Log เป็นอิสระจาก transaction หลัก — ถ้างานหลัก ROLLBACK ประวัติ Log ที่บันทึกไปแล้วยังอยู่ (audit trail ต้องไม่หาย)</div></div>
+      <div class="item"><div class="q"><span class="qn">Q5</span>(BA) Transaction Processing อยู่ตรงไหน?</div><div class="a">เหตุการณ์อนุมัติเอกสาร = 2 การกระทำใน 1 เหตุการณ์: <span class="mono">UPDATE DOCUMENT_DETAIL สถานะ</span> + <span class="mono">INSERT LOG</span> แจ้งเตือนอัตโนมัติผ่าน SP (ไฟล์ TestPLSQL.txt) — สำเร็จ COMMIT ทั้งคู่ / พลาด ROLLBACK</div></div>
+      <div class="item"><div class="q"><span class="qn">Q6</span>(SE) Transaction Processing อยู่ตรงไหน?</div><div class="a"><span class="mono">sp_press_digital_bell</span> = ตรวจ 3 เงื่อนไข (ผู้ใช้ Active / ประเภท UT-003 / รถ Active) แล้ว INSERT ใน 1 transaction · <span class="mono">sp_update_passenger_count</span> = <span class="mono">SELECT FOR UPDATE</span> (ล็อกแถวกันแข่งกันแก้) + ตรวจไม่ให้ติดลบ + UPDATE — ทุกตัว COMMIT เมื่อสำเร็จ / ROLLBACK เมื่อพลาด</div></div>
+      <div class="item"><div class="q"><span class="qn">Q7</span>(SE) Business Rule ที่เขียนไว้ใน PL/SQL?</div><div class="a">1) กดกริ่งได้เฉพาะประเภท "ผู้รับบริการ" UT-003 (คนขับ/แอดมินกดไม่ได้) 2) ยืนยันกริ่งได้เฉพาะสถานะ "รอดำเนินการ" (ใช้ <span class="mono">SQL%ROWCOUNT = 0</span> จับ) 3) จำนวนคนบนรถห้ามติดลบ 4) ปุ่มฉุกเฉินต้อง Active และรหัสรถดึงจากปุ่มโดยตรง ทำให้บันทึกผิดคันไม่ได้</div></div>
+      <div class="item"><div class="q"><span class="qn">Q8</span>(SE) ทำไมรหัส BELL-011 / ALT-1006 สร้างด้วย SUBSTR+MAX+1 ไม่ใช้ SEQUENCE?</div><div class="a">เพื่อให้เลขต่อเนื่องอ่านง่ายและไม่มีช่องว่างเมื่อเกิด ROLLBACK (SEQUENCE จะกระโดดข้ามเลขที่ถูก rollback) — ข้อจำกัด: ถ้า 2 session กดพร้อมกันอาจได้เลขซ้ำและโดน PK violation → ROLLBACK (production จริงควรใช้ SEQUENCE) ควรพูดข้อจำกัดนี้เองตอนถูกถาม</div></div>
+      <div class="item"><div class="q"><span class="qn">Q9</span>(SE) ER ระบุ ยานพาหนะ M:N กล่อง IoT แต่ทำไมตารางเป็น 1:1?</div><div class="a">ตามการใช้งานจริง 1 คันติดกล่องเดียว จึงทำ <span class="mono">iot_id UNIQUE</span> ใน VEHICLES พอ — ถ้าอาจารย์สั่งแก้หน้างานให้เป็น M:N: สร้างตารางกลาง <span class="mono">VEHICLE_IOT (vehicle_id, iot_id)</span> PK composite แล้วลบ iot_id ออกจาก VEHICLES</div></div>
+      <div class="item"><div class="q"><span class="qn">Q10</span>(SE) "จำนวนคนบนรถ" เป็น Derived Attribute ทำไมยังเก็บคอลัมน์?</div><div class="a">เก็บเป็น <b>ค่า cache</b> ที่อัปเดตผ่าน <span class="mono">sp_update_passenger_count</span> เท่านั้น (ไม่ใช่ข้อมูลดิบที่คีย์ตรง ๆ) เพื่อให้ query สถานะรถเร็ว — ค่าจริงมาจากเหตุการณ์ขึ้น/ลงรถ เทียบเท่าการ denormalize เพื่อ performance</div></div>
+      <div class="item"><div class="q"><span class="qn">Q11</span>(SE) ทำไม ROUTE_STOPS เก็บ PK เป็น (ROUTE_ID, SEQ)?</div><div class="a">รายการจุดจอดเป็น Weak Entity แตกจากความสัมพันธ์ M:N ระหว่างสายกับป้าย — PK = PK เจ้าของ (route_id) + Partial Key (seq = ลำดับที่ป้ายในสายนั้น) เพราะสาย 1 สายมีหลายป้าย / ป้าย 1 ที่มีหลายสายผ่าน</div></div>
+      <div class="item"><div class="q"><span class="qn">Q12</span>ทำไมเบอร์โทร (Multivalued Attribute) ถึงเก็บคอลัมน์เดียว?</div><div class="a">ออกแบบให้เหลือเบอร์หลักเบอร์เดียวต่อคนเพื่อความเรียบง่ายของ dataset ตัวอย่าง — ถ้าอาจารย์ให้แก้ตามหลัก 1NF หน้างาน: แตกเป็นตารางย่อย เช่น <span class="mono">USER_PHONES (user_id, phone_number)</span> PK composite แล้วลบคอลัมน์ออก (หลักการเดียวกันกับ "สาขา" ของ BA และ "ช่องทางที่ส่ง" ของ LOG — ซึ่ง LOG แก้แล้วด้วยการทำ 1 แถวต่อ 1 ช่องทาง)</div></div>
+      <div class="item"><div class="q"><span class="qn">Q13</span>ทำไมรายงานใช้ LEFT JOIN บางจุด?</div><div class="a">รองรับข้อมูลที่ยังไม่เกิดเหตุการณ์ เช่น เอกสารที่ยังไม่มีใครกดรับทราบ หรือรถที่ยังไม่มีคนขับ — INNER JOIN จะหล่นแถวพวกนั้นทิ้ง</div></div>
+      <div class="item"><div class="q"><span class="qn">Q14</span>(SE รายงาน 4) ทำไมใช้ WITH clause?</div><div class="a">เก็บสถิติกริ่งและสถิติฉุกเฉินแยกกันก่อน (1 แถวต่อ 1 สาย) แล้วค่อย JOIN เข้ากับตารางสาย ไม่เกิด fan-out (ข้อมูลซ้ำจากการ JOIN ตรง ๆ หลายตาราง) และเลี่ยง CREATE VIEW ที่ user อาจไม่มีสิทธิ์ (ORA-01031)</div></div>
+      <div class="item"><div class="q"><span class="qn">Q15</span>(SE รายงาน 3) KEEP (DENSE_RANK FIRST/LAST ...) คืออะไร?</div><div class="a">Analytic function เลือกค่าจากแถวที่มี seq น้อยสุด/มากสุด เช่น ชื่อป้ายแรก-ป้ายสุดท้ายของสาย โดยไม่ต้องเขียน subquery ซ้อน</div></div>
+      <div class="item"><div class="q"><span class="qn">Q16</span>ทั้งสองงานอยู่ user เดียวกันได้จริงไหม ทำไม Script ตรวจสอบถึงเห็นตาราง 18 ตาราง?</div><div class="a">ได้ — ชื่อตาราง/ชื่อ constraint/ชื่อ procedure ของสองงานไม่ซ้ำกันเลย (BA 8 ตาราง + SE 10 ตาราง) การ deploy รอบก่อนก็อยู่ร่วมกันมาแล้ว ผล Script ตรวจสอบจึงโชว์ทุกตารางที่ user เป็นเจ้าของปนกันตามปกติ และท้ายไฟล์ Verify.txt มี query เสริมกรองเฉพาะตารางของแต่ละงาน จุดสำคัญ: DROP ต้องยิงเฉพาะไฟล์ Drop ของงานตัวเอง ห้ามลบข้ามงาน</div></div>
+      <div class="item"><div class="q"><span class="qn">Q17</span>ถ้าอาจารย์สั่ง DROP แล้วตารางลบไม่หมด?</div><div class="a">เช็คด้วย <span class="mono">SELECT table_name FROM user_tables;</span> — ลบด้วย <span class="mono">DROP TABLE ชื่อ CASCADE CONSTRAINTS;</span> ตามลำดับย้อน FK (ไฟล์ Drop ทั้งสองงานเรียงลำดับไว้แล้ว) และถ้าเจอ object เก่าตกค้างจากเวอร์ชันก่อน ใช้ไฟล์ SE/DropOldObjects.txt ตรวจก่อนแล้วจึงลบเฉพาะที่เกี่ยวข้อง</div></div>
+    </div>
+
+    <h3 style="margin:30px 0 14px">เช็คลิสต์ก่อนเข้าห้องสอบ</h3>
+    <div class="card">
+      <ul class="check">
+        <li>อธิบาย ER Diagram ของงานตัวเองได้ทุกความสัมพันธ์ (cardinality + เส้นคู่/weak entity แปลงเป็นอะไร)</li>
+        <li>รู้ว่าไฟล์ไหนต้องรันก่อน-หลัง และทำไม (FK ต้องมี parent ก่อน)</li>
+        <li>อธิบาย Procedure แต่ละตัวทีละบล็อกได้ (DECLARE / BEGIN / EXCEPTION)</li>
+        <li>รู้ว่า COMMIT / ROLLBACK เกิดตรงไหนในแต่ละ Procedure</li>
+        <li>อ่านผล Script ตรวจสอบได้ (ตารางไหนมี FK ชี้ไปที่ไหน)</li>
+        <li>จำข้อมูล seed หลักได้ (DD-004 เดิม "รอยืนยัน" · VEH-03 สาย RT-02 · passenger_count เริ่ม 0) ไว้เทียบผลก่อน-หลัง</li>
+      </ul>
+    </div>
+
+    <h3 style="margin:30px 0 6px">สคริปต์จริงที่ต้องอธิบายหน้างานได้ (คลิกเพื่อเปิดดูโค้ด)</h3>
+
+    <details class="sql">
+      <summary>BA — plsql.txt : SP_LOG_NOTIFICATION_SENT (Procedure บันทึก Log แจ้งเตือน)</summary>
+      <pre>CREATE OR REPLACE PROCEDURE SP_LOG_NOTIFICATION_SENT (
+  p_log_type      IN VARCHAR2,
+  p_message_sent    IN VARCHAR2,
+  p_notification_message IN VARCHAR2,
+  p_emp_code      IN VARCHAR2,
+  p_detail_code     IN VARCHAR2,
+  o_log_code      OUT VARCHAR2
+) AS
+  PRAGMA AUTONOMOUS_TRANSACTION;
+  v_next_num NUMBER;
+BEGIN
+  -- 1. สร้างรหัส Log อัตโนมัติในรูปแบบ LOG-XXX
+  SELECT NVL(MAX(TO_NUMBER(SUBSTR(code, 5))), 0) + 1
+  INTO v_next_num
+  FROM Log
+  WHERE REGEXP_LIKE(code, '^LOG-[0-9]+$');
+
+  o_log_code := 'LOG-' || LPAD(v_next_num, 3, '0');
+
+  -- 2. บันทึกข้อมูลลงตาราง Log
+  INSERT INTO Log (
+    code,
+    log_type,
+    message_sent,
+    notification_message,
+    sent_datetime,
+    emp_code,
+    detail_code
+  ) VALUES (
+    o_log_code,
+    p_log_type,
+    p_message_sent,
+    p_notification_message,
+    SYSTIMESTAMP,
+    p_emp_code,
+    p_detail_code
+  );
+
+  COMMIT;
+EXCEPTION
+  WHEN OTHERS THEN
+    ROLLBACK;
+    RAISE_APPLICATION_ERROR(-20001, 'ข้อผิดพลาดในการบันทึก Log การแ้งเตือน: ' || SQLERRM);
+END SP_LOG_NOTIFICATION_SENT;
+/</pre>
+    </details>
+
+    <details class="sql">
+      <summary>BA — TestPLSQL.txt : สาธิตเหตุการณ์อนุมัติเอกสาร (BEFORE → EVENT → AFTER)</summary>
+      <pre>SET SERVEROUTPUT ON;
+
+-- 1. ตรวจสอบข้อมูลก่อนเกิดเหตุการณ์ (BEFORE EVENT)
+SELECT code, doc_code, subject, status 
+FROM Document_Detail 
+WHERE code = 'DD-004';   -- เดิมเป็น 'รอยืนยัน'
+
+-- 2. จำลองเหตุการณ์ที่เกิดขึ้น (EVENT SIMULATION)
+DECLARE
+    v_target_detail_code VARCHAR2(10) := 'DD-004';
+    v_approver_emp_code  VARCHAR2(10) := 'EMP-004';
+    v_new_status         VARCHAR2(50) := 'อนุมัติแล้ว';
+    v_generated_log_code VARCHAR2(10);
+BEGIN
+    -- 2.1: อัปเดตสถานะเอกสารในตารางหลัก
+    UPDATE Document_Detail
+    SET status = v_new_status
+    WHERE code = v_target_detail_code;
+
+    -- 2.2: เรียกใช้ Procedure บันทึก Log การแ้งเตือน
+    SP_LOG_NOTIFICATION_SENT(
+        p_log_type             => 'Mobile Push',
+        p_message_sent         => 'อัปเดตสถานะเอกสาร ' || v_target_detail_code || ' เป็น [' || v_new_status || ']',
+        p_notification_message => 'สถานะล่าสุด: ' || v_new_status || ' ดำเนินการโดยพนักงานรหัส ' || v_approver_emp_code,
+        p_emp_code             => v_approver_emp_code,
+        p_detail_code          => v_target_detail_code,
+        o_log_code             => v_generated_log_code
+    );
+
+    -- 2.3: ยืนยันการทำรายการทั้งหมด
+    COMMIT;
+
+    DBMS_OUTPUT.PUT_LINE('=== เกิดเหตุการณ์อนุมัติเอกสารสำเร็จ ===');
+    DBMS_OUTPUT.PUT_LINE('1. อัปเดตสถานะ ' || v_target_detail_code || ' เป็น: ' || v_new_status);
+    DBMS_OUTPUT.PUT_LINE('2. ระบบบันทึก Log แจ้งเตือนรหัส: ' || v_generated_log_code);
+END;
+/
+
+-- 3. ตรวจสอบผลหลังเกิดเหตุการณ์ (AFTER EVENT)
+SELECT code, doc_code, subject, status FROM Document_Detail WHERE code = 'DD-004';
+SELECT code, log_type, message_sent, sent_datetime, emp_code, detail_code
+FROM Log WHERE detail_code = 'DD-004' ORDER BY sent_datetime DESC;</pre>
+    </details>
+
+    <details class="sql">
+      <summary>BA — Join.txt : รายงาน JOIN 8 ตาราง (การทำงานหลัก)</summary>
+      <pre>SELECT *
+FROM Document d
+-- เชื่อมรายการย่อยของเอกสาร
+JOIN Document_Detail dd     ON d.doc_code = dd.doc_code
+
+-- เชื่อมธุรการผู้สร้างเอกสารและแผนกสังกัด
+JOIN Admin adm             ON d.created_by = adm.code
+JOIN Department adm_dept   ON adm.dept_code = adm_dept.dept_code
+
+-- เชื่อมหัวหน้าแผนกผู้อนุมัติเอกสารและแผนกสังกัด
+JOIN Department_Head dh    ON d.approved_by = dh.code
+JOIN Department dh_dept    ON dh.dept_code = dh_dept.dept_code
+
+-- เชื่อมบันทึกรับเอกสารปลายทาง (LEFT JOIN รองรับเอกสารที่ยังไม่มีการกดรับ)
+LEFT JOIN Receipt_Record rec ON dd.code = rec.detail_code
+
+-- เชื่อมพนักงานผู้กดรับเอกสารและแผนกสังกัด (LEFT JOIN)
+LEFT JOIN Employee emp     ON rec.confirmed_by = emp.code
+LEFT JOIN Department emp_dept ON emp.dept_code = emp_dept.dept_code
+
+-- เชื่อมประวัติการแ้งเตือนทั้งหมดของเอกสารรายการนั้น ๆ (LEFT JOIN)
+LEFT JOIN Log lg           ON dd.code = lg.detail_code AND (lg.emp_code = emp.code OR lg.emp_code IS NULL)
+
+ORDER BY 
+    d.doc_code ASC, 
+    dd.code ASC, 
+    lg.sent_datetime DESC;</pre>
+    </details>
+
+    <details class="sql">
+      <summary>SE — PLSQL2.txt : 4 Procedures หลัก (กดกริ่ง / ยืนยัน / ฉุกเฉิน / นับคนบนรถ)</summary>
+      <pre>CREATE OR REPLACE PROCEDURE sp_press_digital_bell (
+    p_user_id    IN Digital_Bells.user_id%TYPE,
+    p_vehicle_id IN Digital_Bells.vehicle_id%TYPE,
+    o_bell_id    OUT VARCHAR2,
+    o_status     OUT VARCHAR2
+) IS
+    v_user_type_id   Users.user_type_id%TYPE;
+    v_user_status    Users.status%TYPE;
+    v_vehicle_status Vehicles.status%TYPE;
+    v_next_num       NUMBER;
+BEGIN
+    SELECT user_type_id, status
+    INTO   v_user_type_id, v_user_status
+    FROM   Users
+    WHERE  user_id = p_user_id;
+
+    IF v_user_status &lt;&gt; 'Active' THEN
+        o_status := 'ERROR: บัญชีผู้ใช้ถูกระงับ ไม่สามารถกดกริ่งได้';
+        RETURN;
+    END IF;
+
+    -- Business Rule: กดกริ่งได้เฉพาะผู้รับบริการ (ผู้โดยสาร)
+    IF v_user_type_id &lt;&gt; 'UT-003' THEN
+        o_status := 'ERROR: เฉพาะผู้โดยสาร (ประเภทผู้รับบริการ) เท่านั้นที่กดกริ่งได้';
+        RETURN;
+    END IF;
+
+    SELECT status
+    INTO   v_vehicle_status
+    FROM   Vehicles
+    WHERE  vehicle_id = p_vehicle_id;
+
+    IF v_vehicle_status &lt;&gt; 'Active' THEN
+        o_status := 'ERROR: ยานพาหนะไม่พร้อมให้บริการ';
+        RETURN;
+    END IF;
+
+    SELECT NVL(MAX(TO_NUMBER(SUBSTR(bell_id, 6))), 0) + 1
+    INTO   v_next_num
+    FROM   Digital_Bells
+    WHERE  REGEXP_LIKE(bell_id, '^BELL-[0-9]+$');
+
+    o_bell_id := 'BELL-' || LPAD(TO_CHAR(v_next_num), 3, '0');
+
+    INSERT INTO Digital_Bells (bell_id, date_time, bell_status, user_id, vehicle_id)
+    VALUES (o_bell_id, SYSTIMESTAMP, 'รอดำเนินการ', p_user_id, p_vehicle_id);
+
+    COMMIT;
+    o_status := 'SUCCESS: กดกริ่งสำเร็จ รหัส ' || o_bell_id;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        ROLLBACK;
+        o_status := 'ERROR: ไม่พบผู้ใช้งานหรือยานพาหนะรหัสนี้ในระบบ';
+    WHEN OTHERS THEN
+        ROLLBACK;
+        o_status := 'ERROR: ' || SQLERRM;
+END sp_press_digital_bell;
+/
+
+CREATE OR REPLACE PROCEDURE sp_confirm_digital_bell (
+    p_bell_id IN Digital_Bells.bell_id%TYPE,
+    o_status  OUT VARCHAR2
+) IS
+BEGIN
+    UPDATE Digital_Bells
+    SET    bell_status = 'รับทราบแล้ว'
+    WHERE  bell_id     = p_bell_id
+    AND    bell_status = 'รอดำเนินการ';
+
+    IF SQL%ROWCOUNT = 0 THEN
+        ROLLBACK;
+        o_status := 'ERROR: ไม่พบรหัสกริ่ง หรือยืนยันได้เฉพาะสถานะ "รอดำเนินการ" เท่านั้น';
+    ELSE
+        COMMIT;
+        o_status := 'SUCCESS: ยืนยันรับสัญญาณกริ่ง ' || p_bell_id || ' เรียบร้อย';
+    END IF;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        o_status := 'ERROR: ' || SQLERRM;
+END sp_confirm_digital_bell;
+/
+
+CREATE OR REPLACE PROCEDURE sp_report_emergency_alert (
+    p_button_id IN Emergency_Buttons.button_id%TYPE,
+    o_log_id    OUT VARCHAR2,
+    o_status    OUT VARCHAR2
+) IS
+    v_vehicle_id Vehicles.vehicle_id%TYPE;
+    v_btn_status Emergency_Buttons.status%TYPE;
+    v_next_num   NUMBER;
+BEGIN
+    SELECT vehicle_id, status
+    INTO   v_vehicle_id, v_btn_status
+    FROM   Emergency_Buttons
+    WHERE  button_id = p_button_id;
+
+    IF v_btn_status &lt;&gt; 'Active' THEN
+        o_status := 'ERROR: ปุ่มนี้อยู่ในสถานะชำรุด/ปิดใช้งาน';
+        RETURN;
+    END IF;
+
+    SELECT NVL(MAX(TO_NUMBER(SUBSTR(log_id, 5))), 0) + 1
+    INTO   v_next_num
+    FROM   Alert_Logs
+    WHERE  REGEXP_LIKE(log_id, '^ALT-[0-9]+$');
+
+    o_log_id := 'ALT-' || LPAD(TO_CHAR(v_next_num), 4, '0');
+
+    INSERT INTO Alert_Logs (log_id, vehicle_id, button_id, timestamp, status)
+    VALUES (o_log_id, v_vehicle_id, p_button_id, SYSTIMESTAMP, 'Completed');
+
+    COMMIT;
+    o_status := 'SUCCESS: บันทึกเหตุฉุกเฉิน รหัส ' || o_log_id;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        ROLLBACK;
+        o_status := 'ERROR: ไม่พบปุ่มกดแ้งเตือนรหัสนี้';
+    WHEN OTHERS THEN
+        ROLLBACK;
+        o_status := 'ERROR: ' || SQLERRM;
+END sp_report_emergency_alert;
+/
+
+CREATE OR REPLACE PROCEDURE sp_update_passenger_count (
+    p_vehicle_id IN Vehicles.vehicle_id%TYPE,
+    p_delta      IN NUMBER,
+    o_status     OUT VARCHAR2
+) IS
+    v_current NUMBER;
+BEGIN
+    -- ล็อกแถวรถและอ่านจำนวนคนปัจจุบัน
+    SELECT passenger_count
+    INTO   v_current
+    FROM   Vehicles
+    WHERE  vehicle_id = p_vehicle_id
+    FOR UPDATE;
+
+    IF v_current + p_delta &lt; 0 THEN
+        ROLLBACK;
+        o_status := 'ERROR: จำนวนคนบนรถห้ามติดลบ (ปัจจุบัน = ' || v_current || ' คน)';
+    ELSE
+        UPDATE Vehicles
+        SET    passenger_count = passenger_count + p_delta
+        WHERE  vehicle_id = p_vehicle_id;
+
+        COMMIT;
+        o_status := 'SUCCESS: จำนวนคนบนรถ ' || p_vehicle_id || ' ตอนนี้ = '
+                    || (v_current + p_delta) || ' คน';
+    END IF;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        ROLLBACK;
+        o_status := 'ERROR: ไม่พบยานพาหนะรหัสนี้';
+    WHEN OTHERS THEN
+        ROLLBACK;
+        o_status := 'ERROR: ' || SQLERRM;
+END sp_update_passenger_count;
+/</pre>
+    </details>
+
+    <details class="sql">
+      <summary>SE — PLSQL1.txt : sp_update_iot_location (อัปเดตพิกัดจากกล่อง IoT)</summary>
+      <pre>CREATE OR REPLACE PROCEDURE sp_update_iot_location (
+    p_iot_id    IN IoT_Boxes.iot_id%TYPE,
+    p_latitude  IN IoT_Boxes.latitude%TYPE,
+    p_longitude IN IoT_Boxes.longitude%TYPE,
+    o_status    OUT VARCHAR2
+) IS
+BEGIN
+    UPDATE IoT_Boxes
+    SET latitude  = p_latitude,
+        longitude = p_longitude,
+        status    = 'Active'
+    WHERE iot_id  = p_iot_id;
+
+    IF SQL%ROWCOUNT = 0 THEN
+        o_status := 'ERROR: ไม่พบกล่อง IoT รหัสนี้ในระบบ';
+    ELSE
+        o_status := 'SUCCESS';
+        COMMIT;
+    END IF;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        o_status := 'ERROR: ' || SQLERRM;
+END sp_update_iot_location;
+/</pre>
+    </details>
+
+    <details class="sql">
+      <summary>SE — TestPLSQL2.txt : สาธิตวงจรการทำงานครบ 7 เหตุการณ์ + ทดสอบ Business Rule</summary>
+      <pre>SET SERVEROUTPUT ON;
+
+-- 1. สถานะก่อนเกิดเหตุการณ์ (BEFORE EVENT)
+SELECT vehicle_id, license_plate, passenger_count, status
+FROM   Vehicles WHERE vehicle_id = 'VEH-03';
+
+SELECT COUNT(*) AS total_bells FROM Digital_Bells WHERE vehicle_id = 'VEH-03';
+SELECT COUNT(*) AS total_alerts FROM Alert_Logs;
+
+-- 2. จำลองเหตุการณ์ (EVENT SIMULATION)
+DECLARE
+    v_bell_id VARCHAR2(20);
+    v_log_id  VARCHAR2(20);
+    v_status  VARCHAR2(255);
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('=== เหตุการณ์ 2.1: ผู้โดยสาร U-1009 กดกริ่งขอลงรถ VEH-03 ===');
+    sp_press_digital_bell(
+        p_user_id    => 'U-1009',
+        p_vehicle_id => 'VEH-03',
+        o_bell_id    => v_bell_id,
+        o_status     => v_status
+    );
+    DBMS_OUTPUT.PUT_LINE(v_status);
+
+    DBMS_OUTPUT.PUT_LINE('=== เหตุการณ์ 2.2: คนขับยืนยันรับสัญญาณกริ่ง ' || v_bell_id || ' ===');
+    sp_confirm_digital_bell(p_bell_id => v_bell_id, o_status => v_status);
+    DBMS_OUTPUT.PUT_LINE(v_status);
+
+    DBMS_OUTPUT.PUT_LINE('=== เหตุการณ์ 2.3: มีผู้โดยสารขึ้นรถที่ป้าย +2 คน ===');
+    sp_update_passenger_count(p_vehicle_id => 'VEH-03', p_delta => 2, o_status => v_status);
+    DBMS_OUTPUT.PUT_LINE(v_status);
+
+    DBMS_OUTPUT.PUT_LINE('=== เหตุการณ์ 2.4: ผู้โดยสารที่กดกริ่งลงรถ -1 คน ===');
+    sp_update_passenger_count(p_vehicle_id => 'VEH-03', p_delta => -1, o_status => v_status);
+    DBMS_OUTPUT.PUT_LINE(v_status);
+
+    DBMS_OUTPUT.PUT_LINE('=== เหตุการณ์ 2.5: กดปุ่มฉุกเฉิน BTN-05 บน VEH-03 ===');
+    sp_report_emergency_alert(p_button_id => 'BTN-05', o_log_id => v_log_id, o_status => v_status);
+    DBMS_OUTPUT.PUT_LINE(v_status);
+
+    DBMS_OUTPUT.PUT_LINE('=== เหตุการณ์ 2.6: คนขับ U-1002 พยายามกดกริ่ง (ต้องไม่สำเร็จ) ===');
+    sp_press_digital_bell(
+        p_user_id    => 'U-1002',
+        p_vehicle_id => 'VEH-03',
+        o_bell_id    => v_bell_id,
+        o_status     => v_status
+    );
+    DBMS_OUTPUT.PUT_LINE(v_status);
+
+    DBMS_OUTPUT.PUT_LINE('=== เหตุการณ์ 2.7: ลงรถ -10 คน ทั้งที่บนรถมี 1 คน (ต้องไม่สำเร็จ) ===');
+    sp_update_passenger_count(p_vehicle_id => 'VEH-03', p_delta => -10, o_status => v_status);
+    DBMS_OUTPUT.PUT_LINE(v_status);
+END;
+/
+
+-- 3. ตรวจสอบผลหลังเกิดเหตุการณ์ (AFTER EVENT)
+SELECT bell_id, date_time, bell_status, user_id
+FROM   Digital_Bells WHERE vehicle_id = 'VEH-03' ORDER BY date_time DESC;
+
+SELECT vehicle_id, passenger_count FROM Vehicles WHERE vehicle_id = 'VEH-03';
+
+SELECT log_id, vehicle_id, button_id, timestamp, status
+FROM   Alert_Logs ORDER BY timestamp DESC;</pre>
+    </details>
+
+    <details class="sql">
+      <summary>SE — Join.txt : รายงาน JOIN 5 ฉบับ (รวม JOIN มากสุด 7 ตาราง + WITH clause)</summary>
+      <pre>-- รายงานที่ 1: ประวัติการกดกริ่งดิจิตอลขอลงรถ (JOIN 5 ตาราง)
+SELECT
+    db.bell_id, db.date_time, db.bell_status,
+    u.user_id,
+    u.first_name || ' ' || u.last_name AS passenger_name,
+    ut.type_name                       AS user_type,
+    v.vehicle_id, v.license_plate,
+    r.route_id, r.route_name
+FROM Digital_Bells db
+JOIN Users      u  ON db.user_id     = u.user_id
+JOIN User_Types ut ON u.user_type_id = ut.user_type_id
+JOIN Vehicles   v  ON db.vehicle_id  = v.vehicle_id
+JOIN Routes     r  ON v.route_id     = r.route_id
+ORDER BY db.date_time DESC;
+
+-- รายงานที่ 2: ประวัติเหตุการณ์ฉุกเฉินบนรถ (JOIN 6 ตาราง)
+SELECT
+    al.log_id, al.timestamp, al.status,
+    eb.button_id, eb.button_location,
+    v.license_plate, r.route_name,
+    u.first_name || ' ' || u.last_name AS driver_name,
+    iot.iot_id                         AS iot_box_id
+FROM Alert_Logs al
+JOIN Emergency_Buttons eb ON al.button_id      = eb.button_id
+JOIN Vehicles   v         ON al.vehicle_id     = v.vehicle_id
+JOIN Routes     r         ON v.route_id        = r.route_id
+LEFT JOIN Users u         ON v.driver_user_id  = u.user_id
+LEFT JOIN IoT_Boxes iot   ON v.iot_id          = iot.iot_id
+ORDER BY al.timestamp DESC;
+
+-- รายงานที่ 3: สรุปภาพรวมแต่ละสายเดินรถ (JOIN 4 ตาราง + GROUP BY)
+SELECT
+    r.route_id, r.route_name,
+    COUNT(DISTINCT v.vehicle_id)                              AS total_vehicles,
+    COUNT(rs.seq)                                             AS total_stops,
+    MIN(bs.stop_name) KEEP (DENSE_RANK FIRST ORDER BY rs.seq) AS first_stop,
+    MAX(bs.stop_name) KEEP (DENSE_RANK LAST  ORDER BY rs.seq) AS last_stop
+FROM Routes r
+LEFT JOIN Vehicles    v  ON r.route_id = v.route_id
+LEFT JOIN Route_Stops rs ON r.route_id = rs.route_id
+LEFT JOIN Bus_Stops   bs ON rs.stop_id = bs.stop_id
+GROUP BY r.route_id, r.route_name
+ORDER BY r.route_id;
+
+-- รายงานที่ 4: สรุปจำนวนเหตุการณ์แยกตามสาย (WITH clause + JOIN)
+WITH Bell_Stats AS (
+    SELECT v.route_id, COUNT(*) AS bell_count
+    FROM Digital_Bells db
+    JOIN Vehicles v ON db.vehicle_id = v.vehicle_id
+    GROUP BY v.route_id
+),
+Alert_Stats AS (
+    SELECT v.route_id, COUNT(*) AS alert_count
+    FROM Alert_Logs al
+    JOIN Vehicles v ON al.vehicle_id = v.vehicle_id
+    GROUP BY v.route_id
+)
+SELECT
+    r.route_id, r.route_name,
+    NVL(bs.bell_count, 0)   AS total_bell_presses,
+    NVL(ast.alert_count, 0) AS total_emergency_alerts
+FROM Routes r
+LEFT JOIN Bell_Stats  bs  ON r.route_id = bs.route_id
+LEFT JOIN Alert_Stats ast ON r.route_id = ast.route_id
+ORDER BY r.route_id;
+
+-- รายงานที่ 5: เหตุการณ์กดกริ่ง + จุดจอดทั้งหมดในเส้นทางของคันนั้น (JOIN 7 ตาราง)
+SELECT
+    db.bell_id, db.date_time, db.bell_status,
+    u.first_name || ' ' || u.last_name AS passenger_name,
+    ut.type_name,
+    v.license_plate, r.route_name,
+    rs.seq, bs.stop_name
+FROM Digital_Bells db
+JOIN Users        u  ON db.user_id     = u.user_id
+JOIN User_Types   ut ON u.user_type_id = ut.user_type_id
+JOIN Vehicles     v  ON db.vehicle_id  = v.vehicle_id
+JOIN Routes       r  ON v.route_id     = r.route_id
+LEFT JOIN Route_Stops rs ON r.route_id = rs.route_id
+LEFT JOIN Bus_Stops   bs ON rs.stop_id = bs.stop_id
+ORDER BY db.date_time DESC, r.route_id, rs.seq;</pre>
+    </details>
+
+    <details class="sql">
+      <summary>ทั้งสองงาน — Verify.txt : Script ตรวจสอบ TABLE + CONSTRAINT (เวอร์ชันแก้แล้ว)</summary>
+      <pre>-- Script ของอาจารย์ (แก้ USER_TABLES.OWNER -> USER AS OWNER)
+SELECT
+    t.TABLE_NAME,
+    t.TABLESPACE_NAME,
+    USER AS OWNER,
+    c.CONSTRAINT_NAME,
+    c.CONSTRAINT_TYPE,
+    c.TABLE_NAME
+FROM USER_TABLES t
+LEFT OUTER JOIN USER_CONSTRAINTS c
+       ON (t.TABLE_NAME = c.TABLE_NAME)
+ORDER BY t.TABLE_NAME, c.CONSTRAINT_TYPE, c.CONSTRAINT_NAME;
+
+-- (เสริม) แสดงคอลัมน์ที่เกี่ยวข้องกับแต่ละ Constraint
+SELECT
+    c.TABLE_NAME,
+    c.CONSTRAINT_NAME,
+    c.CONSTRAINT_TYPE,
+    cc.COLUMN_NAME,
+    cc.POSITION
+FROM USER_CONSTRAINTS c
+LEFT JOIN USER_CONS_COLUMNS cc
+       ON c.CONSTRAINT_NAME = cc.CONSTRAINT_NAME
+      AND c.OWNER = cc.OWNER
+ORDER BY c.TABLE_NAME, c.CONSTRAINT_TYPE, c.CONSTRAINT_NAME, cc.POSITION;
+
+-- (เสริม) กรองเฉพาะตารางของแต่ละโปรเจกต์ — ดูท้ายไฟล์ Verify.txt ของแต่ละโฟลเดอร์</pre>
+    </details>
   </div>
 </section>
 
