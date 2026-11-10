@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Database Systems Project — เอกสารโครงสร้างตาราง (BA + SE)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f7fb; --card:#ffffff; --ink:#1e2430; --muted:#5b6472; --line:#e3e7ef;
+  --ba:#7c3aed; --ba-soft:#f3ecfe; --ba-line:#d9c8fa;
+  --se:#0e7490; --se-soft:#e6f6fa; --se-line:#bfe6f0;
+  --gold:#b45309; --gold-bg:#fef3c7;
+  --blue:#1d4ed8; --blue-bg:#dbeafe;
+  --purple:#6d28d9; --purple-bg:#ede9fe;
+  --red:#b91c1c; --red-bg:#fee2e2;
+  --gray:#475569; --gray-bg:#e2e8f0;
+  --green:#047857; --green-bg:#d1fae5;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--ink);line-height:1.75;font-size:16px}
+h1,h2,h3,h4{font-family:'Kanit',sans-serif;line-height:1.4}
+code,.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+
+/* ===== Hero ===== */
+.hero{background:linear-gradient(135deg,#111827 0%,#1e293b 55%,#312e81 100%);color:#fff;padding:64px 0 56px;text-align:center}
+.hero h1{font-size:clamp(26px,4vw,40px);font-weight:700;margin-bottom:12px}
+.hero p{max-width:760px;margin:0 auto;color:#cbd5e1;font-size:17px}
+.hero .badges{display:flex;gap:10px;justify-content:center;margin-top:22px;flex-wrap:wrap}
+.hero .badges span{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);padding:6px 16px;border-radius:999px;font-size:14px}
+
+/* ===== Nav ===== */
+nav{position:sticky;top:0;z-index:50;background:#ffffffee;backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;gap:4px;align-items:center;flex-wrap:wrap;padding-top:10px;padding-bottom:10px}
+nav a{color:var(--muted);text-decoration:none;font-size:14.5px;padding:7px 14px;border-radius:999px;font-weight:500;transition:.15s}
+nav a:hover{background:var(--gray-bg);color:var(--ink)}
+nav a.nav-ba{color:var(--ba)} nav a.nav-ba:hover{background:var(--ba-soft)}
+nav a.nav-se{color:var(--se)} nav a.nav-se:hover{background:var(--se-soft)}
+
+/* ===== Sections ===== */
+section{padding:56px 0 8px}
+.sec-head{margin-bottom:26px}
+.kicker{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 14px;border-radius:999px;margin-bottom:10px}
+.sec-head h2{font-size:clamp(23px,3vw,32px)}
+.sec-head .sub{color:var(--muted);max-width:860px;margin-top:6px}
+
+.kicker.ba{background:var(--ba-soft);color:var(--ba)}
+.kicker.se{background:var(--se-soft);color:var(--se)}
+.kicker.gen{background:var(--gray-bg);color:var(--gray)}
+#ba h2,#ba h3{color:var(--ba)} #se h2,#se h3{color:var(--se)}
+
+/* ===== Cards ===== */
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px 26px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:880px){.grid2,.grid3{grid-template-columns:1fr}}
+
+/* ===== ER image ===== */
+.er-frame{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 2px 10px rgba(16,24,40,.06)}
+.er-frame img{width:100%;height:auto;display:block;border-radius:8px}
+.er-frame figcaption{font-size:14px;color:var(--muted);text-align:center;margin-top:10px}
+.er-zoom{display:inline-block;position:relative}
+.er-zoom:hover::after{content:'คลิกเพื่อดูภาพเต็ม 🔍';position:absolute;inset:auto 0 12px 0;background:#000c;color:#fff;font-size:13px;padding:5px;border-radius:8px;text-align:center}
+.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:16px}
+.legend .item{display:flex;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:14px}
+.legend .sym{width:26px;height:26px;flex:none;border:2px solid var(--ink);background:#fff}
+.legend .s-entity{border-style:solid}
+.legend .s-weak{border-style:double;border-width:5px}
+.legend .s-rel{transform:rotate(45deg);width:22px;height:22px}
+.legend .s-key{border:1.6px solid var(--ink);border-radius:50%;background:linear-gradient(#fff 55%,#111 55%,#111 60%,#fff 60%)}
+.legend .s-multi{border:1.6px solid var(--ink);border-radius:50%;box-shadow:0 0 0 3px #fff,0 0 0 4.6px var(--ink)}
+.legend .s-derived{border:1.6px dashed var(--ink);border-radius:50%}
+
+/* ===== mapping table ===== */
+table.map{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:15px}
+table.map th{background:#f1f5f9;text-align:left;padding:10px 14px;font-family:'Kanit';font-weight:600;border-bottom:2px solid var(--line)}
+table.map td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+table.map tr:last-child td{border-bottom:none}
+.mono{font-size:13.5px}
+
+/* ===== entity cards ===== */
+.ent{background:#fff;border:1px solid var(--line);border-left:5px solid var(--gray);border-radius:14px;padding:20px 22px;margin-bottom:20px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+#ba .ent{border-left-color:var(--ba)}
+#se .ent{border-left-color:var(--se)}
+.ent h3{font-size:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.ent .thainame{color:var(--muted);font-weight:400;font-size:15px}
+.ent table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14.5px}
+.ent th{background:#f8fafc;text-align:left;padding:8px 12px;border-bottom:2px solid var(--line);font-weight:600;font-family:'Kanit';font-size:13.5px}
+.ent td{padding:7px 12px;border-bottom:1px solid #eef1f6;vertical-align:top}
+.ent tr:last-child td{border-bottom:none}
+.ent td:first-child{white-space:nowrap}
+.note{margin-top:12px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px 14px;font-size:14px}
+.note b{color:#92400e}
+.badge{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:999px;font-family:'Kanit';letter-spacing:.02em;white-space:nowrap}
+.b-pk{background:var(--gold-bg);color:var(--gold)}
+.b-fk{background:var(--blue-bg);color:var(--blue)}
+.b-u{background:var(--purple-bg);color:var(--purple)}
+.b-nn{background:var(--red-bg);color:var(--red)}
+.b-def{background:var(--gray-bg);color:var(--gray)}
+.b-weak{background:#fce7f3;color:#9d174d}
+
+/* ===== relationship list ===== */
+.rel{display:flex;flex-direction:column;gap:10px}
+.rel .item{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 18px;font-size:15px}
+.rel .item b{font-family:'Kanit'}
+.rel .card-part{display:inline-block;font-size:12.5px;font-weight:700;padding:1px 10px;border-radius:999px;margin:0 2px}
+.rel .one{background:var(--green-bg);color:var(--green)}
+.rel .many{background:var(--blue-bg);color:var(--blue)}
+
+/* ===== workflow ===== */
+.flow{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch}
+.flow .step{flex:1 1 200px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;position:relative;font-size:14.5px}
+.flow .step .n{display:inline-flex;width:26px;height:26px;border-radius:50%;align-items:center;justify-content:center;font-family:'Kanit';font-weight:700;color:#fff;font-size:14px;margin-bottom:6px}
+#ba .flow .n{background:var(--ba)} #se .flow .n{background:var(--se)}
+.flow .arrow{align-self:center;font-size:22px;color:var(--muted)}
+
+/* ===== PL/SQL ===== */
+.proc{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:18px}
+.proc h4{font-size:16.5px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.proc h4 code{font-size:15px}
+.proc ul{margin:8px 0 0 20px}
+.proc li{margin-bottom:4px;font-size:15px}
+.tag{display:inline-block;font-size:12px;font-weight:700;padding:2px 10px;border-radius:6px;font-family:'JetBrains Mono'}
+.tag-out{background:#dcfce7;color:#166534}
+.tag-err{background:#fee2e2;color:#991b1b}
+.tag-tx{background:#e0e7ff;color:#3730a3}
+
+/* ===== stats ===== */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:12px;text-align:center;padding:14px 8px}
+.stat .num{font-family:'Kanit';font-weight:700;font-size:26px}
+#ba .stat .num{color:var(--ba)} #se .stat .num{color:var(--se)}
+.stat .lbl{font-size:13px;color:var(--muted);margin-top:2px}
+
+/* ===== run order ===== */
+table.run{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);font-size:14.5px;border-radius:12px;overflow:hidden}
+table.run th{background:#f1f5f9;padding:10px 14px;text-align:left;border-bottom:2px solid var(--line);font-family:'Kanit'}
+table.run td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+table.run tr:last-child td{border-bottom:none}
+.ctypes span{display:inline-block;margin:4px 6px 4px 0;padding:8px 14px;border-radius:10px;font-size:14px;font-weight:600}
+footer{margin-top:64px;background:#111827;color:#94a3b8;padding:30px 0;font-size:14px;text-align:center}
+footer b{color:#e2e8f0}
+.top-link{display:block;text-align:right;font-size:13px;margin-bottom:8px}
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="wrap">
+    <h1>Database Systems Project Documentation</h1>
+    <p>เอกสารประกอบการสอบชิ้นงานโครงงานวิชา Database Systems — สรุปโครงสร้างตาราง ความสัมพันธ์ และ PL/SQL ของ Business Domain ทั้ง 2 งาน (อ.ประพจน์ — Business Analysis และ อ.วรางคณา — Software Engineering)</p>
+    <div class="badges">
+      <span>🗂 BA — Document Approval System (8 ตาราง)</span>
+      <span>🚌 SE — Smart Transit System (10 ตาราง)</span>
+      <span>🐘 Oracle Database</span>
+    </div>
+  </div>
+</header>
+
+<!-- ================= NAV ================= -->
+<nav>
+  <div class="wrap">
+    <a href="#overview">ภาพรวม</a>
+    <a href="#ba" class="nav-ba">งาน BA (อ.อู๊ด)</a>
+    <a href="#se" class="nav-se">งาน SE (อ.ผึ้ง)</a>
+    <a href="#exam">วันสอบ + Script ตรวจสอบ</a>
+  </div>
+</nav>
+
+<!-- ================= OVERVIEW ================= -->
+<section id="overview">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="kicker gen">Overview</span>
+      <h2>ภาพรวมโปรเจกต์</h2>
+      <p class="sub">ทั้งสองงานอยู่ร่วมกันบน DB User เดียวกัน (<span class="mono">SQL_S2_11</span> บน Oracle) รวม 18 ตาราง — ตรวจแล้วว่า<b>ไม่มีชื่อตาราง / Constraint / Procedure ซ้ำกันเลย</b> จึงไม่มีข้อขัดแย้งใด ๆ และไฟล์ DROP ของแต่ละงานแยกขอบเขตกันชัดเจน</p>
+    </div>
+    <div class="grid2">
+      <div class="card" style="border-top:4px solid var(--ba)">
+        <h3 style="color:var(--ba)">[ Part I ] งาน อ.ประพจน์ (อ.อู๊ด) — BA</h3>
+        <p style="margin-top:8px;color:var(--muted);font-size:15px"><b style="color:var(--ink)">ระบบจัดการอนุมัติ แจ้งเตือน และรับทราบเอกสารภายในองค์กร</b><br>
+        (Document Approval, Notification &amp; Acknowledgment System) — ครอบคลุมการร่างเอกสารโดยธุรการ → อนุมัติโดยหัวหน้าแผนก → แจ้งเตือนพนักงาน → บันทึกผลรับทราบตามเกณฑ์ SLA</p>
+        <p style="margin-top:10px;font-size:14px;color:var(--muted)">8 เอนทิตี (Strong 7 + Weak 1) · วิชา <b>Business Analysis and Process Management</b></p>
+        <p style="margin-top:10px"><a href="#ba" style="color:var(--ba);font-weight:600">ดูรายละเอียดทั้งหมด ↓</a></p>
+      </div>
+      <div class="card" style="border-top:4px solid var(--se)">
+        <h3 style="color:var(--se)">[ Part II ] งาน อ.วรางคณา (อ.ผึ้ง) — SE</h3>
+        <p style="margin-top:8px;color:var(--muted);font-size:15px"><b style="color:var(--ink)">ระบบขนส่งสาธารณะอัจฉริยะ</b><br>
+        (Smart Transit / Smart Bus System) — ผสานการทำงานระหว่างผู้โดยสาร เส้นทางเดินรถ ยานพาหนะ กริ่งดิจิตอล ปุ่มฉุกเฉิน และอุปกรณ์ IoT ติดรถ</p>
+        <p style="margin-top:10px;font-size:14px;color:var(--muted)">10 เอนทิตี (Strong 9 + Weak 1) · วิชา <b>Software Engineering</b></p>
+        <p style="margin-top:10px"><a href="#se" style="color:var(--se);font-weight:600">ดูรายละเอียดทั้งหมด ↓</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= BA ================= -->
+<section id="ba">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="kicker ba">Part I — Business Analysis (อ.ประพจน์ / อ.อู๊ด)</span>
+      <h2>ระบบอนุมัติ แจ้งเตือน และรับทราบเอกสาร</h2>
+      <p class="sub">แผนภาพ ER เขียนด้วยสัญลักษณ์ Chen Notation — วางไว้บนสุดเพื่อใช้เป็นฐานอ้างอิงเวลากลับมาดูโครงสร้างตารางด้านล่าง</p>
+    </div>
+
+    <!-- ER DIAGRAM (บนสุดของงาน) -->
+    <figure class="er-frame">
+      <a class="er-zoom" href="assets/er-ba.png" target="_blank"><img src="assets/er-ba.png" alt="ER Diagram — ระบบอนุมัติเอกสาร (BA)"></a>
+      <figcaption>ER Diagram งาน BA — Document Approval, Notification &amp; Acknowledgment System (8 เอนทิตี)</figcaption>
+      <div class="legend">
+        <div class="item"><span class="sym s-entity"></span> Strong Entity</div>
+        <div class="item"><span class="sym s-weak"></span> Weak Entity (รายละเอียดเอกสาร)</div>
+        <div class="item"><span class="sym s-rel"></span> Relationship</div>
+        <div class="item"><span class="sym s-key"></span> Key Attribute (PK)</div>
+        <div class="item"><span class="sym s-multi"></span> Multivalued Attribute</div>
+        <div class="item"><span class="sym s-derived"></span> Derived Attribute</div>
+      </div>
+    </figure>
+
+    <!-- ER -> TABLE MAPPING -->
+    <h3 style="margin:34px 0 14px">1) การแปลง ER Diagram → ตารางจริง (Relational Schema)</h3>
+    <table class="map">
+      <tr><th>เอนทิตีใน ER</th><th>ประเภท</th><th>ตารางใน Oracle</th><th>หมายเหตุการแปลง</th></tr>
+      <tr><td>หัวหน้าแผนก</td><td>Strong</td><td class="mono">DEPARTMENT_HEAD</td><td>Multivalued (เบอร์, สาขา) เก็บเป็นคอลัมน์เดี่ยวของเบอร์/สาขาหลัก</td></tr>
+      <tr><td>แผนก</td><td>Strong</td><td class="mono">DEPARTMENT</td><td>เชื่อมกับหัวหน้าแบบ 1:1 ด้วย FK สองทาง (circular)</td></tr>
+      <tr><td>ธุรการ</td><td>Strong</td><td class="mono">ADMIN</td><td>—</td></tr>
+      <tr><td>พนักงาน</td><td>Strong</td><td class="mono">EMPLOYEE</td><td>—</td></tr>
+      <tr><td>เอกสาร</td><td>Strong</td><td class="mono">DOCUMENT</td><td>รวมความสัมพันธ์ "ร่าง" (ธุรการ) และ "อนุมัติ" (หัวหน้า) เป็น FK</td></tr>
+      <tr><td>รายละเอียดเอกสาร</td><td><span class="badge b-weak">WEAK</span></td><td class="mono">DOCUMENT_DETAIL</td><td>Identifying Relationship → เก็บ FK กลับเอกสารแม่ (doc_code)</td></tr>
+      <tr><td>log (ประวัติแจ้งเตือน)</td><td>Strong</td><td class="mono">LOG</td><td>ทำหน้าที่ตารางเชื่อม พนักงาน ↔ รายละเอียดเอกสาร</td></tr>
+      <tr><td>บันทึกรับทราบ</td><td>Strong</td><td class="mono">RECEIPT_RECORD</td><td>เก็บหลักฐาน IP + เวลา + ผลเทียบ SLA</td></tr>
+    </table>
+
+    <!-- TABLE STRUCTURES -->
+    <h3 style="margin:34px 0 14px">2) โครงสร้างตารางแบบละเอียด (จากไฟล์ CreateTable.txt)</h3>
+
+    <div class="ent">
+      <h3><span class="mono">DEPARTMENT</span> <span class="thainame">— แผนก</span></h3>
+      <table>
+        <tr><th>คอลัมน์</th><th>ชนิดข้อมูล</th><th>Constraints</th><th>คำอธิบาย</th></tr>
+        <tr><td class="mono">dept_code</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-pk">PK</span></td><td>รหัสแผนก เช่น DEPT-01</td></tr>
+        <tr><td class="mono">dept_name</td><td class="mono">VARCHAR2(100)</td><td><span class="badge b-nn">NOT NULL</span></td><td>ชื่อแผนก เช่น ฝ่ายเทคโนโลยีสารสนเทศ</td></tr>
+        <tr><td class="mono">phone</td><td class="mono">VARCHAR2(20)</td><td>—</td><td>เบอร์ติดต่อแผนก (ใน ER เป็น Multivalued → เก็บเบอร์หลักเบอร์เดียว)</td></tr>
+        <tr><td class="mono">branch</td><td class="mono">VARCHAR2(100)</td><td>—</td><td>สาขาที่ตั้ง (เช่น สำนักงานใหญ่ สาขาอโศก)</td></tr>
+        <tr><td class="mono">head_code</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-fk">FK</span> → DEPARTMENT_HEAD(code)</td><td>หัวหน้าแผนกประจำ — เพิ่มด้วย <span class="mono">ALTER TABLE</span> หลังสร้างตารางทั้งคู่แล้ว</td></tr>
+      </table>
+      <div class="note"><b>จุดซักถาม:</b> หัวหน้าแผนก ↔ แผนก เป็น 1:1 แบบ Total Participation (เส้นคู่ทั้งสองฝั่งใน ER) จึงทำเป็น FK สองทางวนกันเอง → ลำดับการ INSERT ต้องใส่แผนกก่อน (head_code = NULL) แล้วค่อย <span class="mono">UPDATE</span> ย้อนกลับ</div>
+    </div>
+
+    <div class="ent">
+      <h3><span class="mono">DEPARTMENT_HEAD</span> <span class="thainame">— หัวหน้าแผนก</span></h3>
+      <table>
+        <tr><th>คอลัมน์</th><th>ชนิดข้อมูล</th><th>Constraints</th><th>คำอธิบาย</th></tr>
+        <tr><td class="mono">code</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-pk">PK</span></td><td>รหัสหัวหน้าแผนก เช่น DH-001</td></tr>
+        <tr><td class="mono">name</td><td class="mono">VARCHAR2(100)</td><td><span class="badge b-nn">NOT NULL</span></td><td>ชื่อ-นามสกุล</td></tr>
+        <tr><td class="mono">position</td><td class="mono">VARCHAR2(100)</td><td>—</td><td>ตำแหน่ง เช่น ผู้จัดการฝ่ายไอที</td></tr>
+        <tr><td class="mono">branch</td><td class="mono">VARCHAR2(100)</td><td>—</td><td>สาขาที่ดูแล (Multivalued ใน ER)</td></tr>
+        <tr><td class="mono">phone</td><td class="mono">VARCHAR2(20)</td><td>—</td><td>เบอร์โทรติดต่อ (Multivalued ใน ER)</td></tr>
+        <tr><td class="mono">dept_code</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-fk">FK</span> → DEPARTMENT(dept_code)</td><td>แผนกที่สังกัด / ดูแล</td></tr>
+      </table>
+    </div>
+
+    <div class="ent">
+      <h3><span class="mono">ADMIN</span> <span class="thainame">— เจ้าหน้าที่ธุรการ</span></h3>
+      <table>
+        <tr><th>คอลัมน์</th><th>ชนิดข้อมูล</th><th>Constraints</th><th>คำอธิบาย</th></tr>
+        <tr><td class="mono">code</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-pk">PK</span></td><td>รหัสธุรการ เช่น AD-001</td></tr>
+        <tr><td class="mono">name</td><td class="mono">VARCHAR2(100)</td><td><span class="badge b-nn">NOT NULL</span></td><td>ชื่อ-นามสกุล</td></tr>
+        <tr><td class="mono">position</td><td class="mono">VARCHAR2(100)</td><td>—</td><td>ตำแหน่ง เช่น เจ้าหน้าที่ธุรการอาวุโส</td></tr>
+        <tr><td class="mono">branch</td><td class="mono">VARCHAR2(100)</td><td>—</td><td>สาขาที่ปฏิบัติงาน</td></tr>
+        <tr><td class="mono">phone</td><td class="mono">VARCHAR2(20)</td><td>—</td><td>เบอร์โทรติดต่อ</td></tr>
+        <tr><td class="mono">dept_code</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-fk">FK</span> → DEPARTMENT(dept_code)</td><td>แผนกที่สังกัด (ธุรการประจำแผนก)</td></tr>
+      </table>
+    </div>
+
+    <div class="ent">
+      <h3><span class="mono">EMPLOYEE</span> <span class="thainame">— พนักงาน (ปลายทางรับเอกสาร)</span></h3>
+      <table>
+        <tr><th>คอลัมน์</th><th>ชนิดข้อมูล</th><th>Constraints</th><th>คำอธิบาย</th></tr>
+        <tr><td class="mono">code</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-pk">PK</span></td><td>รหัสพนักงาน เช่น EMP-001</td></tr>
+        <tr><td class="mono">name</td><td class="mono">VARCHAR2(100)</td><td><span class="badge b-nn">NOT NULL</span></td><td>ชื่อ-นามสกุล</td></tr>
+        <tr><td class="mono">position</td><td class="mono">VARCHAR2(100)</td><td>—</td><td>ตำแหน่งงาน</td></tr>
+        <tr><td class="mono">branch</td><td class="mono">VARCHAR2(100)</td><td>—</td><td>สาขาที่ปฏิบัติงาน (Multivalued ใน ER)</td></tr>
+        <tr><td class="mono">phone</td><td class="mono">VARCHAR2(20)</td><td>—</td><td>เบอร์โทร (Multivalued ใน ER)</td></tr>
+        <tr><td class="mono">dept_code</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-fk">FK</span> → DEPARTMENT(dept_code)</td><td>แผนกที่สังกัด</td></tr>
+      </table>
+    </div>
+
+    <div class="ent">
+      <h3><span class="mono">DOCUMENT</span> <span class="thainame">— เอกสารหลัก</span></h3>
+      <table>
+        <tr><th>คอลัมน์</th><th>ชนิดข้อมูล</th><th>Constraints</th><th>คำอธิบาย</th></tr>
+        <tr><td class="mono">doc_code</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-pk">PK</span></td><td>รหัสเอกสาร เช่น DOC-2026-001</td></tr>
+        <tr><td class="mono">title</td><td class="mono">VARCHAR2(255)</td><td><span class="badge b-nn">NOT NULL</span></td><td>ชื่อเอกสาร / ชื่อเรื่อง</td></tr>
+        <tr><td class="mono">approved_by</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-fk">FK</span> → DEPARTMENT_HEAD(code)</td><td>หัวหน้าแผนกผู้พิจารณาอนุมัติ (ความสัมพันธ์ "อนุมัติ" 1:M)</td></tr>
+        <tr><td class="mono">created_by</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-fk">FK</span> → ADMIN(code)</td><td>ธุรการผู้ร่างเอกสาร (ความสัมพันธ์ "ร่าง" 1:M)</td></tr>
+      </table>
+    </div>
+
+    <div class="ent">
+      <h3><span class="mono">DOCUMENT_DETAIL</span> <span class="thainame">— รายละเอียดเอกสาร</span> <span class="badge b-weak">WEAK ENTITY</span></h3>
+      <table>
+        <tr><th>คอลัมน์</th><th>ชนิดข้อมูล</th><th>Constraints</th><th>คำอธิบาย</th></tr>
+        <tr><td class="mono">code</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-pk">PK</span> (Partial Key)</td><td>รหัสรายละเอียด เช่น DD-001 — คอลัมน์ "โค้ด" ของ Weak Entity</td></tr>
+        <tr><td class="mono">doc_code</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-nn">NOT NULL</span> <span class="badge b-fk">FK</span> → DOCUMENT</td><td>เอกสารแม่ที่รายละเอียดนี้สังกัด (Identifying Relationship)</td></tr>
+        <tr><td class="mono">subject</td><td class="mono">VARCHAR2(255)</td><td>—</td><td>หัวข้อ/เนื้อหาส่วนนี้ของเอกสาร</td></tr>
+        <tr><td class="mono">priority</td><td class="mono">VARCHAR2(50)</td><td>—</td><td>ระดับความสำคัญ (ปกติ / สำคัญมาก / ด่วนมาก / ด่วนที่สุด)</td></tr>
+        <tr><td class="mono">target_group</td><td class="mono">VARCHAR2(100)</td><td>—</td><td>กลุ่มเป้าหมายที่ต้องรับทราบ</td></tr>
+        <tr><td class="mono">sender_code</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-fk">FK</span> → ADMIN(code)</td><td>ธุรการผู้ส่งเอกสารฉบับนี้</td></tr>
+        <tr><td class="mono">doc_date</td><td class="mono">DATE</td><td>—</td><td>วันที่ร่างเอกสาร</td></tr>
+        <tr><td class="mono">expire_date</td><td class="mono">DATE</td><td>—</td><td>วันหมดอายุ / กำหนดเส้นตายการรับทราบ (ใช้เทียบ SLA)</td></tr>
+        <tr><td class="mono">sla_limit</td><td class="mono">VARCHAR2(20)</td><td>—</td><td>เกณฑ์เวลา SLA เช่น "1 วัน", "3 วัน", "7 วัน"</td></tr>
+        <tr><td class="mono">month</td><td class="mono">VARCHAR2(20)</td><td>—</td><td>เดือนที่ออกเอกสาร (ใช้จัดกลุ่มรายงาน)</td></tr>
+        <tr><td class="mono">status</td><td class="mono">VARCHAR2(50)</td><td>—</td><td>สถานะ: รอยืนยัน / อนุมัติแล้ว / ไม่อนุมัติ / กำลังดำเนินการ / ปิดงานแล้ว</td></tr>
+      </table>
+      <div class="note"><b>จุดซักถาม:</b> 1 เอกสารมีได้หลายรายละเอียด (1:M Identifying) สาเหตุที่แยกตาราง เพราะ SLA / สถานะ / กลุ่มเป้าหมาย เปลี่ยนตามแต่ละรอบการแจ้ง ไม่ใช่ข้อมูลหัวเอกสาร</div>
+    </div>
+
+    <div class="ent">
+      <h3><span class="mono">RECEIPT_RECORD</span> <span class="thainame">— บันทึกการรับทราบ</span></h3>
+      <table>
+        <tr><th>คอลัมน์</th><th>ชนิดข้อมูล</th><th>Constraints</th><th>คำอธิบาย</th></tr>
+        <tr><td class="mono">code</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-pk">PK</span></td><td>รหัสบันทึกรับทราบ เช่น REC-001</td></tr>
+        <tr><td class="mono">ip_address</td><td class="mono">VARCHAR2(45)</td><td>—</td><td>หมายเลข IP ของเครื่องที่กดรับทราบ (หลักฐานยืนยันตัวตน)</td></tr>
+        <tr><td class="mono">sla_limit</td><td class="mono">VARCHAR2(20)</td><td>—</td><td>เกณฑ์ SLA ณ ขณะรับทราบ</td></tr>
+        <tr><td class="mono">recipient_type</td><td class="mono">VARCHAR2(100)</td><td>—</td><td>ประเภทผู้รับ เช่น หัวหน้าส่วนงาน / ผู้จัดการฝ่าย</td></tr>
+        <tr><td class="mono">received_datetime</td><td class="mono">TIMESTAMP</td><td>—</td><td>วัน-เวลาที่กดยืนยันรับทราบ (ใช้เทียบกับ expire_date)</td></tr>
+        <tr><td class="mono">detail_code</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-fk">FK</span> → DOCUMENT_DETAIL(code)</td><td>รายละเอียดเอกสารที่รับทราบ</td></tr>
+        <tr><td class="mono">confirmed_by</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-fk">FK</span> → EMPLOYEE(code)</td><td>พนักงานผู้กดรับทราบ</td></tr>
+      </table>
+    </div>
+
+    <div class="ent">
+      <h3><span class="mono">LOG</span> <span class="thainame">— ประวัติการแจ้งเตือน</span></h3>
+      <table>
+        <tr><th>คอลัมน์</th><th>ชนิดข้อมูล</th><th>Constraints</th><th>คำอธิบาย</th></tr>
+        <tr><td class="mono">code</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-pk">PK</span></td><td>รหัส Log เช่น LOG-001 (สร้างอัตโนมัติโดย Procedure)</td></tr>
+        <tr><td class="mono">log_type</td><td class="mono">VARCHAR2(50)</td><td>—</td><td>ช่องทาง/ประเภทการแจ้งเตือน: System Alert / SMS Warning / Email Notification / Mobile Push (ER: Multivalued "ช่องทางที่ส่ง" → 1 แถวต่อ 1 ช่องทาง)</td></tr>
+        <tr><td class="mono">message_sent</td><td class="mono">VARCHAR2(255)</td><td>—</td><td>ข้อความสรุปที่ส่ง</td></tr>
+        <tr><td class="mono">notification_message</td><td class="mono">VARCHAR2(4000)</td><td>—</td><td>ข้อความแจ้งเตือนฉบับเต็ม</td></tr>
+        <tr><td class="mono">sent_datetime</td><td class="mono">TIMESTAMP</td><td>—</td><td>วัน-เวลาที่ส่งแจ้งเตือน</td></tr>
+        <tr><td class="mono">emp_code</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-fk">FK</span> → EMPLOYEE(code)</td><td>พนักงานปลายทางที่ถูกแจ้ง</td></tr>
+        <tr><td class="mono">detail_code</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-fk">FK</span> → DOCUMENT_DETAIL(code)</td><td>รายละเอียดเอกสารที่เกี่ยวข้อง</td></tr>
+      </table>
+      <div class="note"><b>จุดซักถาม:</b> "ช่องทางที่ส่ง" ใน ER เป็น Multivalued Attribute (ส่งได้หลายช่องทาง) → ตามหลัก 1NF จัดเก็บเป็น 1 แถวต่อ 1 ช่องทาง ในคอลัมน์ <span class="mono">log_type</span></div>
+    </div>
+
+    <!-- RELATIONSHIPS -->
+    <h3 style="margin:34px 0 14px">3) ความสัมพันธ์ทั้งหมด 9 จุด (จาก ER Diagram)</h3>
+    <div class="rel">
+      <div class="item"><b>หัวหน้าแผนก ↔ แผนก</b> — <span class="card-part one">1</span>:<span class="card-part one">1</span> Total Participation (เส้นคู่ทั้งสองฝั่ง) → ทุกแผนกต้องมีหัวหน้า และหัวหน้าทุกคนต้องมีแผนก ใช้ FK สองทาง</div>
+      <div class="item"><b>แผนก → ธุรการ</b> — <span class="card-part one">1</span>:<span class="card-part many">M</span> แผนกมีธุรการประจำเพื่อจัดการเอกสาร (Total Participation)</div>
+      <div class="item"><b>แผนก → พนักงาน</b> — <span class="card-part one">1</span>:<span class="card-part many">M</span> แผนกหนึ่งมีพนักงานสังกัดได้หลายคน</div>
+      <div class="item"><b>ธุรการ → เอกสาร</b> (ร่าง) — <span class="card-part one">1</span>:<span class="card-part many">M</span> ธุรการ 1 คนร่างเอกสารได้หลายฉบับ → <span class="mono">DOCUMENT.created_by</span></div>
+      <div class="item"><b>หัวหน้าแผนก → เอกสาร</b> (อนุมัติ) — <span class="card-part one">1</span>:<span class="card-part many">M</span> หัวหน้า 1 คนอนุมัติเอกสารได้หลายฉบับ → <span class="mono">DOCUMENT.approved_by</span></div>
+      <div class="item"><b>เอกสาร → รายละเอียดเอกสาร</b> — <span class="card-part one">1</span>:<span class="card-part many">M</span> <b>Identifying Relationship</b> (ขนมเปียกปูนสองชั้น + Weak Entity)</div>
+      <div class="item"><b>พนักงาน ↔ LOG ↔ รายละเอียดเอกสาร</b> — ตาราง LOG เชื่อมว่าเอกสารรายการใด ถูกแจ้งไปยังพนักงานคนใด เมื่อใด ช่องทางใด</div>
+      <div class="item"><b>พนักงาน → บันทึกรับทราบ</b> — <span class="card-part one">1</span>:<span class="card-part many">M</span> พนักงาน 1 คนกดรับทราบได้หลายรายการ → <span class="mono">RECEIPT_RECORD.confirmed_by</span></div>
+      <div class="item"><b>รายละเอียดเอกสาร → บันทึกรับทราบ</b> — <span class="card-part one">1</span>:<span class="card-part many">M</span> การรับทราบแต่ละครั้งเป็นของรายละเอียดเอกสารรายการใด → <span class="mono">RECEIPT_RECORD.detail_code</span></div>
+    </div>
+
+    <!-- WORKFLOW -->
+    <h3 style="margin:34px 0 14px">4) วงจรการทำงานของระบบ (Transaction Flow)</h3>
+    <div class="flow">
+      <div class="step"><span class="n">1</span><br><b>ธุรการร่างเอกสาร</b><br>INSERT <span class="mono">DOCUMENT</span> + <span class="mono">DOCUMENT_DETAIL</span> (กำหนด SLA, วันหมดอายุ, กลุ่มเป้าหมาย)</div>
+      <div class="arrow">➜</div>
+      <div class="step"><span class="n">2</span><br><b>หัวหน้าแผนกอนุมัติ</b><br>UPDATE <span class="mono">DOCUMENT_DETAIL.status</span> เช่น รอยืนยัน → อนุมัติแล้ว</div>
+      <div class="arrow">➜</div>
+      <div class="step"><span class="n">3</span><br><b>ระบบแจ้งเตือน</b><br>เรียก <span class="mono">SP_LOG_NOTIFICATION_SENT</span> → INSERT <span class="mono">LOG</span> อัตโนมัติ</div>
+      <div class="arrow">➜</div>
+      <div class="step"><span class="n">4</span><br><b>พนักงานรับทราบ</b><br>INSERT <span class="mono">RECEIPT_RECORD</span> (IP + เวลา) เทียบ SLA กับ <span class="mono">expire_date</span></div>
+    </div>
+
+    <!-- PLSQL -->
+    <h3 style="margin:34px 0 14px">5) Stored Procedure (PL/SQL — Transaction Processing)</h3>
+    <div class="proc">
+      <h4><code>SP_LOG_NOTIFICATION_SENT</code> <span class="tag tag-tx">AUTONOMOUS_TRANSACTION</span> <span class="tag tag-out">OUT: o_log_code</span></h4>
+      <p>บันทึกประวัติการแจ้งเตือนอัตโนมัติ — หัวใจของขั้นตอนที่ 3 ในวงจร</p>
+      <ul>
+        <li><b>สร้างรหัสอัตโนมัติ:</b> หา <span class="mono">MAX(TO_NUMBER(SUBSTR(code,5)))</span> เฉพาะแถวที่ <span class="mono">REGEXP_LIKE(code,'^LOG-[0-9]+$')</span> แล้ว +1 → <span class="mono">LPAD</span> เป็น LOG-033</li>
+        <li><b>INSERT</b> ลงตาราง LOG พร้อมเวลา <span class="mono">SYSTIMESTAMP</span> แล้ว <span class="mono">COMMIT</span></li>
+        <li><b>PRAGMA AUTONOMOUS_TRANSACTION:</b> transaction ของ Log เป็นอิสระจากงานหลัก — ถ้างานหลัก ROLLBACK ประวัติ Log ที่บันทึกแล้ว<b>ยังอยู่</b> (audit trail ต้องไม่หาย)</li>
+        <li><b>จัดการ error:</b> <span class="mono">WHEN OTHERS → ROLLBACK → RAISE_APPLICATION_ERROR(-20001)</span></li>
+      </ul>
+    </div>
+    <div class="proc">
+      <h4><code>TestPLSQL.txt</code> — ไฟล์สาธิตหน้างาน (BEFORE → EVENT → AFTER)</h4>
+      <ul>
+        <li><b>BEFORE:</b> ดูสถานะเอกสาร DD-004 (เดิม = "รอยืนยัน")</li>
+        <li><b>EVENT:</b> จำลองเหตุการณ์อนุมัติ — <span class="mono">UPDATE DOCUMENT_DETAIL</span> สถานะเป็น "อนุมัติแล้ว" + เรียก SP บันทึก Log (ได้รหัสใหม่ LOG-033) แล้ว <span class="mono">COMMIT</span> ทั้งเหตุการณ์</li>
+        <li><b>AFTER:</b> ตรวจว่าสถานะเปลี่ยนจริง + มีแถว Log ใหม่เกิดขึ้น</li>
+      </ul>
+    </div>
+
+    <!-- REPORT -->
+    <h3 style="margin:34px 0 14px">6) รายงาน JOIN หลายตาราง (Join.txt — เชื่อม 8 ตาราง)</h3>
+    <div class="card">
+      <p style="font-size:15px">รายงานการทำงานหลัก — เชื่อมทั้ง Master Tables และ Transaction Tables:</p>
+      <p class="mono" style="font-size:13.5px;margin-top:10px;background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:12px 14px">
+      DOCUMENT ➜ DOCUMENT_DETAIL ➜ ADMIN(ผู้สร้าง) ➜ DEPARTMENT ➜ DEPARTMENT_HEAD(ผู้อนุมัติ) ➜ DEPARTMENT ➜ RECEIPT_RECORD(LEFT) ➜ EMPLOYEE(LEFT) ➜ DEPARTMENT(LEFT) ➜ LOG(LEFT)</p>
+      <p style="font-size:14.5px;margin-top:10px;color:var(--muted)">ใช้ <b>LEFT JOIN</b> กับฝั่งรับทราบ/Log เพื่อรองรับเอกสารที่ยังไม่มีใครกดรับ — ถ้าใช้ INNER JOIN แถวพวกนั้นจะหล่นหาย</p>
+    </div>
+
+    <!-- SEED -->
+    <h3 style="margin:34px 0 14px">7) ข้อมูลจำลอง (Seed Data — ไฟล์ Insert.txt)</h3>
+    <div class="stats">
+      <div class="stat"><div class="num">8</div><div class="lbl">DEPARTMENT</div></div>
+      <div class="stat"><div class="num">8</div><div class="lbl">DEPARTMENT_HEAD</div></div>
+      <div class="stat"><div class="num">10</div><div class="lbl">ADMIN</div></div>
+      <div class="stat"><div class="num">20</div><div class="lbl">EMPLOYEE</div></div>
+      <div class="stat"><div class="num">15</div><div class="lbl">DOCUMENT</div></div>
+      <div class="stat"><div class="num">21</div><div class="lbl">DOCUMENT_DETAIL</div></div>
+      <div class="stat"><div class="num">21</div><div class="lbl">RECEIPT_RECORD</div></div>
+      <div class="stat"><div class="num">32</div><div class="lbl">LOG</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SE ================= -->
+<section id="se">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="kicker se">Part II — Software Engineering (อ.วรางคณา / อ.ผึ้ง)</span>
+      <h2>ระบบขนส่งสาธารณะอัจฉริยะ (Smart Transit)</h2>
+      <p class="sub">แผนภาพ ER เขียนด้วยสัญลักษณ์ Chen Notation — วางไว้บนสุดเพื่อใช้เป็นฐานอ้างอิงเวลากลับมาดูโครงสร้างตารางด้านล่าง</p>
+    </div>
+
+    <!-- ER DIAGRAM (บนสุดของงาน) -->
+    <figure class="er-frame">
+      <a class="er-zoom" href="assets/er-se.png" target="_blank"><img src="assets/er-se.png" alt="ER Diagram — ระบบขนส่งสาธารณะอัจฉริยะ (SE)"></a>
+      <figcaption>ER Diagram งาน SE — Smart Transit / Smart Bus System (10 เอนทิตี)</figcaption>
+      <div class="legend">
+        <div class="item"><span class="sym s-entity"></span> Strong Entity</div>
+        <div class="item"><span class="sym s-weak"></span> Weak Entity (รายการจุดจอด)</div>
+        <div class="item"><span class="sym s-rel"></span> Relationship</div>
+        <div class="item"><span class="sym s-key"></span> Key Attribute (PK)</div>
+        <div class="item"><span class="sym s-multi"></span> Multivalued Attribute (เบอร์โทร)</div>
+        <div class="item"><span class="sym s-derived"></span> Derived Attribute (จำนวนคนบนรถ)</div>
+      </div>
+    </figure>
+
+    <!-- ER -> TABLE MAPPING -->
+    <h3 style="margin:34px 0 14px">1) การแปลง ER Diagram → ตารางจริง (Relational Schema)</h3>
+    <table class="map">
+      <tr><th>เอนทิตีใน ER</th><th>ประเภท</th><th>ตารางใน Oracle</th><th>หมายเหตุการแปลง</th></tr>
+      <tr><td>user Type</td><td>Strong</td><td class="mono">USER_TYPES</td><td>ตาราง lookup ประเภทผู้ใช้</td></tr>
+      <tr><td>user</td><td>Strong</td><td class="mono">USERS</td><td>เบอร์โทร (Multivalued) → เก็บเบอร์หลักเบอร์เดียว</td></tr>
+      <tr><td>กริ่งดิจิตอล</td><td>Strong</td><td class="mono">DIGITAL_BELLS</td><td>ตาราง Transaction หลักของระบบ</td></tr>
+      <tr><td>จุดจอดรถ</td><td>Strong</td><td class="mono">BUS_STOPS</td><td>พิกัดเก็บเป็น latitude / longitude แยกคอลัมน์</td></tr>
+      <tr><td>รายการจุดจอด</td><td><span class="badge b-weak">WEAK</span></td><td class="mono">ROUTE_STOPS</td><td>แตก M:N ระหว่างเส้นทางกับจุดจอด + เก็บลำดับ (Seq)</td></tr>
+      <tr><td>เส้นทางเดินรถ</td><td>Strong</td><td class="mono">ROUTES</td><td>—</td></tr>
+      <tr><td>ยานพาหนะ</td><td>Strong</td><td class="mono">VEHICLES</td><td>"จำนวนคนบนรถ" เป็น Derived → เก็บเป็นค่า cache (passenger_count)</td></tr>
+      <tr><td>ปุ่มกดแจ้งเตือน</td><td>Strong</td><td class="mono">EMERGENCY_BUTTONS</td><td>ปุ่ม physical บนตัวรถ</td></tr>
+      <tr><td>บันทึกสถิติการแจ้งเตือน</td><td>Strong</td><td class="mono">ALERT_LOGS</td><td>ประวัติเหตุการณ์ฉุกเฉิน</td></tr>
+      <tr><td>กล่อง IOT</td><td>Strong</td><td class="mono">IOT_BOXES</td><td>ER ระบุ M:N กับรถ → ใช้งานจริง 1:1 (iot_id UNIQUE)</td></tr>
+    </table>
+
+    <!-- TABLE STRUCTURES -->
+    <h3 style="margin:34px 0 14px">2) โครงสร้างตารางแบบละเอียด (จากไฟล์ DDL.txt)</h3>
+
+    <div class="ent">
+      <h3><span class="mono">USER_TYPES</span> <span class="thainame">— ประเภทผู้ใช้งาน</span></h3>
+      <table>
+        <tr><th>คอลัมน์</th><th>ชนิดข้อมูล</th><th>Constraints</th><th>คำอธิบาย</th></tr>
+        <tr><td class="mono">user_type_id</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-pk">PK</span></td><td>รหัสประเภท เช่น UT-001 (ผู้ดูแลระบบ), UT-002 (พนักงานขับรถ), UT-003 (ผู้รับบริการ)</td></tr>
+        <tr><td class="mono">type_name</td><td class="mono">VARCHAR2(100)</td><td><span class="badge b-nn">NOT NULL</span></td><td>ชื่อประเภทผู้ใช้</td></tr>
+        <tr><td class="mono">description</td><td class="mono">VARCHAR2(255)</td><td>—</td><td>คำอธิบายเพิ่มเติม</td></tr>
+      </table>
+    </div>
+
+    <div class="ent">
+      <h3><span class="mono">USERS</span> <span class="thainame">— ผู้ใช้งานระบบ</span></h3>
+      <table>
+        <tr><th>คอลัมน์</th><th>ชนิดข้อมูล</th><th>Constraints</th><th>คำอธิบาย</th></tr>
+        <tr><td class="mono">user_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-pk">PK</span></td><td>รหัสผู้ใช้ เช่น U-1001</td></tr>
+        <tr><td class="mono">first_name</td><td class="mono">VARCHAR2(100)</td><td><span class="badge b-nn">NOT NULL</span></td><td>ชื่อ (ER: Composite Attribute "ชื่อ" แตกเป็น FName)</td></tr>
+        <tr><td class="mono">last_name</td><td class="mono">VARCHAR2(100)</td><td><span class="badge b-nn">NOT NULL</span></td><td>นามสกุล (LName)</td></tr>
+        <tr><td class="mono">phone_number</td><td class="mono">VARCHAR2(20)</td><td>—</td><td>เบอร์โทร (ER: Multivalued วงรีสองชั้น → เก็บเบอร์หลักเบอร์เดียว)</td></tr>
+        <tr><td class="mono">email</td><td class="mono">VARCHAR2(100)</td><td>—</td><td>อีเมลผู้ใช้</td></tr>
+        <tr><td class="mono">user_type_id</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-fk">FK</span> → USER_TYPES</td><td>ประเภทผู้ใช้ (ใช้เป็น Business Rule: กดกริ่งได้เฉพาะ UT-003)</td></tr>
+        <tr><td class="mono">status</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-def">DEFAULT 'Active'</span></td><td>สถานะบัญชี</td></tr>
+      </table>
+    </div>
+
+    <div class="ent">
+      <h3><span class="mono">ROUTES</span> <span class="thainame">— เส้นทางเดินรถ</span></h3>
+      <table>
+        <tr><th>คอลัมน์</th><th>ชนิดข้อมูล</th><th>Constraints</th><th>คำอธิบาย</th></tr>
+        <tr><td class="mono">route_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-pk">PK</span></td><td>รหัสสาย เช่น RT-01</td></tr>
+        <tr><td class="mono">route_name</td><td class="mono">VARCHAR2(100)</td><td><span class="badge b-nn">NOT NULL</span></td><td>ชื่อสาย เช่น สาย 1: รอบมหาวิทยาลัย</td></tr>
+        <tr><td class="mono">description</td><td class="mono">VARCHAR2(255)</td><td>—</td><td>รายละเอียดเส้นทาง</td></tr>
+        <tr><td class="mono">start_time</td><td class="mono">VARCHAR2(8)</td><td>—</td><td>เวลาเริ่มให้บริการ</td></tr>
+        <tr><td class="mono">end_time</td><td class="mono">VARCHAR2(8)</td><td>—</td><td>เวลาสิ้นสุดให้บริการ</td></tr>
+        <tr><td class="mono">status</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-def">DEFAULT 'Active'</span></td><td>สถานะสายเดินรถ</td></tr>
+      </table>
+    </div>
+
+    <div class="ent">
+      <h3><span class="mono">BUS_STOPS</span> <span class="thainame">— จุดจอดรถ</span></h3>
+      <table>
+        <tr><th>คอลัมน์</th><th>ชนิดข้อมูล</th><th>Constraints</th><th>คำอธิบาย</th></tr>
+        <tr><td class="mono">stop_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-pk">PK</span></td><td>รหัสจุดจอด เช่น BS-01</td></tr>
+        <tr><td class="mono">stop_name</td><td class="mono">VARCHAR2(100)</td><td><span class="badge b-nn">NOT NULL</span></td><td>ชื่อป้าย เช่น หน้าประตูใหญ่ (Main Gate)</td></tr>
+        <tr><td class="mono">latitude</td><td class="mono">NUMBER(10,6)</td><td>—</td><td>พิกัดละติจูด (ER: พิกัด)</td></tr>
+        <tr><td class="mono">longitude</td><td class="mono">NUMBER(10,6)</td><td>—</td><td>พิกัดลองจิจูด</td></tr>
+        <tr><td class="mono">description</td><td class="mono">VARCHAR2(255)</td><td>—</td><td>รายละเอียดเพิ่มเติม</td></tr>
+      </table>
+    </div>
+
+    <div class="ent">
+      <h3><span class="mono">ROUTE_STOPS</span> <span class="thainame">— รายการจุดจอดในเส้นทาง</span> <span class="badge b-weak">WEAK ENTITY</span></h3>
+      <table>
+        <tr><th>คอลัมน์</th><th>ชนิดข้อมูล</th><th>Constraints</th><th>คำอธิบาย</th></tr>
+        <tr><td class="mono">route_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-pk">PK</span> (ร่วม) <span class="badge b-fk">FK</span> → ROUTES</td><td>เส้นทางที่ป้ายนี้อยู่ (PK เจ้าของ)</td></tr>
+        <tr><td class="mono">seq</td><td class="mono">NUMBER</td><td><span class="badge b-pk">PK</span> (ร่วม — Partial Key)</td><td>ลำดับที่จอดในสายนั้น (ER: แอตทริบิวต์ Seq ขีดเส้นใต้)</td></tr>
+        <tr><td class="mono">stop_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-fk">FK</span> → BUS_STOPS</td><td>จุดจอดที่ปรากฏในเส้นทาง</td></tr>
+        <tr><td class="mono">est_time_offset_min</td><td class="mono">NUMBER</td><td>—</td><td>เวลาโดยประมาณจากจุดเริ่มสาย (นาที)</td></tr>
+        <tr><td class="mono">note</td><td class="mono">VARCHAR2(255)</td><td>—</td><td>หมายเหตุ</td></tr>
+      </table>
+      <div class="note"><b>จุดซักถาม:</b> เส้นทาง 1 สายมีหลายป้าย และป้าย 1 ที่มีรถหลายสายผ่าน (M:N) → แตกด้วย Weak Entity PK = (route_id, seq) ตามหลัก "PK เจ้าของ + Partial Key"</div>
+    </div>
+
+    <div class="ent">
+      <h3><span class="mono">IOT_BOXES</span> <span class="thainame">— กล่อง IoT</span></h3>
+      <table>
+        <tr><th>คอลัมน์</th><th>ชนิดข้อมูล</th><th>Constraints</th><th>คำอธิบาย</th></tr>
+        <tr><td class="mono">iot_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-pk">PK</span></td><td>รหัสกล่อง เช่น IOT-001</td></tr>
+        <tr><td class="mono">latitude</td><td class="mono">NUMBER(10,6)</td><td>—</td><td>พิกัดล่าสุดจาก GPS (อัปเดตผ่าน Procedure)</td></tr>
+        <tr><td class="mono">longitude</td><td class="mono">NUMBER(10,6)</td><td>—</td><td>พิกัดลองจิจูดล่าสุด</td></tr>
+        <tr><td class="mono">firmware_version</td><td class="mono">VARCHAR2(50)</td><td>—</td><td>เวอร์ชันเฟิร์มแวร์ของกล่อง</td></tr>
+        <tr><td class="mono">network_type</td><td class="mono">VARCHAR2(50)</td><td>—</td><td>ชนิดเครือข่ายที่ใช้เชื่อมต่อ</td></tr>
+        <tr><td class="mono">status</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-def">DEFAULT 'Active'</span></td><td>สถานะอุปกรณ์</td></tr>
+      </table>
+    </div>
+
+    <div class="ent">
+      <h3><span class="mono">VEHICLES</span> <span class="thainame">— ยานพาหนะ</span></h3>
+      <table>
+        <tr><th>คอลัมน์</th><th>ชนิดข้อมูล</th><th>Constraints</th><th>คำอธิบาย</th></tr>
+        <tr><td class="mono">vehicle_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-pk">PK</span></td><td>รหัสรถ เช่น VEH-01</td></tr>
+        <tr><td class="mono">license_plate</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-nn">NOT NULL</span></td><td>เลขทะเบียน เช่น กข-1001</td></tr>
+        <tr><td class="mono">vehicle_model</td><td class="mono">VARCHAR2(100)</td><td>—</td><td>รุ่น/แบบรถ</td></tr>
+        <tr><td class="mono">capacity</td><td class="mono">NUMBER</td><td>—</td><td>ความจุผู้โดยสารสูงสุด</td></tr>
+        <tr><td class="mono">passenger_count</td><td class="mono">NUMBER</td><td><span class="badge b-def">DEFAULT 0</span></td><td><b>จำนวนคนบนรถ</b> — ER เป็น Derived Attribute (วงรีเส้นประ) → เก็บเป็นค่า cache อัปเดตผ่าน Procedure เท่านั้น</td></tr>
+        <tr><td class="mono">route_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-fk">FK</span> → ROUTES</td><td>สายที่รถวิ่งประจำ</td></tr>
+        <tr><td class="mono">iot_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-u">UNIQUE</span> <span class="badge b-fk">FK</span> → IOT_BOXES</td><td>กล่อง IoT ประจำคัน (ER ระบุ M:N → ใช้งานจริง 1 คันต่อ 1 กล่อง)</td></tr>
+        <tr><td class="mono">driver_user_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-fk">FK</span> → USERS</td><td>พนักงานขับรถผู้ประจำคัน</td></tr>
+        <tr><td class="mono">status</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-def">DEFAULT 'Active'</span></td><td>สถานะพร้อมให้บริการ</td></tr>
+      </table>
+      <div class="note"><b>จุดซักถาม:</b> ทำไม Derived Attribute ถึงเก็บคอลัมน์? — เก็บเป็น <b>ค่า cache</b> ที่อัปเดตผ่าน <span class="mono">sp_update_passenger_count</span> เท่านั้น (เทียบเท่าการ denormalize เพื่อความเร็วในการ query สถานะรถ)</div>
+    </div>
+
+    <div class="ent">
+      <h3><span class="mono">EMERGENCY_BUTTONS</span> <span class="thainame">— ปุ่มกดแจ้งเตือนฉุกเฉิน</span></h3>
+      <table>
+        <tr><th>คอลัมน์</th><th>ชนิดข้อมูล</th><th>Constraints</th><th>คำอธิบาย</th></tr>
+        <tr><td class="mono">button_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-pk">PK</span></td><td>รหัสปุ่ม เช่น BTN-01</td></tr>
+        <tr><td class="mono">vehicle_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-fk">FK</span> → VEHICLES</td><td>รถที่ปุ่มติดตั้งอยู่ (1 คันมีได้หลายปุ่ม)</td></tr>
+        <tr><td class="mono">button_location</td><td class="mono">VARCHAR2(100)</td><td>—</td><td>ตำแหน่งติดตั้งบนรถ</td></tr>
+        <tr><td class="mono">status</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-def">DEFAULT 'Active'</span></td><td>สถานะปุ่ม (Active / ชำรุด)</td></tr>
+      </table>
+    </div>
+
+    <div class="ent">
+      <h3><span class="mono">DIGITAL_BELLS</span> <span class="thainame">— กริ่งดิจิตอล (ตาราง Transaction หลัก)</span></h3>
+      <table>
+        <tr><th>คอลัมน์</th><th>ชนิดข้อมูล</th><th>Constraints</th><th>คำอธิบาย</th></tr>
+        <tr><td class="mono">bell_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-pk">PK</span></td><td>รหัสการกดกริ่ง เช่น BELL-001 (สร้างอัตโนมัติโดย Procedure)</td></tr>
+        <tr><td class="mono">date_time</td><td class="mono">TIMESTAMP</td><td>—</td><td>วัน-เวลาที่กดกริ่ง (ER: Date Time)</td></tr>
+        <tr><td class="mono">bell_status</td><td class="mono">VARCHAR2(50)</td><td>—</td><td>สถานะกริ่ง: รอดำเนินการ / รับทราบแล้ว / สำเร็จ / ยกเลิก</td></tr>
+        <tr><td class="mono">user_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-fk">FK</span> → USERS</td><td>ผู้ใช้ที่กดกริ่ง (ความสัมพันธ์ "กดส่งสัญญาณ" 1:M)</td></tr>
+        <tr><td class="mono">vehicle_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-fk">FK</span> → VEHICLES</td><td>รถคันที่ขอลง (ความสัมพันธ์ "ส่งสัญญาณ" M:1)</td></tr>
+        <tr><td class="mono">note</td><td class="mono">VARCHAR2(255)</td><td>—</td><td>หมายเหตุ</td></tr>
+      </table>
+      <div class="note"><b>จุดซักถาม:</b> ใน ER กริ่งดิจิตอลทำหน้าที่เสมือน Transaction/Log table เชื่อมระหว่างผู้ใช้กับยานพาหนะ — เป็นตารางที่เกิด INSERT บ่อยที่สุดในระบบ</div>
+    </div>
+
+    <div class="ent">
+      <h3><span class="mono">ALERT_LOGS</span> <span class="thainame">— บันทึกสถิติการแจ้งเตือนฉุกเฉิน</span></h3>
+      <table>
+        <tr><th>คอลัมน์</th><th>ชนิดข้อมูล</th><th>Constraints</th><th>คำอธิบาย</th></tr>
+        <tr><td class="mono">log_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-pk">PK</span></td><td>รหัสบันทึก เช่น ALT-1001</td></tr>
+        <tr><td class="mono">vehicle_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-fk">FK</span> → VEHICLES</td><td>รถที่เกิดเหตุการณ์</td></tr>
+        <tr><td class="mono">button_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-fk">FK</span> → EMERGENCY_BUTTONS</td><td>ปุ่มที่ถูกกด</td></tr>
+        <tr><td class="mono">timestamp</td><td class="mono">TIMESTAMP</td><td>—</td><td>วัน-เวลาที่เกิดเหตุ</td></tr>
+        <tr><td class="mono">status</td><td class="mono">VARCHAR2(20)</td><td>—</td><td>สถานะการจัดการเหตุการณ์ เช่น Completed</td></tr>
+        <tr><td class="mono">note</td><td class="mono">VARCHAR2(255)</td><td>—</td><td>หมายเหตุ</td></tr>
+      </table>
+    </div>
+
+    <!-- RELATIONSHIPS -->
+    <h3 style="margin:34px 0 14px">3) ความสัมพันธ์ทั้งหมด 8 จุด (จาก ER Diagram)</h3>
+    <div class="rel">
+      <div class="item"><b>user Type → user</b> — <span class="card-part one">1</span>:<span class="card-part many">M</span> ประเภทผู้ใช้หนึ่งแบบมีผู้ใช้หลายคน (Admin / คนขับ / ผู้รับบริการ)</div>
+      <div class="item"><b>user → กริ่งดิจิตอล</b> (กดส่งสัญญาณ) — <span class="card-part one">1</span>:<span class="card-part many">M</span> ผู้ใช้ 1 คนกดกริ่งได้หลายครั้ง</div>
+      <div class="item"><b>กริ่งดิจิตอล → ยานพาหนะ</b> (ส่งสัญญาณ) — <span class="card-part many">M</span>:<span class="card-part one">1</span> สัญญาณหลายรายการส่งไปยังรถคันเดียว</div>
+      <div class="item"><b>เส้นทางเดินรถ ↔ รายการจุดจอด ↔ จุดจอดรถ</b> — <span class="card-part one">1</span>:<span class="card-part many">M</span> ทั้งสองฝั่ง (แตก M:N) เก็บลำดับที่ <span class="mono">Seq</span></div>
+      <div class="item"><b>เส้นทางเดินรถ → ยานพาหนะ</b> — <span class="card-part one">1</span>:<span class="card-part many">M</span> สายหนึ่งมีรถวิ่งหลายคัน</div>
+      <div class="item"><b>ยานพาหนะ → ปุ่มกดแจ้งเตือน</b> — <span class="card-part one">1</span>:<span class="card-part many">M</span> รถ 1 คันติดปุ่มได้หลายปุ่ม</div>
+      <div class="item"><b>ยานพาหนะ → บันทึกสถิติการแจ้งเตือน</b> — <span class="card-part one">1</span>:<span class="card-part many">M</span> รถ 1 คันมีประวัติเหตุฉุกเฉินได้หลายรายการ</div>
+      <div class="item"><b>ยานพาหนะ ↔ กล่อง IOT</b> — ER ระบุ <span class="card-part many">M</span>:<span class="card-part many">N</span> → ใช้งานจริงทำเป็น 1:1 ด้วย <span class="mono">iot_id UNIQUE</span></div>
+    </div>
+
+    <!-- WORKFLOW -->
+    <h3 style="margin:34px 0 14px">4) วงจรการทำงานของระบบ (Transaction Flow)</h3>
+    <div class="flow">
+      <div class="step"><span class="n">1</span><br><b>ผู้โดยสารกดกริ่ง</b><br><span class="mono">sp_press_digital_bell</span> → INSERT <span class="mono">DIGITAL_BELLS</span> สถานะ "รอดำเนินการ"</div>
+      <div class="arrow">➜</div>
+      <div class="step"><span class="n">2</span><br><b>คนขับยืนยัน</b><br><span class="mono">sp_confirm_digital_bell</span> → สถานะ "รับทราบแล้ว"</div>
+      <div class="arrow">➜</div>
+      <div class="step"><span class="n">3</span><br><b>ขึ้น/ลงรถ</b><br><span class="mono">sp_update_passenger_count</span> → ปรับจำนวนคนบนรถ (+/−)</div>
+      <div class="arrow">➜</div>
+      <div class="step"><span class="n">4</span><br><b>เหตุฉุกเฉิน / IoT</b><br><span class="mono">sp_report_emergency_alert</span> บันทึกเหตุ · <span class="mono">sp_update_iot_location</span> อัปเดตพิกัด</div>
+    </div>
+
+    <!-- PLSQL -->
+    <h3 style="margin:34px 0 14px">5) Stored Procedures (PL/SQL — Transaction Processing) 5 ตัว</h3>
+    <div class="proc">
+      <h4><code>sp_press_digital_bell</code> — ผู้โดยสารกดกริ่งขอลงรถ <span class="tag tag-out">OUT: o_bell_id, o_status</span></h4>
+      <ul>
+        <li><b>ตรวจ 3 เงื่อนไข:</b> บัญชี Active → ประเภทต้องเป็น UT-003 (ผู้รับบริการ) → รถต้อง Active</li>
+        <li><b>สร้างรหัสอัตโนมัติ</b> BELL-XXX จาก <span class="mono">MAX + SUBSTR + REGEXP_LIKE</span> แล้ว INSERT สถานะ "รอดำเนินการ"</li>
+        <li><b>Business Rule:</b> คนขับ/แอดมินกดกริ่งไม่ได้ → คืนข้อความ ERROR (ไม่มี INSERT เกิดขึ้น)</li>
+        <li>สำเร็จ <span class="mono">COMMIT</span> / ล้มเหลว <span class="mono">ROLLBACK</span> ทั้ง transaction</li>
+      </ul>
+    </div>
+    <div class="proc">
+      <h4><code>sp_confirm_digital_bell</code> — ยืนยันรับสัญญาณกริ่ง <span class="tag tag-out">OUT: o_status</span></h4>
+      <ul>
+        <li>UPDATE เฉพาะแถวที่สถานะ = "รอดำเนินการ" → เปลี่ยนเป็น "รับทราบแล้ว"</li>
+        <li>ใช้ <b><span class="mono">SQL%ROWCOUNT = 0</span></b> จับกรณีไม่พบรหัส หรือยืนยันซ้ำ (ยืนยันได้ครั้งเดียว)</li>
+      </ul>
+    </div>
+    <div class="proc">
+      <h4><code>sp_report_emergency_alert</code> — บันทึกเหตุฉุกเฉินจากปุ่ม <span class="tag tag-out">OUT: o_log_id, o_status</span></h4>
+      <ul>
+        <li>ตรวจว่าปุ่มมีอยู่จริงและสถานะ Active</li>
+        <li><b>รหัสรถดึงจากปุ่มโดยตรง</b> (ไม่รับ vehicle_id จากผู้เรียก) → บันทึกผิดคันไม่ได้</li>
+        <li>สร้างรหัส ALT-XXXX อัตโนมัติ แล้ว INSERT ลง <span class="mono">ALERT_LOGS</span></li>
+      </ul>
+    </div>
+    <div class="proc">
+      <h4><code>sp_update_passenger_count</code> — อัปเดตจำนวนคนบนรถ <span class="tag tag-tx">FOR UPDATE</span> <span class="tag tag-out">OUT: o_status</span></h4>
+      <ul>
+        <li><span class="mono">SELECT ... FOR UPDATE</span> ล็อกแถวรถ กัน 2 session แก้พร้อมกัน</li>
+        <li><b>Business Rule:</b> จำนวนคนบนรถห้ามติดลบ — ถ้าผลลัพธ์ติดลบ → ROLLBACK แล้วคืน ERROR</li>
+        <li>รับ <span class="mono">p_delta</span> เป็น +2 (ขึ้นรถ) หรือ −1 (ลงรถ) ได้ทั้งคู่</li>
+      </ul>
+    </div>
+    <div class="proc">
+      <h4><code>sp_update_iot_location</code> — รับพิกัดจากกล่อง IoT <span class="tag tag-out">OUT: o_status</span></h4>
+      <ul>
+        <li>UPDATE พิกัดล่าสุดของกล่อง IoT (จำลองข้อมูล GPS ส่งเข้ามาตลอดเวลา)</li>
+        <li>ใช้ <span class="mono">SQL%ROWCOUNT = 0</span> จับกรณีรหัสกล่องไม่มีในระบบ</li>
+      </ul>
+    </div>
+    <div class="proc">
+      <h4><code>TestPLSQL2.txt</code> — ไฟล์สาธิตหน้างาน (BEFORE → EVENT × 7 → AFTER)</h4>
+      <ul>
+        <li>จำลอง 1 รอบการทำงานจริง: กดกริ่ง → ยืนยัน → ขึ้นรถ +2 → ลงรถ −1 → ปุ่มฉุกเฉิน</li>
+        <li><b>ทดสอบ Business Rule สด:</b> คนขับ U-1002 พยายามกดกริ่ง (ต้อง ERROR) และลงรถ −10 จนติดลบ (ต้อง ERROR)</li>
+        <li>AFTER: เทียบผล — ได้ BELL-011 (รับทราบแล้ว), passenger_count = 1, ALT-1006 เกิดขึ้นจริง</li>
+      </ul>
+    </div>
+
+    <!-- REPORTS -->
+    <h3 style="margin:34px 0 14px">6) รายงาน JOIN หลายตาราง (Join.txt — 5 ฉบับ)</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4 style="color:var(--se);font-size:15.5px">รายงาน 1 — ประวัติการกดกริ่ง (JOIN 5 ตาราง)</h4>
+        <p style="font-size:14px;color:var(--muted)">DIGITAL_BELLS ➜ USERS ➜ USER_TYPES ➜ VEHICLES ➜ ROUTES — ใครกดกริ่ง ขอลงรถคันไหน สายอะไร เมื่อไร สถานะอะไร</p>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--se);font-size:15.5px">รายงาน 2 — เหตุการณ์ฉุกเฉิน (JOIN 6 ตาราง)</h4>
+        <p style="font-size:14px;color:var(--muted)">ALERT_LOGS ➜ EMERGENCY_BUTTONS ➜ VEHICLES ➜ ROUTES ➜ USERS(คนขับ) ➜ IoT_BOXES — ใช้ LEFT JOIN รองรับข้อมูลไม่ครบ</p>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--se);font-size:15.5px">รายงาน 3 — สรุปแต่ละสาย (JOIN 4 + GROUP BY)</h4>
+        <p style="font-size:14px;color:var(--muted)">ROUTES ➜ VEHICLES ➜ ROUTE_STOPS ➜ BUS_STOPS — นับจำนวนรถ/จุดจอด + analytic <span class="mono">KEEP DENSE_RANK</span> หาป้ายแรก-ป้ายสุดท้าย</p>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--se);font-size:15.5px">รายงาน 4 — สถิติเหตุการณ์ต่อสาย (WITH clause)</h4>
+        <p style="font-size:14px;color:var(--muted)">รวมสถิติกริ่งและฉุกเฉินแยกกันก่อน (1 แถวต่อ 1 สาย) แล้วจึง JOIN — ไม่เกิด fan-out และเลี่ยง CREATE VIEW ที่ user ไม่มีสิทธิ์</p>
+      </div>
+      <div class="card" style="grid-column:1/-1">
+        <h4 style="color:var(--se);font-size:15.5px">รายงาน 5 — กดกริ่ง + จุดจอดทั้งสาย (JOIN มากที่สุด 7 ตาราง)</h4>
+        <p style="font-size:14px;color:var(--muted)">DIGITAL_BELLS ➜ USERS ➜ USER_TYPES ➜ VEHICLES ➜ ROUTES ➜ ROUTE_STOPS ➜ BUS_STOPS — แสดงว่ากริ่งแต่ละครั้งเกิดบนคันที่วิ่งสายอะไร ต้องแวะจอดป้ายไหนบ้าง</p>
+      </div>
+    </div>
+
+    <!-- SEED -->
+    <h3 style="margin:34px 0 14px">7) ข้อมูลจำลอง (Seed Data — ไฟล์ DML.txt)</h3>
+    <div class="stats">
+      <div class="stat"><div class="num">3</div><div class="lbl">USER_TYPES</div></div>
+      <div class="stat"><div class="num">10</div><div class="lbl">USERS</div></div>
+      <div class="stat"><div class="num">3</div><div class="lbl">ROUTES</div></div>
+      <div class="stat"><div class="num">10</div><div class="lbl">BUS_STOPS</div></div>
+      <div class="stat"><div class="num">13</div><div class="lbl">ROUTE_STOPS</div></div>
+      <div class="stat"><div class="num">6</div><div class="lbl">IOT_BOXES</div></div>
+      <div class="stat"><div class="num">6</div><div class="lbl">VEHICLES</div></div>
+      <div class="stat"><div class="num">8</div><div class="lbl">EMERGENCY_BUTTONS</div></div>
+      <div class="stat"><div class="num">10</div><div class="lbl">DIGITAL_BELLS</div></div>
+      <div class="stat"><div class="num">5</div><div class="lbl">ALERT_LOGS</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= EXAM ================= -->
+<section id="exam">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="kicker gen">Exam Day</span>
+      <h2>ลำดับรันไฟล์วันสอบ + Script ตรวจสอบ</h2>
+      <p class="sub">หลักการวันสอบ: <b>DROP ทุกตารางแล้วสร้างใหม่ Face-to-face</b> ทุกสมาชิกต้องอธิบายได้ทุกขั้นตอน (คะแนนต่ำสุดของกลุ่ม = คะแนนนำเสนอ)</p>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h3 style="color:var(--ba);font-size:17px;margin-bottom:12px">ลำดับรันงาน BA</h3>
+        <table class="run">
+          <tr><th>#</th><th>ไฟล์</th><th>ทำอะไร</th></tr>
+          <tr><td>1</td><td class="mono">DropTabke.txt</td><td>ลบ 8 ตารางเดิม</td></tr>
+          <tr><td>2</td><td class="mono">CreateTable.txt</td><td>สร้าง 8 ตาราง + FK</td></tr>
+          <tr><td>3</td><td class="mono">Insert.txt</td><td>ข้อมูลจำลอง 135 แถว</td></tr>
+          <tr><td>4</td><td class="mono">plsql.txt</td><td>สร้าง SP_LOG_NOTIFICATION_SENT</td></tr>
+          <tr><td>5</td><td class="mono">TestPLSQL.txt</td><td>สาธิตเหตุการณ์อนุมัติ + Log</td></tr>
+          <tr><td>6</td><td class="mono">Join.txt</td><td>รายงาน JOIN 8 ตาราง</td></tr>
+          <tr><td>7</td><td class="mono">Verify.txt</td><td>Script ตรวจสอบของอาจารย์</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--se);font-size:17px;margin-bottom:12px">ลำดับรันงาน SE</h3>
+        <table class="run">
+          <tr><th>#</th><th>ไฟล์</th><th>ทำอะไร</th></tr>
+          <tr><td>0</td><td class="mono">DropOldObjects.txt</td><td>ตรวจ object เก่าตกค้าง (ถ้ามี)</td></tr>
+          <tr><td>1</td><td class="mono">DropTable.txt</td><td>ลบ 10 ตารางเดิม</td></tr>
+          <tr><td>2</td><td class="mono">DDL.txt</td><td>สร้าง 10 ตาราง + FK</td></tr>
+          <tr><td>3</td><td class="mono">DML.txt</td><td>ข้อมูลจำลอง 74 แถว</td></tr>
+          <tr><td>4</td><td class="mono">PLSQL1.txt + PLSQL2.txt</td><td>สร้าง 5 Procedures</td></tr>
+          <tr><td>5</td><td class="mono">TestPLSQL2.txt</td><td>สาธิตวงจรกดกริ่งครบ + Rule</td></tr>
+          <tr><td>6</td><td class="mono">Join.txt</td><td>รายงาน JOIN 5 ฉบับ</td></tr>
+          <tr><td>7</td><td class="mono">Verify.txt</td><td>Script ตรวจสอบของอาจารย์</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px">
+      <h3 style="font-size:17px;margin-bottom:10px">Script ตรวจสอบผลการทำงาน (ของอาจารย์)</h3>
+      <p style="font-size:14.5px">แสดงตารางที่ DB User เป็นเจ้าของ พร้อม Constraint ทั้งหมด — จะเห็นทั้ง 18 ตาราง (2 โปรเจกต์ร่วม user) ตามปกติ ท้ายไฟล์ Verify.txt มี query เสริมกรองเฉพาะตารางของแต่ละงาน</p>
+      <div class="ctypes" style="margin-top:14px">
+        <span style="background:var(--gold-bg);color:var(--gold)">P = Primary Key</span>
+        <span style="background:var(--blue-bg);color:var(--blue)">R = Foreign Key</span>
+        <span style="background:var(--purple-bg);color:var(--purple)">U = Unique</span>
+        <span style="background:var(--gray-bg);color:var(--gray)">C = Check / NOT NULL</span>
+        <span style="background:var(--red-bg);color:var(--red)">SYS_Cxxxx = NOT NULL ที่ Oracle ตั้งชื่ออัตโนมัติ</span>
+      </div>
+      <div class="note" style="margin-top:14px"><b>ข้อควรรู้:</b> Script ต้นฉบับของอาจารย์ใช้ <span class="mono">USER_TABLES.OWNER</span> ซึ่งไม่มีอยู่จริงใน Data Dictionary (ORA-00904) — ไฟล์ Verify.txt แก้เป็น <span class="mono">USER AS OWNER</span> แล้ว พร้อมอธิบายเหตุผลหน้างานได้</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <b>Database Systems Project</b> — เอกสารประกอบการสอบ Face-to-face · Deploy บน Oracle (KMITL Database Server)<br>
+    ทุกโครงสร้างอ้างอิงจากไฟล์ DDL/DML/PLSQL จริงของโปรเจกต์ · อัปเดตล่าสุด: พฤศจิกายน 2026
+  </div>
+</footer>
+
+</body>
+</html>
