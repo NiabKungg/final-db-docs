@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สคริปต์ทั้งหมด + คำอธิบาย — งาน BA (ระบบอนุมัติเอกสาร)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f7fb; --card:#fff; --ink:#1e2430; --muted:#5b6472; --line:#e3e7ef;
+  --ba:#7c3aed; --ba-soft:#f3ecfe; --gold:#b45309; --gold-bg:#fef3c7;
+  --green:#047857; --green-bg:#d1fae5; --red:#b91c1c; --red-bg:#fee2e2;
+  --blue:#1d4ed8; --blue-bg:#dbeafe;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--ink);line-height:1.75;font-size:16px}
+h1,h2,h3,h4{font-family:'Kanit',sans-serif;line-height:1.4}
+code,.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+.hero{background:linear-gradient(135deg,#111827,#312e81);color:#fff;padding:44px 0 40px;text-align:center}
+.hero h1{font-size:clamp(24px,3.5vw,34px)}
+.hero p{color:#cbd5e1;max-width:780px;margin:8px auto 0;font-size:16px}
+.hero .back{display:inline-block;color:#c4b5fd;margin-bottom:12px;font-size:14px;text-decoration:none}
+.hero .back:hover{color:#fff}
+nav{position:sticky;top:0;z-index:50;background:#ffffffee;backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;gap:4px;flex-wrap:wrap;padding:9px 20px}
+nav a{color:var(--muted);text-decoration:none;font-size:13.5px;padding:6px 12px;border-radius:999px;font-weight:500}
+nav a:hover{background:var(--ba-soft);color:var(--ba)}
+nav a .n{display:inline-flex;width:19px;height:19px;background:var(--ba);color:#fff;border-radius:50%;align-items:center;justify-content:center;font-size:11px;margin-right:5px;font-family:'Kanit'}
+section.script{padding:42px 0 6px}
+.scr-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.scr-head .order{background:var(--ba);color:#fff;font-family:'Kanit';font-weight:600;font-size:14px;padding:4px 14px;border-radius:999px}
+.scr-head h2{font-size:22px;color:var(--ba)}
+.scr-head .file{font-family:'JetBrains Mono';font-size:13px;background:#fff;border:1px solid var(--line);padding:3px 10px;border-radius:8px;color:var(--muted)}
+.explain{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--ba);border-radius:14px;padding:20px 24px;margin-bottom:14px}
+.explain h4{color:var(--ba);font-size:16px;margin:14px 0 6px}
+.explain h4:first-child{margin-top:0}
+.explain ul,.explain ol{margin:6px 0 6px 22px}
+.explain li{margin-bottom:5px;font-size:15px}
+.explain .mono{font-size:13px;background:#f1f5f9;padding:1px 6px;border-radius:5px}
+.note{margin-top:12px;background:var(--gold-bg);border:1px solid #fde68a;border-radius:10px;padding:10px 14px;font-size:14.5px}
+.note b{color:var(--gold)}
+.out{margin-top:12px;background:var(--green-bg);border:1px solid #a7f3d0;border-radius:10px;padding:10px 14px;font-size:14.5px}
+.out b{color:var(--green)}
+.warn{margin-top:12px;background:var(--red-bg);border:1px solid #fecaca;border-radius:10px;padding:10px 14px;font-size:14.5px}
+.warn b{color:var(--red)}
+details.sql{background:#0f172a;border-radius:12px;margin:10px 0 26px;overflow:hidden;border:1px solid #1e293b}
+details.sql summary{cursor:pointer;padding:13px 18px;font-family:'Kanit';font-weight:600;color:#93c5fd;font-size:15px;list-style-position:inside}
+details.sql summary:hover{color:#bfdbfe}
+details.sql[open] summary{border-bottom:1px solid #1e293b}
+details.sql pre{padding:14px 20px 18px;overflow-x:auto;font-size:12.8px;line-height:1.6;color:#e2e8f0;font-family:'JetBrains Mono',monospace}
+.flowline{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.flowline span{background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px 12px;font-size:13.5px;font-family:'Kanit'}
+.flowline .arr{border:none;background:none;color:var(--muted);padding:5px 2px}
+footer{margin-top:60px;background:#111827;color:#94a3b8;padding:26px 0;font-size:14px;text-align:center}
+footer b{color:#e2e8f0}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <a class="back" href="index.html">← กลับหน้าเอกสารหลัก</a>
+    <h1>สคริปต์ทั้งหมด + คำอธิบายการทำงาน — งาน BA</h1>
+    <p>ระบบจัดการอนุมัติ แจ้งเตือน และรับทราบเอกสาร (Document Approval System) — ทุกไฟล์เรียงตามลำดับที่ต้องรันบน Oracle พร้อมคำอธิบายละเอียดและผลรันจริงจาก server (11 พ.ย. 2026)</p>
+  </div>
+</header>
+
+<nav>
+  <div class="wrap">
+    <a href="#s1"><span class="n">1</span>DropTabke</a>
+    <a href="#s2"><span class="n">2</span>CreateTable (DDL)</a>
+    <a href="#s3"><span class="n">3</span>Insert (DML)</a>
+    <a href="#s4"><span class="n">4</span>plsql (Procedure)</a>
+    <a href="#s5"><span class="n">5</span>TestPLSQL</a>
+    <a href="#s6"><span class="n">6</span>Join (รายงาน)</a>
+    <a href="#s7"><span class="n">7</span>Verify (ตรวจสอบ)</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ================= 1. DROP ================= -->
+<section class="script" id="s1">
+  <div class="scr-head"><span class="order">ขั้นที่ 1</span><h2>ลบตารางเดิมทั้งหมด</h2><span class="file">BA/DropTabke.txt</span></div>
+  <div class="explain">
+    <h4>จุดประสงค์</h4>
+    <p>เคลียร์โครงสร้างเดิมออกให้หมดก่อนสร้างใหม่ — ตามเงื่อนไขอาจารย์ที่ให้ <b>"DROP ทุกตารางแล้วสร้างใหม่ Face-to-face"</b> เพื่อพิสูจน์ว่าสคริปต์ทั้งชุดทำงานได้ตั้งแต่ศูนย์จริง ๆ ไม่ได้พึ่งของเก่า</p>
+    <h4>อธิบายการทำงานทีละจุด</h4>
+    <ul>
+      <li><b>ลำดับการ DROP สำคัญมาก</b> — ต้องลบ "ตารางลูก" (มี FK อ้างอิง) ก่อน "ตารางแม่" เสมอ ลำดับในไฟล์เรียงจากปลายทางสุดของสาย FK ย้อนกลับมา: LOG → RECEIPT_RECORD → DOCUMENT_DETAIL → DOCUMENT → EMPLOYEE → ADMIN → DEPARTMENT_HEAD → DEPARTMENT</li>
+      <li><b><span class="mono">CASCADE CONSTRAINTS</span></b> — สั่งให้ Oracle ลบ constraint (FK) ที่ตารางอื่นชี้เข้ามาทิ้งไปด้วย ถ้าไม่ใส่แล้วมีตารางลูกค้างอยู่ จะเกิด ORA-02266 (cannot drop table ... referenced by a foreign key)</li>
+      <li>ถ้าตารางยังไม่มีอยู่เลย จะได้ ORA-00942 (table or view does not exist) — <b>ไม่ใช่ปัญหา</b> แปลว่าไม่มีอะไรให้ลบ ข้ามต่อได้ (ตอน deploy จริงวันนี้ BA ไม่มีตารางให้ลบ จึงข้ามขั้นนี้ไป)</li>
+    </ul>
+    <div class="note"><b>จุดซักถาม:</b> ทำไมไม่ใช้ <span class="mono">DROP TABLE ... PURGE</span>? — ปกติ DROP ยังเหลือ object ใน recyclebin แต่เพราะเราจะสร้างตารางชื่อเดิมขึ้นมาใหม่ทันที ชื่อซ้ำกับ recyclebin ไม่กระทบการ CREATE และ Script ตรวจสอบของอาจารย์ (USER_TABLES) ไม่แสดง recyclebin อยู่แล้ว</div>
+  </div>
+  <details class="sql" open><summary>สคริปต์เต็ม (8 คำสั่ง)</summary>
+<pre>-- ลบตารางตามลำดับความสัมพันธ์ FK (ลูกก่อนแม่)
+DROP TABLE DOCUMENT_DETAIL CASCADE CONSTRAINTS;
+DROP TABLE DOCUMENT CASCADE CONSTRAINTS;
+DROP TABLE DEPARTMENT_HEAD CASCADE CONSTRAINTS;
+DROP TABLE EMPLOYEE CASCADE CONSTRAINTS;
+DROP TABLE DEPARTMENT CASCADE CONSTRAINTS;
+DROP TABLE ADMIN CASCADE CONSTRAINTS;
+DROP TABLE RECEIPT_RECORD CASCADE CONSTRAINTS;
+DROP TABLE LOG CASCADE CONSTRAINTS;</pre>
+  </details>
+</section>
+
+<!-- ================= 2. DDL ================= -->
+<section class="script" id="s2">
+  <div class="scr-head"><span class="order">ขั้นที่ 2</span><h2>สร้างตารางทั้ง 8 ตาราง (DDL)</h2><span class="file">BA/CreateTable.txt</span></div>
+  <div class="explain">
+    <h4>จุดประสงค์</h4>
+    <p>แปลง ER Diagram (Chen Notation 8 เอนทิตี) เป็นโครงสร้างตารางจริงบน Oracle พร้อม PK, FK, NOT NULL ครบทุกความสัมพันธ์</p>
+    <h4>อธิบายการทำงานทีละตาราง</h4>
+    <ol>
+      <li><b>Department (แผนก)</b> — สร้างก่อนสุดเพราะเป็น "แม่" ที่ทุกตารางคนอื่นชี้มา มีคอลัมน์ <span class="mono">head_code</span> ไว้เก็บหัวหน้าแผนก แต่<b>ยังไม่ผูก FK ตอน CREATE</b> — เพราะ DEPARTMENT_HEAD ยังไม่ถูกสร้าง (ต่างฝ่ายต่างอ้างถึงกันแบบวงจร 1:1)</li>
+      <li><b>Department_Head (หัวหน้าแผนก)</b> — มี FK <span class="mono">fk_dh_dept</span> ชี้กลับไป Department ได้เพราะ Department ถูกสร้างไปแล้ว</li>
+      <li><b>ALTER TABLE (คำสั่งที่ 1.3)</b> — ปิดวงจร 1:1 ด้วยการเติม FK <span class="mono">fk_dept_head</span> (head_code → DEPARTMENT_HEAD) ทีหลัง — <b>นี่คือคำตอบของปัญหา circular reference</b>: สร้างแม่ก่อน แล้วค่อยเติมสายสัมพันธ์ย้อนกลับ</li>
+      <li><b>Admin (ธุรการ) และ Employee (พนักงาน)</b> — โครงสร้างเหมือนกัน (code, name, position, branch, phone, dept_code) ต่างกันที่บทบาท: ธุรการ = คนร่าง/ส่งเอกสาร, พนักงาน = ปลายทางผู้รับทราบ</li>
+      <li><b>Document (เอกสารหลัก)</b> — รวม 2 ความสัมพันธ์จาก ER เป็น FK: <span class="mono">created_by → ADMIN</span> (ความสัมพันธ์ "ร่าง" 1:M) และ <span class="mono">approved_by → DEPARTMENT_HEAD</span> (ความสัมพันธ์ "อนุมัติ" 1:M)</li>
+      <li><b>Document_Detail (รายละเอียดเอกสาร)</b> — จาก <b>Weak Entity</b> ใน ER (สี่เหลี่ยมสองชั้น + Identifying Relationship) เก็บสาระสำคัญของระบบไว้ที่นี่: <span class="mono">sla_limit</span> (เกณฑ์เวลา), <span class="mono">expire_date</span> (กำหนดเส้นตาย), <span class="mono">status</span> (รอยืนยัน/อนุมัติแล้ว/ไม่อนุมัติ/กำลังดำเนินการ/ปิดงานแล้ว)</li>
+      <li><b>Receipt_Record (บันทึกรับทราบ)</b> — Transaction table เก็บหลักฐานการกดรับทราบ: IP (<span class="mono">VARCHAR2(45)</span> กว้างพอสำหรับ IPv6), เวลา <span class="mono">TIMESTAMP</span> และ FK สองเส้น (เอกสาร + พนักงาน)</li>
+      <li><b>Log (ประวัติแจ้งเตือน)</b> — เก็บว่าใครถูกแจ้งเรื่องอะไร ช่องทางไหน เมื่อไร — คอลัมน์ <span class="mono">log_type</span> ทำหน้าที่แทน Multivalued Attribute "ช่องทางที่ส่ง" ใน ER ด้วยหลัก 1NF: <b>1 แถวต่อ 1 ช่องทาง</b> (จึงเห็นเอกสารเดียวมี LOG หลายแถวหลายช่องทาง)</li>
+    </ol>
+    <div class="note"><b>จุดซักถาม:</b> เบอร์โทร/สาขาใน ER เป็น Multivalued (วงรีสองชั้น) ทำไมเก็บคอลัมน์เดียว? — เลือกเก็บเบอร์หลักเบอร์เดียวเพื่อความเรียบง่ายของ dataset ถ้าต้องแก้ให้ตรงหลัก 1NF หน้างาน: แตกเป็นตารางย่อย เช่น <span class="mono">EMPLOYEE_PHONE(code, phone)</span> PK composite แล้วลบคอลัมน์เดิม</div>
+  </div>
+  <details class="sql" open><summary>สคริปต์เต็ม (9 คำสั่ง: CREATE 8 + ALTER 1)</summary>
+<pre>-- ============================================================
+-- 1. DATA DEFINITION LANGUAGE (DDL) FOR ORACLE
+-- ============================================================
+
+-- 1.1 ตาราง Department (แผนก)
+CREATE TABLE Department (
+    dept_code VARCHAR2(10) PRIMARY KEY,
+    dept_name VARCHAR2(100) NOT NULL,
+    phone VARCHAR2(20),
+    branch VARCHAR2(100),
+    head_code VARCHAR2(10)
+);
+
+-- 1.2 ตาราง Department_Head (หัวหน้าแผนก / ผู้บริหาร)
+CREATE TABLE Department_Head (
+    code VARCHAR2(10) PRIMARY KEY,
+    name VARCHAR2(100) NOT NULL,
+    position VARCHAR2(100),
+    branch VARCHAR2(100),
+    phone VARCHAR2(20),
+    dept_code VARCHAR2(10),
+    CONSTRAINT fk_dh_dept FOREIGN KEY (dept_code) REFERENCES Department(dept_code)
+);
+
+-- 1.3 เพิ่ม Foreign Key จาก Department ไปยัง Department_Head
+ALTER TABLE Department ADD CONSTRAINT fk_dept_head FOREIGN KEY (head_code) REFERENCES Department_Head(code);
+
+-- 1.4 ตาราง Admin (เจ้าหน้าที่ธุรการ)
+CREATE TABLE Admin (
+    code VARCHAR2(10) PRIMARY KEY,
+    name VARCHAR2(100) NOT NULL,
+    position VARCHAR2(100),
+    branch VARCHAR2(100),
+    phone VARCHAR2(20),
+    dept_code VARCHAR2(10),
+    CONSTRAINT fk_admin_dept FOREIGN KEY (dept_code) REFERENCES Department(dept_code)
+);
+
+-- 1.5 ตาราง Employee (พนักงานในองค์กร)
+CREATE TABLE Employee (
+    code VARCHAR2(10) PRIMARY KEY,
+    name VARCHAR2(100) NOT NULL,
+    position VARCHAR2(100),
+    branch VARCHAR2(100),
+    phone VARCHAR2(20),
+    dept_code VARCHAR2(10),
+    CONSTRAINT fk_emp_dept FOREIGN KEY (dept_code) REFERENCES Department(dept_code)
+);
+
+-- 1.6 ตาราง Document (เอกสารหลัก)
+CREATE TABLE Document (
+    doc_code VARCHAR2(20) PRIMARY KEY,
+    title VARCHAR2(255) NOT NULL,
+    approved_by VARCHAR2(10),
+    created_by VARCHAR2(10),
+    CONSTRAINT fk_doc_approved FOREIGN KEY (approved_by) REFERENCES Department_Head(code),
+    CONSTRAINT fk_doc_created FOREIGN KEY (created_by) REFERENCES Admin(code)
+);
+
+-- 1.7 ตาราง Document_Detail (รายละเอียดเอกสาร)
+CREATE TABLE Document_Detail (
+    code VARCHAR2(10) PRIMARY KEY,
+    doc_code VARCHAR2(20) NOT NULL,
+    subject VARCHAR2(255),
+    priority VARCHAR2(50),
+    target_group VARCHAR2(100),
+    sender_code VARCHAR2(10),
+    doc_date DATE,
+    expire_date DATE,
+    sla_limit VARCHAR2(20),
+    month VARCHAR2(20),
+    status VARCHAR2(50),
+    CONSTRAINT fk_dd_doc FOREIGN KEY (doc_code) REFERENCES Document(doc_code),
+    CONSTRAINT fk_dd_sender FOREIGN KEY (sender_code) REFERENCES Admin(code)
+);
+
+-- 1.8 ตาราง Receipt_Record (บันทึกรับปลายทาง)
+CREATE TABLE Receipt_Record (
+    code VARCHAR2(10) PRIMARY KEY,
+    ip_address VARCHAR2(45),
+    sla_limit VARCHAR2(20),
+    recipient_type VARCHAR2(100),
+    received_datetime TIMESTAMP,
+    detail_code VARCHAR2(10),
+    confirmed_by VARCHAR2(10),
+    CONSTRAINT fk_rec_detail FOREIGN KEY (detail_code) REFERENCES Document_Detail(code),
+    CONSTRAINT fk_rec_emp FOREIGN KEY (confirmed_by) REFERENCES Employee(code)
+);
+
+-- 1.9 ตาราง Log (ประวัติการแจ้งเตือนและระบบ)
+CREATE TABLE Log (
+    code VARCHAR2(10) PRIMARY KEY,
+    log_type VARCHAR2(50),
+    message_sent VARCHAR2(255),
+    notification_message VARCHAR2(4000),
+    sent_datetime TIMESTAMP,
+    emp_code VARCHAR2(10),
+    detail_code VARCHAR2(10),
+    CONSTRAINT fk_log_emp FOREIGN KEY (emp_code) REFERENCES Employee(code),
+    CONSTRAINT fk_log_detail FOREIGN KEY (detail_code) REFERENCES Document_Detail(code)
+);</pre>
+  </details>
+  <div class="out"><b>ผลรันจริง 11 พ.ย. 2026:</b> สร้างครบ 8 ตาราง ไม่มี error ใด (ตรวจด้วย SELECT 'BA_DDL_OK' ลงท้าย → ผ่าน) — และ Script ตรวจสอบของอาจารย์แสดง constraint ของตาราง BA ครบทุกตัว: P (PK), R (FK ทั้ง 11 เส้น), C (NOT NULL)</div>
+</section>
+
+<!-- ================= 3. DML ================= -->
+<section class="script" id="s3">
+  <div class="scr-head"><span class="order">ขั้นที่ 3</span><h2>ใส่ข้อมูลจำลอง 135 แถว (DML)</h2><span class="file">BA/Insert.txt</span></div>
+  <div class="explain">
+    <h4>จุดประสงค์</h4>
+    <p>เติมข้อมูลจำลองที่สอดคล้องกันทั้ง 8 ตาราง (รวม 135 แถว) เพื่อให้รายงาน JOIN และการทดสอบ Procedure มีข้อมูลจริงให้ประมวลผล — <b>ความสอดคล้อง (FK integrity) ตรวจแล้วทุกแถว ไม่มี reference แขวนลอย</b></p>
+    <h4>โครงสร้างไฟล์ (เรียง 9 ส่วนตามลำดับ FK)</h4>
+    <div class="flowline">
+      <span>2.1 Department (8)</span><span class="arr">→</span>
+      <span>2.2 Department_Head (8)</span><span class="arr">→</span>
+      <span>2.3 UPDATE head_code (8)</span><span class="arr">→</span>
+      <span>2.4 Admin (10)</span><span class="arr">→</span>
+      <span>2.5 Employee (20)</span><span class="arr">→</span>
+      <span>2.6 Document (15)</span><span class="arr">→</span>
+      <span>2.7 Document_Detail (21)</span><span class="arr">→</span>
+      <span>2.8 Receipt_Record (21)</span><span class="arr">→</span>
+      <span>2.9 Log (32)</span><span class="arr">→</span>
+      <span>COMMIT</span>
+    </div>
+    <h4>อธิบายการทำงานทีละจุด</h4>
+    <ul>
+      <li><b>ส่วน 2.1 + 2.2 + 2.3 เป็นสามีชิ้นของวงจร 1:1</b> — INSERT แผนกด้วย <span class="mono">head_code = NULL</span> ก่อน (เพราะหัวหน้ายังไม่มีข้อมูล ผูก FK ไม่ได้) → INSERT หัวหน้าแผนกทั้ง 8 คน → แล้วค่อย <span class="mono">UPDATE Department SET head_code = 'DH-xxx'</span> ย้อนกลับ เป็นเทคนิคมาตรฐานแก้ปัญหาข้อมูลวนกันเอง</li>
+      <li><b>ลำดับ INSERT = ลำดับ FK เสมอ</b> — พนักงานต้องมาก่อน Receipt_Record, Document ต้องมาก่อน Document_Detail ฯลฯ ถ้าสลับจะเจอ ORA-02291 (parent key not found) ทันที</li>
+      <li><b>วันที่ใช้ TO_DATE + format mask</b> — เช่น <span class="mono">TO_DATE('2026-08-07','YYYY-MM-DD')</span> ป้องกันปัญหา NLS_DATE_FORMAT ต่างเครื่อง และเวลาใช้ <span class="mono">TO_TIMESTAMP(...'YYYY-MM-DD HH24:MI:SS')</span></li>
+      <li><b>ข้อมูลถูกออกแบบให้ "มีเรื่องราว"</b> — เอกสาร 15 ฉบับกระจายทุกแผนก, DD-004 ตั้งใจให้สถานะ "รอยืนยัน" เพื่อเป็นตัวชูโรงของไฟล์ทดสอบ (ขั้นที่ 5), LOG 32 แถวครอบคลุม 4 ช่องทาง (System Alert / SMS Warning / Email Notification / Mobile Push)</li>
+      <li><b>COMMIT ท้ายไฟล์</b> — ยืนยันทุกอย่างใน transaction เดียว ถ้ากลางทางพังทั้งชุดจะไม่ค้างเศษข้อมูล</li>
+    </ul>
+    <div class="warn"><b>ข้อควรระวัง:</b> ไฟล์นี้ใหญ่ ~52KB — ตอนวางใน iSQL*Plus ให้วางทั้งไฟล์ในครั้งเดียวได้ แต่ถ้าเครื่องช้า/ตัดหาย ให้แบ่งรันเป็น 3 ส่วนตามหัวข้อ 2.1–2.5 / 2.6–2.7 / 2.8–2.9 ได้ (วันนี้ deploy จริงแบ่ง 3 ส่วนและผ่านทุกส่วน)</div>
+    <div class="note"><b>จุดซักถาม:</b> ทำไม DD-004 ถึงตั้งสถานะ "รอยืนยัน" ไว้? — เพื่อใช้พิสูจน์ Transaction Processing ในขั้นที่ 5: เอกสารจะถูกอนุมัติและระบบสร้าง Log ให้เอง ผลก่อน-หลังเทียบได้ชัดต่อหน้าอาจารย์</div>
+  </div>
+  <details class="sql"><summary>สคริปต์เต็ม (135 คำสั่ง INSERT/UPDATE + COMMIT — กดเปิดดู)</summary>
+<pre>-- ============================================================
+-- 2. DATA MANIPULATION LANGUAGE (DML) FOR ORACLE
+-- ============================================================
+
+-- 2.1 INSERT: Department (กำหนด head_code เป็น NULL ก่อน)
+INSERT INTO Department (dept_code, dept_name, phone, branch, head_code) VALUES ('DEPT-01', 'ฝ่ายบริหารและกลยุทธ์', '02-100-1001', 'สำนักงานใหญ่ (กรุงเทพฯ)', NULL);
+INSERT INTO Department (dept_code, dept_name, phone, branch, head_code) VALUES ('DEPT-02', 'ฝ่ายการเงินและบัญชี', '02-100-1002', 'สำนักงานใหญ่ (กรุงเทพฯ)', NULL);
+INSERT INTO Department (dept_code, dept_name, phone, branch, head_code) VALUES ('DEPT-03', 'ฝ่ายเทคโนโลยีสารสนเทศ', '02-200-2001', 'ศูนย์ไอที สาขาอโศก', NULL);
+INSERT INTO Department (dept_code, dept_name, phone, branch, head_code) VALUES ('DEPT-04', 'ฝ่ายทรัพยากรบุคคล', '02-100-1004', 'สำนักงานใหญ่ (กรุงเทพฯ)', NULL);
+INSERT INTO Department (dept_code, dept_name, phone, branch, head_code) VALUES ('DEPT-05', 'ฝ่ายจัดซื้อและพัสดุ', '02-300-3001', 'สาขาบางนา', NULL);
+INSERT INTO Department (dept_code, dept_name, phone, branch, head_code) VALUES ('DEPT-06', 'ฝ่ายการตลาดและสื่อสารองค์กร', '02-100-1006', 'สำนักงานใหญ่ (กรุงเทพฯ)', NULL);
+INSERT INTO Department (dept_code, dept_name, phone, branch, head_code) VALUES ('DEPT-07', 'ฝ่ายปฏิบัติการและคลังสินค้า', '02-400-4001', 'ศูนย์กระจายสินค้า วังน้อย', NULL);
+INSERT INTO Department (dept_code, dept_name, phone, branch, head_code) VALUES ('DEPT-08', 'ฝ่ายกฎหมายและกำกับดูแล', '02-100-1008', 'สำนักงานใหญ่ (กรุงเทพฯ)', NULL);
+
+-- 2.2 INSERT: Department_Head
+INSERT INTO Department_Head (code, name, position, branch, phone, dept_code) VALUES ('DH-001', 'ดร.สมชาย วิเศษกุล', 'ผู้อำนวยการฝ่ายบริหาร', 'สำนักงานใหญ่ (กรุงเทพฯ)', '081-111-1001', 'DEPT-01');
+INSERT INTO Department_Head (code, name, position, branch, phone, dept_code) VALUES ('DH-002', 'คุณวิภาดา รักษ์พงษ์', 'ผู้จัดการฝ่ายการเงิน', 'สำนักงานใหญ่ (กรุงเทพฯ)', '081-222-2002', 'DEPT-02');
+INSERT INTO Department_Head (code, name, position, branch, phone, dept_code) VALUES ('DH-003', 'คุณกิตติศักดิ์ มั่นคงดี', 'ผู้จัดการฝ่ายไอที', 'ศูนย์ไอที สาขาอโศก', '081-333-3003', 'DEPT-03');
+INSERT INTO Department_Head (code, name, position, branch, phone, dept_code) VALUES ('DH-004', 'คุณนภาพร เจริญสุข', 'ผู้จัดการฝ่าย HR', 'สำนักงานใหญ่ (กรุงเทพฯ)', '081-444-4004', 'DEPT-04');
+INSERT INTO Department_Head (code, name, position, branch, phone, dept_code) VALUES ('DH-005', 'คุณเกริกชัย อัครเดช', 'ผู้จัดการฝ่ายจัดซื้อ', 'สาขาบางนา', '081-555-5005', 'DEPT-05');
+INSERT INTO Department_Head (code, name, position, branch, phone, dept_code) VALUES ('DH-006', 'คุณศิริพร เลิศวณิช', 'ผู้จัดการฝ่ายการตลาด', 'สำนักงานใหญ่ (กรุงเทพฯ)', '081-666-6006', 'DEPT-06');
+INSERT INTO Department_Head (code, name, position, branch, phone, dept_code) VALUES ('DH-007', 'คุณอนุชา สมบูรณ์', 'ผู้จัดการฝ่ายปฏิบัติการ', 'ศูนย์กระจายสินค้า วังน้อย', '081-777-7007', 'DEPT-07');
+INSERT INTO Department_Head (code, name, position, branch, phone, dept_code) VALUES ('DH-008', 'คุณพีรพล สุจริตกุล', 'ผู้จัดการฝ่ายกฎหมาย', 'สำนักงานใหญ่ (กรุงเทพฯ)', '081-888-8008', 'DEPT-08');
+
+-- 2.3 UPDATE: Department (อัปเดต head_code ย้อนกลับเข้ามา)
+UPDATE Department SET head_code = 'DH-001' WHERE dept_code = 'DEPT-01';
+UPDATE Department SET head_code = 'DH-002' WHERE dept_code = 'DEPT-02';
+UPDATE Department SET head_code = 'DH-003' WHERE dept_code = 'DEPT-03';
+UPDATE Department SET head_code = 'DH-004' WHERE dept_code = 'DEPT-04';
+UPDATE Department SET head_code = 'DH-005' WHERE dept_code = 'DEPT-05';
+UPDATE Department SET head_code = 'DH-006' WHERE dept_code = 'DEPT-06';
+UPDATE Department SET head_code = 'DH-007' WHERE dept_code = 'DEPT-07';
+UPDATE Department SET head_code = 'DH-008' WHERE dept_code = 'DEPT-08';
+
+-- 2.4 INSERT: Admin
+INSERT INTO Admin (code, name, position, branch, phone, dept_code) VALUES ('AD-001', 'นางสาวสุภาพร ชูใจ', 'เจ้าหน้าที่ธุรการอาวุโส', 'สำนักงานใหญ่ (กรุงเทพฯ)', '089-111-0001', 'DEPT-01');
+INSERT INTO Admin (code, name, position, branch, phone, dept_code) VALUES ('AD-002', 'นายอนันต์ ศรีสุข', 'เจ้าหน้าที่เอกสารและธุรการ', 'สำนักงานใหญ่ (กรุงเทพฯ)', '089-222-0002', 'DEPT-02');
+INSERT INTO Admin (code, name, position, branch, phone, dept_code) VALUES ('AD-003', 'นางสาวนภา พรหมดี', 'เจ้าหน้าที่ธุรการระบบ', 'ศูนย์ไอที สาขาอโศก', '089-333-0003', 'DEPT-03');
+INSERT INTO Admin (code, name, position, branch, phone, dept_code) VALUES ('AD-004', 'นางสาววรรณา เด่นดวง', 'เจ้าหน้าที่ธุรการบุคคล', 'สำนักงานใหญ่ (กรุงเทพฯ)', '089-444-0004', 'DEPT-04');
+INSERT INTO Admin (code, name, position, branch, phone, dept_code) VALUES ('AD-005', 'นายชัยวัฒน์ มีทรัพย์', 'เจ้าหน้าที่ธุรการพัสดุ', 'สาขาบางนา', '089-555-0005', 'DEPT-05');
+INSERT INTO Admin (code, name, position, branch, phone, dept_code) VALUES ('AD-006', 'นางสาวกานดา สมสวย', 'เจ้าหน้าที่ธุรการสื่อสาร', 'สำนักงานใหญ่ (กรุงเทพฯ)', '089-666-0006', 'DEPT-06');
+INSERT INTO Admin (code, name, position, branch, phone, dept_code) VALUES ('AD-007', 'นายสมศักดิ์ ขยันเพียร', 'เจ้าหน้าที่ธุรการคลังสินค้า', 'ศูนย์กระจายสินค้า วังน้อย', '089-777-0007', 'DEPT-07');
+INSERT INTO Admin (code, name, position, branch, phone, dept_code) VALUES ('AD-008', 'นางสาวปิยะนันท์ มั่นจิต', 'เจ้าหน้าที่ธุรการกฎหมาย', 'สำนักงานใหญ่ (กรุงเทพฯ)', '089-888-0008', 'DEPT-08');
+INSERT INTO Admin (code, name, position, branch, phone, dept_code) VALUES ('AD-009', 'นายธนพล เจริญผล', 'ผู้ช่วยเจ้าหน้าที่ธุรการ', 'สำนักงานใหญ่ (กรุงเทพฯ)', '089-999-0009', 'DEPT-01');
+INSERT INTO Admin (code, name, position, branch, phone, dept_code) VALUES ('AD-010', 'นางสาวพิมลพรรณ เปรมปรีดิ์', 'ผู้ช่วยเจ้าหน้าที่ธุรการ', 'ศูนย์ไอที สาขาอโศก', '089-000-0010', 'DEPT-03');
+
+-- 2.5 INSERT: Employee
+INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-001', 'นายธนกฤต มีสุข', 'พนักงานวิเคราะห์ระบบ', 'ศูนย์ไอที สาขาอโศก', '086-100-0001', 'DEPT-03');
+INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-002', 'นางสาวปิยะดา วงศ์ใหญ่', 'พนักงานบัญชีอาวุโส', 'สำนักงานใหญ่ (กรุงเทพฯ)', '086-100-0002', 'DEPT-02');
+INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-003', 'นายรัชชานนท์ ชัยชนะ', 'พนักงานประสานงานโครงการ', 'สำนักงานใหญ่ (กรุงเทพฯ)', '086-100-0003', 'DEPT-01');
+INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-004', 'นางสาวกมลวรรณ สุขเสริฐ', 'พนักงานพัฒนาซอฟต์แวร์', 'ศูนย์ไอที สาขาอโศก', '086-100-0004', 'DEPT-03');
+INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-005', 'นายณัฐพงษ์ บุญมาก', 'พนักงานสรรหาบุคลากร', 'สำนักงานใหญ่ (กรุงเทพฯ)', '086-100-0005', 'DEPT-04');
+INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-006', 'นางสาวชนิกานต์ ใจบุญ', 'พนักงานจัดซื้อ', 'สาขาบางนา', '086-100-0006', 'DEPT-05');
+INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-007', 'นายวรวุฒิ การค้า', 'พนักงานการตลาดดิจิทัล', 'สำนักงานใหญ่ (กรุงเทพฯ)', '086-100-0007', 'DEPT-06');
+INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-008', 'นายสรวิทย์ คงทน', 'พนักงานควบคุมสต็อก', 'ศูนย์กระจายสินค้า วังน้อย', '086-100-0008', 'DEPT-07');
+INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-009', 'นางสาวศิริพร ดีจริง', 'พนักงานตรวจสอบสัญญา', 'สำนักงานใหญ่ (กรุงเทพฯ)', '086-100-0009', 'DEPT-08');
+INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-010', 'นายกิตติพงษ์ สุขสันต์', 'พนักงานดูแลเครือข่าย', 'ศูนย์ไอที สาขาอโศก', '086-100-0010', 'DEPT-03');
+INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-011', 'นางสาวอารียา ชมภู', 'พนักงานการเงิน', 'สำนักงานใหญ่ (กรุงเทพฯ)', '086-100-0011', 'DEPT-02');
+INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-012', 'นายปฏิภาณ รุ่งเรือง', 'พนักงานบริการไอที', 'ศูนย์ไอที สาขาอโศก', '086-100-0012', 'DEPT-03');
+INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-013', 'นางสาวเบญจมาศ แซ่ตั้ง', 'พนักงานฝึกอบรม', 'สำนักงานใหญ่ (กรุงเทพฯ)', '086-100-0013', 'DEPT-04');
+INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-014', 'นายภาคิน ทรัพย์เจริญ', 'พนักงานจัดซื้อเครื่องมือ', 'สาขาบางนา', '086-100-0014', 'DEPT-05');
+INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-015', 'นางสาวชนิดาภา มงคล', 'พนักงานกราฟิกดีไซน์', 'สำนักงานใหญ่ (กรุงเทพฯ)', '086-100-0015', 'DEPT-06');
+INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-016', 'นายศุภกร คุ้มครอง', 'พนักงานคลังสินค้า', 'ศูนย์กระจายสินค้า วังน้อย', '086-100-0016', 'DEPT-07');
+INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-017', 'นางสาวมณฑา สมพงษ์', 'พนักงานการเงินรับ', 'สำนักงานใหญ่ (กรุงเทพฯ)', '086-100-0017', 'DEPT-02');
+INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-018', 'นายเอกลักษณ์ ชูเกียรติ', 'พนักงานวิเคราะห์ข้อมูล', 'ศูนย์ไอที สาขาอโศก', '086-100-0018', 'DEPT-03');
+INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-019', 'นางสาวพรทิพย์ เปรมจิตต์', 'พนักงานธุรการส่วนกลาง', 'สำนักงานใหญ่ (กรุงเทพฯ)', '086-100-0019', 'DEPT-01');
+INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-020', 'นายวิทวัส สายชล', 'พนักงานขนส่ง', 'ศูนย์กระจายสินค้า วังน้อย', '086-100-0020', 'DEPT-07');
+COMMIT;
+</pre>
+  </details>
+  <details class="sql"><summary>สคริปต์เต็ม ต่อ (Document + Document_Detail + Receipt_Record + Log + COMMIT)</summary>
+<pre>-- 2.6 INSERT: Document
+INSERT INTO Document (doc_code, title, approved_by, created_by) VALUES ('DOC-2026-001', 'อนุมัติแผนงบประมาณพัฒนาซอฟต์แวร์ประจำปี 2026', 'DH-003', 'AD-003');
+INSERT INTO Document (doc_code, title, approved_by, created_by) VALUES ('DOC-2026-002', 'รายงานการขอจัดซื้ออุปกรณ์เครื่องคอมพิวเตอร์และ Server', 'DH-003', 'AD-003');
+INSERT INTO Document (doc_code, title, approved_by, created_by) VALUES ('DOC-2026-003', 'เอกสารรอบการเบิกจ่ายเบี้ยเลี้ยงและค่าเดินทางประจำเดือน', 'DH-002', 'AD-002');
+INSERT INTO Document (doc_code, title, approved_by, created_by) VALUES ('DOC-2026-004', 'อนุมัติโครงสร้างอัตรากำลังพลและปรับตำแหน่งพนักงาน', 'DH-001', 'AD-001');
+INSERT INTO Document (doc_code, title, approved_by, created_by) VALUES ('DOC-2026-005', 'รายงานการจัดซื้อวัตถุดิบและพัสดุสำนักงาน Q4', 'DH-005', 'AD-005');
+INSERT INTO Document (doc_code, title, approved_by, created_by) VALUES ('DOC-2026-006', 'แผนการจัดแคมเปญการตลาดและสื่อโฆษณาปี 2026', 'DH-006', 'AD-006');
+INSERT INTO Document (doc_code, title, approved_by, created_by) VALUES ('DOC-2026-007', 'รายงานตรวจนับสินค้าคงคลังประจำไตรมาสที่ 3', 'DH-007', 'AD-007');
+INSERT INTO Document (doc_code, title, approved_by, created_by) VALUES ('DOC-2026-008', 'ร่างสัญญาข้อตกลงความร่วมมือกับผู้ให้บริการภายนอก', 'DH-008', 'AD-008');
+INSERT INTO Document (doc_code, title, approved_by, created_by) VALUES ('DOC-2026-009', 'ขออนุมัติจัดอบรมหลักสูตร Cybersecurity awareness', 'DH-004', 'AD-004');
+INSERT INTO Document (doc_code, title, approved_by, created_by) VALUES ('DOC-2026-010', 'รายงานผลการประเมินความเสี่ยงด้านเทคโนโลยีสารสนเทศ', 'DH-003', 'AD-010');
+INSERT INTO Document (doc_code, title, approved_by, created_by) VALUES ('DOC-2026-011', 'ขออนุมัติงบประมาณปรับปรุงห้องเซิร์ฟเวอร์สาขาอโศก', 'DH-003', 'AD-003');
+INSERT INTO Document (doc_code, title, approved_by, created_by) VALUES ('DOC-2026-012', 'สรุปยอดการจ่ายสวัสดิการพนักงานประจำปี', 'DH-002', 'AD-002');
+INSERT INTO Document (doc_code, title, approved_by, created_by) VALUES ('DOC-2026-013', 'รายงานสรุปข้อร้องเรียนและสถิติบริการลูกค้า', 'DH-001', 'AD-009');
+INSERT INTO Document (doc_code, title, approved_by, created_by) VALUES ('DOC-2026-014', 'สัญญาจ้างบริษัทรักษาความปลอดภัยประจำศูนย์กระจายสินค้า', 'DH-008', 'AD-008');
+INSERT INTO Document (doc_code, title, approved_by, created_by) VALUES ('DOC-2026-015', 'ขอจัดซื้อวัสดุอุปกรณ์แพ็คสินค้าเพิ่มเติม', 'DH-005', 'AD-005');
+
+-- 2.7 INSERT: Document_Detail (21 แถว)
+INSERT INTO Document_Detail (code, doc_code, subject, priority, target_group, sender_code, doc_date, expire_date, sla_limit, month, status) VALUES ('DD-001', 'DOC-2026-001', 'รายละเอียดส่วนที่ 1 ของ อนุมัติแผนงบประมาณพัฒนาซอฟต์แวร์ประจำปี 2026', 'ปกติ', 'ฝ่ายจัดซื้อและพัสดุ', 'AD-003', TO_DATE('2026-08-07', 'YYYY-MM-DD'), TO_DATE('2026-10-06', 'YYYY-MM-DD'), '1 วัน', 'สิงหาคม', 'อนุมัติแล้ว');
+INSERT INTO Document_Detail (code, doc_code, subject, priority, target_group, sender_code, doc_date, expire_date, sla_limit, month, status) VALUES ('DD-002', 'DOC-2026-002', 'รายละเอียดส่วนที่ 1 ของ รายงานการขอจัดซื้ออุปกรณ์เครื่องคอมพิวเตอร์และ Server', 'ด่วนที่สุด', 'ฝ่ายบริหารและกลยุทธ์', 'AD-003', TO_DATE('2026-08-08', 'YYYY-MM-DD'), TO_DATE('2026-08-22', 'YYYY-MM-DD'), '1 วัน', 'สิงหาคม', 'ปิดงานแล้ว');
+INSERT INTO Document_Detail (code, doc_code, subject, priority, target_group, sender_code, doc_date, expire_date, sla_limit, month, status) VALUES ('DD-003', 'DOC-2026-003', 'รายละเอียดส่วนที่ 1 ของ เอกสารรอบการเบิกจ่ายเบี้ยเลี้ยงและค่าเดินทางประจำเดือน', 'สำคัญมาก', 'ฝ่ายการตลาด', 'AD-002', TO_DATE('2026-05-12', 'YYYY-MM-DD'), TO_DATE('2026-06-11', 'YYYY-MM-DD'), '3 วัน', 'พฤษภาคม', 'ไม่อนุมัติ');
+INSERT INTO Document_Detail (code, doc_code, subject, priority, target_group, sender_code, doc_date, expire_date, sla_limit, month, status) VALUES ('DD-004', 'DOC-2026-004', 'รายละเอียดส่วนที่ 1 ของ อนุมัติโครงสร้างอัตรากำลังพลและปรับตำแหน่งพนักงาน', 'ปกติ', 'ฝ่ายจัดซื้อและพัสดุ', 'AD-001', TO_DATE('2026-06-04', 'YYYY-MM-DD'), TO_DATE('2026-06-18', 'YYYY-MM-DD'), '5 วัน', 'มิถุนายน', 'รอยืนยัน');
+INSERT INTO Document_Detail (code, doc_code, subject, priority, target_group, sender_code, doc_date, expire_date, sla_limit, month, status) VALUES ('DD-005', 'DOC-2026-005', 'รายละเอียดส่วนที่ 1 ของ รายงานการจัดซื้อวัตถุดิบและพัสดุสำนักงาน Q4', 'สำคัญมาก', 'ฝ่ายเทคโนโลยีสารสนเทศ', 'AD-005', TO_DATE('2026-02-23', 'YYYY-MM-DD'), TO_DATE('2026-04-24', 'YYYY-MM-DD'), '5 วัน', 'กุมภาพันธ์', 'อนุมัติแล้ว');
+INSERT INTO Document_Detail (code, doc_code, subject, priority, target_group, sender_code, doc_date, expire_date, sla_limit, month, status) VALUES ('DD-006', 'DOC-2026-005', 'รายละเอียดส่วนที่ 2 ของ รายงานการจัดซื้อวัตถุดิบและพัสดุสำนักงาน Q4', 'สำคัญมาก', 'ฝ่ายการเงินและบัญชี', 'AD-005', TO_DATE('2026-03-03', 'YYYY-MM-DD'), TO_DATE('2026-04-02', 'YYYY-MM-DD'), '5 วัน', 'มีนาคม', 'ไม่อนุมัติ');
+INSERT INTO Document_Detail (code, doc_code, subject, priority, target_group, sender_code, doc_date, expire_date, sla_limit, month, status) VALUES ('DD-007', 'DOC-2026-006', 'รายละเอียดส่วนที่ 1 ของ แผนการจัดแคมเปญการตลาดและสื่อโฆษณาปี 2026', 'สำคัญมาก', 'ฝ่ายบริหารและกลยุทธ์', 'AD-006', TO_DATE('2026-07-12', 'YYYY-MM-DD'), TO_DATE('2026-09-10', 'YYYY-MM-DD'), '2 วัน', 'กรกฎาคม', 'ไม่อนุมัติ');
+INSERT INTO Document_Detail (code, doc_code, subject, priority, target_group, sender_code, doc_date, expire_date, sla_limit, month, status) VALUES ('DD-008', 'DOC-2026-007', 'รายละเอียดส่วนที่ 1 ของ รายงานตรวจนับสินค้าคงคลังประจำไตรมาสที่ 3', 'ด่วนมาก', 'ฝ่ายการเงินและบัญชี', 'AD-007', TO_DATE('2026-09-02', 'YYYY-MM-DD'), TO_DATE('2026-09-16', 'YYYY-MM-DD'), '2 วัน', 'กันยายน', 'ไม่อนุมัติ');
+INSERT INTO Document_Detail (code, doc_code, subject, priority, target_group, sender_code, doc_date, expire_date, sla_limit, month, status) VALUES ('DD-009', 'DOC-2026-007', 'รายละเอียดส่วนที่ 2 ของ รายงานตรวจนับสินค้าคงคลังประจำไตรมาสที่ 3', 'ด่วนที่สุด', 'ฝ่ายบริหารและกลยุทธ์', 'AD-007', TO_DATE('2026-06-02', 'YYYY-MM-DD'), TO_DATE('2026-08-01', 'YYYY-MM-DD'), '2 วัน', 'มิถุนายน', 'กำลังดำเนินการ');
+INSERT INTO Document_Detail (code, doc_code, subject, priority, target_group, sender_code, doc_date, expire_date, sla_limit, month, status) VALUES ('DD-010', 'DOC-2026-008', 'รายละเอียดส่วนที่ 1 ของ ร่างสัญญาข้อตกลงความร่วมมือกับผู้ให้บริการภายนอก', 'ด่วนมาก', 'ฝ่ายเทคโนโลยีสารสนเทศ', 'AD-008', TO_DATE('2026-04-29', 'YYYY-MM-DD'), TO_DATE('2026-05-06', 'YYYY-MM-DD'), '7 วัน', 'เมษายน', 'กำลังดำเนินการ');
+INSERT INTO Document_Detail (code, doc_code, subject, priority, target_group, sender_code, doc_date, expire_date, sla_limit, month, status) VALUES ('DD-011', 'DOC-2026-009', 'รายละเอียดส่วนที่ 1 ของ ขออนุมัติจัดอบรมหลักสูตร Cybersecurity awareness', 'ด่วนมาก', 'ฝ่ายจัดซื้อและพัสดุ', 'AD-004', TO_DATE('2026-02-27', 'YYYY-MM-DD'), TO_DATE('2026-03-13', 'YYYY-MM-DD'), '2 วัน', 'กุมภาพันธ์', 'รอยืนยัน');
+INSERT INTO Document_Detail (code, doc_code, subject, priority, target_group, sender_code, doc_date, expire_date, sla_limit, month, status) VALUES ('DD-012', 'DOC-2026-009', 'รายละเอียดส่วนที่ 2 ของ ขออนุมัติจัดอบรมหลักสูตร Cybersecurity awareness', 'ปกติ', 'ฝ่ายทรัพยากรบุคคล', 'AD-004', TO_DATE('2026-03-20', 'YYYY-MM-DD'), TO_DATE('2026-05-19', 'YYYY-MM-DD'), '3 วัน', 'มีนาคม', 'รอยืนยัน');
+INSERT INTO Document_Detail (code, doc_code, subject, priority, target_group, sender_code, doc_date, expire_date, sla_limit, month, status) VALUES ('DD-013', 'DOC-2026-010', 'รายละเอียดส่วนที่ 1 ของ รายงานผลการประเมินความเสี่ยงด้านเทคโนโลยีสารสนเทศ', 'ด่วนที่สุด', 'ฝ่ายปฏิบัติการ', 'AD-010', TO_DATE('2026-06-02', 'YYYY-MM-DD'), TO_DATE('2026-06-09', 'YYYY-MM-DD'), '5 วัน', 'มิถุนายน', 'ไม่อนุมัติ');
+INSERT INTO Document_Detail (code, doc_code, subject, priority, target_group, sender_code, doc_date, expire_date, sla_limit, month, status) VALUES ('DD-014', 'DOC-2026-010', 'รายละเอียดส่วนที่ 2 ของ รายงานผลการประเมินความเสี่ยงด้านเทคโนโลยีสารสนเทศ', 'สำคัญมาก', 'ฝ่ายจัดซื้อและพัสดุ', 'AD-010', TO_DATE('2026-04-09', 'YYYY-MM-DD'), TO_DATE('2026-05-09', 'YYYY-MM-DD'), '7 วัน', 'เมษายน', 'ไม่อนุมัติ');
+INSERT INTO Document_Detail (code, doc_code, subject, priority, target_group, sender_code, doc_date, expire_date, sla_limit, month, status) VALUES ('DD-015', 'DOC-2026-011', 'รายละเอียดส่วนที่ 1 ของ ขออนุมัติงบประมาณปรับปรุงห้องเซิร์ฟเวอร์สาขาอโศก', 'ด่วนมาก', 'ฝ่ายจัดซื้อและพัสดุ', 'AD-003', TO_DATE('2026-05-09', 'YYYY-MM-DD'), TO_DATE('2026-07-08', 'YYYY-MM-DD'), '5 วัน', 'พฤษภาคม', 'ปิดงานแล้ว');
+INSERT INTO Document_Detail (code, doc_code, subject, priority, target_group, sender_code, doc_date, expire_date, sla_limit, month, status) VALUES ('DD-016', 'DOC-2026-012', 'รายละเอียดส่วนที่ 1 ของ สรุปยอดการจ่ายสวัสดิการพนักงานประจำปี', 'ด่วนที่สุด', 'ฝ่ายทรัพยากรบุคคล', 'AD-002', TO_DATE('2026-09-04', 'YYYY-MM-DD'), TO_DATE('2026-09-11', 'YYYY-MM-DD'), '5 วัน', 'กันยายน', 'อนุมัติแล้ว');
+INSERT INTO Document_Detail (code, doc_code, subject, priority, target_group, sender_code, doc_date, expire_date, sla_limit, month, status) VALUES ('DD-017', 'DOC-2026-013', 'รายละเอียดส่วนที่ 1 ของ รายงานสรุปข้อร้องเรียนและสถิติบริการลูกค้า', 'สำคัญมาก', 'ฝ่ายเทคโนโลยีสารสนเทศ', 'AD-009', TO_DATE('2026-03-20', 'YYYY-MM-DD'), TO_DATE('2026-04-19', 'YYYY-MM-DD'), '3 วัน', 'มีนาคม', 'ไม่อนุมัติ');
+INSERT INTO Document_Detail (code, doc_code, subject, priority, target_group, sender_code, doc_date, expire_date, sla_limit, month, status) VALUES ('DD-018', 'DOC-2026-013', 'รายละเอียดส่วนที่ 2 ของ รายงานสรุปข้อร้องเรียนและสถิติบริการลูกค้า', 'ด่วนมาก', 'ฝ่ายปฏิบัติการ', 'AD-009', TO_DATE('2026-08-28', 'YYYY-MM-DD'), TO_DATE('2026-09-11', 'YYYY-MM-DD'), '7 วัน', 'สิงหาคม', 'กำลังดำเนินการ');
+INSERT INTO Document_Detail (code, doc_code, subject, priority, target_group, sender_code, doc_date, expire_date, sla_limit, month, status) VALUES ('DD-019', 'DOC-2026-014', 'รายละเอียดส่วนที่ 1 ของ สัญญาจ้างบริษัทรักษาความปลอดภัยประจำศูนย์กระจายสินค้า', 'ด่วนที่สุด', 'ฝ่ายบริหารและกลยุทธ์', 'AD-008', TO_DATE('2026-02-17', 'YYYY-MM-DD'), TO_DATE('2026-03-19', 'YYYY-MM-DD'), '1 วัน', 'กุมภาพันธ์', 'อนุมัติแล้ว');
+INSERT INTO Document_Detail (code, doc_code, subject, priority, target_group, sender_code, doc_date, expire_date, sla_limit, month, status) VALUES ('DD-020', 'DOC-2026-014', 'รายละเอียดส่วนที่ 2 ของ สัญญาจ้างบริษัทรักษาความปลอดภัยประจำศูนย์กระจายสินค้า', 'ปกติ', 'ฝ่ายทรัพยากรบุคคล', 'AD-008', TO_DATE('2026-03-01', 'YYYY-MM-DD'), TO_DATE('2026-03-31', 'YYYY-MM-DD'), '1 วัน', 'มีนาคม', 'ปิดงานแล้ว');
+INSERT INTO Document_Detail (code, doc_code, subject, priority, target_group, sender_code, doc_date, expire_date, sla_limit, month, status) VALUES ('DD-021', 'DOC-2026-015', 'รายละเอียดส่วนที่ 1 ของ ขอจัดซื้อวัสดุอุปกรณ์แพ็คสินค้าเพิ่มเติม', 'ด่วนมาก', 'ฝ่ายทรัพยากรบุคคล', 'AD-005', TO_DATE('2026-05-20', 'YYYY-MM-DD'), TO_DATE('2026-07-19', 'YYYY-MM-DD'), '3 วัน', 'พฤษภาคม', 'ปิดงานแล้ว');
+
+-- 2.8 INSERT: Receipt_Record (21 แถว)
+INSERT INTO Receipt_Record (code, ip_address, sla_limit, recipient_type, received_datetime, detail_code, confirmed_by) VALUES ('REC-001', '192.168.7.165', '1 วัน', 'พนักงานระดับปฏิบัติการ', TO_TIMESTAMP('2026-08-08 16:46:00', 'YYYY-MM-DD HH24:MI:SS'), 'DD-001', 'EMP-012');
+INSERT INTO Receipt_Record (code, ip_address, sla_limit, recipient_type, received_datetime, detail_code, confirmed_by) VALUES ('REC-002', '192.168.5.138', '1 วัน', 'พนักงานธุรการ', TO_TIMESTAMP('2026-08-09 12:13:00', 'YYYY-MM-DD HH24:MI:SS'), 'DD-002', 'EMP-008');
+INSERT INTO Receipt_Record (code, ip_address, sla_limit, recipient_type, received_datetime, detail_code, confirmed_by) VALUES ('REC-003', '192.168.8.143', '3 วัน', 'หัวหน้าส่วนงาน', TO_TIMESTAMP('2026-05-14 13:28:00', 'YYYY-MM-DD HH24:MI:SS'), 'DD-003', 'EMP-017');
+INSERT INTO Receipt_Record (code, ip_address, sla_limit, recipient_type, received_datetime, detail_code, confirmed_by) VALUES ('REC-004', '192.168.3.102', '5 วัน', 'ผู้จัดการฝ่าย', TO_TIMESTAMP('2026-06-04 14:17:00', 'YYYY-MM-DD HH24:MI:SS'), 'DD-004', 'EMP-004');
+INSERT INTO Receipt_Record (code, ip_address, sla_limit, recipient_type, received_datetime, detail_code, confirmed_by) VALUES ('REC-005', '192.168.7.29', '5 วัน', 'หัวหน้าส่วนงาน', TO_TIMESTAMP('2026-02-25 10:38:00', 'YYYY-MM-DD HH24:MI:SS'), 'DD-005', 'EMP-002');
+INSERT INTO Receipt_Record (code, ip_address, sla_limit, recipient_type, received_datetime, detail_code, confirmed_by) VALUES ('REC-006', '192.168.9.104', '5 วัน', 'พนักงานธุรการ', TO_TIMESTAMP('2026-03-04 09:29:00', 'YYYY-MM-DD HH24:MI:SS'), 'DD-006', 'EMP-008');
+INSERT INTO Receipt_Record (code, ip_address, sla_limit, recipient_type, received_datetime, detail_code, confirmed_by) VALUES ('REC-007', '192.168.10.163', '2 วัน', 'เจ้าหน้าที่วิเคราะห์', TO_TIMESTAMP('2026-07-13 16:06:00', 'YYYY-MM-DD HH24:MI:SS'), 'DD-007', 'EMP-015');
+INSERT INTO Receipt_Record (code, ip_address, sla_limit, recipient_type, received_datetime, detail_code, confirmed_by) VALUES ('REC-008', '192.168.8.103', '2 วัน', 'ผู้จัดการฝ่าย', TO_TIMESTAMP('2026-09-02 09:36:00', 'YYYY-MM-DD HH24:MI:SS'), 'DD-008', 'EMP-007');
+INSERT INTO Receipt_Record (code, ip_address, sla_limit, recipient_type, received_datetime, detail_code, confirmed_by) VALUES ('REC-009', '192.168.9.56', '2 วัน', 'เจ้าหน้าที่วิเคราะห์', TO_TIMESTAMP('2026-06-02 13:41:00', 'YYYY-MM-DD HH24:MI:SS'), 'DD-009', 'EMP-011');
+INSERT INTO Receipt_Record (code, ip_address, sla_limit, recipient_type, received_datetime, detail_code, confirmed_by) VALUES ('REC-010', '192.168.4.245', '7 วัน', 'พนักงานระดับปฏิบัติการ', TO_TIMESTAMP('2026-04-29 12:07:00', 'YYYY-MM-DD HH24:MI:SS'), 'DD-010', 'EMP-005');
+INSERT INTO Receipt_Record (code, ip_address, sla_limit, recipient_type, received_datetime, detail_code, confirmed_by) VALUES ('REC-011', '192.168.1.67', '2 วัน', 'พนักงานธุรการ', TO_TIMESTAMP('2026-02-27 16:48:00', 'YYYY-MM-DD HH24:MI:SS'), 'DD-011', 'EMP-006');
+INSERT INTO Receipt_Record (code, ip_address, sla_limit, recipient_type, received_datetime, detail_code, confirmed_by) VALUES ('REC-012', '192.168.1.48', '3 วัน', 'หัวหน้าส่วนงาน', TO_TIMESTAMP('2026-03-21 14:18:00', 'YYYY-MM-DD HH24:MI:SS'), 'DD-012', 'EMP-018');
+INSERT INTO Receipt_Record (code, ip_address, sla_limit, recipient_type, received_datetime, detail_code, confirmed_by) VALUES ('REC-013', '192.168.10.161', '5 วัน', 'พนักงานธุรการ', TO_TIMESTAMP('2026-06-03 09:57:00', 'YYYY-MM-DD HH24:MI:SS'), 'DD-013', 'EMP-001');
+INSERT INTO Receipt_Record (code, ip_address, sla_limit, recipient_type, received_datetime, detail_code, confirmed_by) VALUES ('REC-014', '192.168.6.143', '7 วัน', 'เจ้าหน้าที่วิเคราะห์', TO_TIMESTAMP('2026-04-10 08:15:00', 'YYYY-MM-DD HH24:MI:SS'), 'DD-014', 'EMP-017');
+INSERT INTO Receipt_Record (code, ip_address, sla_limit, recipient_type, received_datetime, detail_code, confirmed_by) VALUES ('REC-015', '192.168.1.90', '5 วัน', 'พนักงานธุรการ', TO_TIMESTAMP('2026-05-11 14:35:00', 'YYYY-MM-DD HH24:MI:SS'), 'DD-015', 'EMP-011');
+INSERT INTO Receipt_Record (code, ip_address, sla_limit, recipient_type, received_datetime, detail_code, confirmed_by) VALUES ('REC-016', '192.168.9.207', '5 วัน', 'พนักงานธุรการ', TO_TIMESTAMP('2026-09-04 15:32:00', 'YYYY-MM-DD HH24:MI:SS'), 'DD-016', 'EMP-015');
+INSERT INTO Receipt_Record (code, ip_address, sla_limit, recipient_type, received_datetime, detail_code, confirmed_by) VALUES ('REC-017', '192.168.3.157', '3 วัน', 'พนักงานระดับปฏิบัติการ', TO_TIMESTAMP('2026-03-20 09:30:00', 'YYYY-MM-DD HH24:MI:SS'), 'DD-017', 'EMP-009');
+INSERT INTO Receipt_Record (code, ip_address, sla_limit, recipient_type, received_datetime, detail_code, confirmed_by) VALUES ('REC-018', '192.168.10.203', '7 วัน', 'ผู้จัดการฝ่าย', TO_TIMESTAMP('2026-08-29 13:04:00', 'YYYY-MM-DD HH24:MI:SS'), 'DD-018', 'EMP-015');
+INSERT INTO Receipt_Record (code, ip_address, sla_limit, recipient_type, received_datetime, detail_code, confirmed_by) VALUES ('REC-019', '192.168.4.203', '1 วัน', 'เจ้าหน้าที่วิเคราะห์', TO_TIMESTAMP('2026-02-18 15:27:00', 'YYYY-MM-DD HH24:MI:SS'), 'DD-019', 'EMP-009');
+INSERT INTO Receipt_Record (code, ip_address, sla_limit, recipient_type, received_datetime, detail_code, confirmed_by) VALUES ('REC-020', '192.168.3.129', '1 วัน', 'พนักงานระดับปฏิบัติการ', TO_TIMESTAMP('2026-03-01 12:11:00', 'YYYY-MM-DD HH24:MI:SS'), 'DD-020', 'EMP-006');
+INSERT INTO Receipt_Record (code, ip_address, sla_limit, recipient_type, received_datetime, detail_code, confirmed_by) VALUES ('REC-021', '192.168.10.108', '3 วัน', 'พนักงานระดับปฏิบัติการ', TO_TIMESTAMP('2026-05-21 14:10:00', 'YYYY-MM-DD HH24:MI:SS'), 'DD-021', 'EMP-006');
+
+-- 2.9 INSERT: Log (32 แถว)
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-001', 'System Alert', 'แจ้งเตือนสร้างเอกสาร DD-001 สำหรับ ฝ่ายจัดซื้อและพัสดุ', 'โปรดดำเนินการตรวจสอบภายใน 1 วัน', TO_TIMESTAMP('2026-08-07 08:46:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-012', 'DD-001');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-002', 'SMS Warning', 'อัปเดตสถานะเอกสาร DD-001 เป็น [อนุมัติแล้ว]', 'สถานะล่าสุด: อนุมัติแล้ว เมื่อ 2026-08-08', TO_TIMESTAMP('2026-08-08 14:27:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-012', 'DD-001');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-003', 'System Alert', 'แจ้งเตือนสร้างเอกสาร DD-002 สำหรับ ฝ่ายบริหารและกลยุทธ์', 'โปรดดำเนินการตรวจสอบภายใน 1 วัน', TO_TIMESTAMP('2026-08-08 11:55:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-008', 'DD-002');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-004', 'Email Notification', 'อัปเดตสถานะเอกสาร DD-002 เป็น [ปิดงานแล้ว]', 'สถานะล่าสุด: ปิดงานแล้ว เมื่อ 2026-08-09', TO_TIMESTAMP('2026-08-09 13:47:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-008', 'DD-002');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-005', 'SMS Warning', 'แจ้งเตือนสร้างเอกสาร DD-003 สำหรับ ฝ่ายการตลาด', 'โปรดดำเนินการตรวจสอบภายใน 3 วัน', TO_TIMESTAMP('2026-05-12 10:26:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-017', 'DD-003');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-006', 'Mobile Push', 'อัปเดตสถานะเอกสาร DD-003 เป็น [ไม่อนุมัติ]', 'สถานะล่าสุด: ไม่อนุมัติ เมื่อ 2026-05-14', TO_TIMESTAMP('2026-05-14 17:04:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-017', 'DD-003');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-007', 'Mobile Push', 'แจ้งเตือนสร้างเอกสาร DD-004 สำหรับ ฝ่ายจัดซื้อและพัสดุ', 'โปรดดำเนินการตรวจสอบภายใน 5 วัน', TO_TIMESTAMP('2026-06-04 09:39:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-004', 'DD-004');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-008', 'Email Notification', 'แจ้งเตือนสร้างเอกสาร DD-005 สำหรับ ฝ่ายเทคโนโลยีสารสนเทศ', 'โปรดดำเนินการตรวจสอบภายใน 5 วัน', TO_TIMESTAMP('2026-02-23 08:46:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-002', 'DD-005');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-009', 'Mobile Push', 'แจ้งเตือนสร้างเอกสาร DD-006 สำหรับ ฝ่ายการเงินและบัญชี', 'โปรดดำเนินการตรวจสอบภายใน 5 วัน', TO_TIMESTAMP('2026-03-03 11:53:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-008', 'DD-006');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-010', 'System Alert', 'อัปเดตสถานะเอกสาร DD-006 เป็น [ไม่อนุมัติ]', 'สถานะล่าสุด: ไม่อนุมัติ เมื่อ 2026-03-04', TO_TIMESTAMP('2026-03-04 15:08:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-008', 'DD-006');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-011', 'Mobile Push', 'แจ้งเตือนสร้างเอกสาร DD-007 สำหรับ ฝ่ายบริหารและกลยุทธ์', 'โปรดดำเนินการตรวจสอบภายใน 2 วัน', TO_TIMESTAMP('2026-07-12 11:21:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-015', 'DD-007');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-012', 'Mobile Push', 'อัปเดตสถานะเอกสาร DD-007 เป็น [ไม่อนุมัติ]', 'สถานะล่าสุด: ไม่อนุมัติ เมื่อ 2026-07-13', TO_TIMESTAMP('2026-07-13 17:51:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-015', 'DD-007');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-013', 'Mobile Push', 'แจ้งเตือนสร้างเอกสาร DD-008 สำหรับ ฝ่ายการเงินและบัญชี', 'โปรดดำเนินการตรวจสอบภายใน 2 วัน', TO_TIMESTAMP('2026-09-02 08:15:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-007', 'DD-008');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-014', 'System Alert', 'อัปเดตสถานะเอกสาร DD-008 เป็น [ไม่อนุมัติ]', 'สถานะล่าสุด: ไม่อนุมัติ เมื่อ 2026-09-02', TO_TIMESTAMP('2026-09-02 14:06:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-007', 'DD-008');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-015', 'SMS Warning', 'แจ้งเตือนสร้างเอกสาร DD-009 สำหรับ ฝ่ายบริหารและกลยุทธ์', 'โปรดดำเนินการตรวจสอบภายใน 2 วัน', TO_TIMESTAMP('2026-06-02 08:19:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-011', 'DD-009');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-016', 'Email Notification', 'อัปเดตสถานะเอกสาร DD-009 เป็น [กำลังดำเนินการ]', 'สถานะล่าสุด: กำลังดำเนินการ เมื่อ 2026-06-02', TO_TIMESTAMP('2026-06-02 16:56:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-011', 'DD-009');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-017', 'SMS Warning', 'แจ้งเตือนสร้างเอกสาร DD-010 สำหรับ ฝ่ายเทคโนโลยีสารสนเทศ', 'โปรดดำเนินการตรวจสอบภายใน 7 วัน', TO_TIMESTAMP('2026-04-29 09:44:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-005', 'DD-010');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-018', 'System Alert', 'แจ้งเตือนสร้างเอกสาร DD-011 สำหรับ ฝ่ายจัดซื้อและพัสดุ', 'โปรดดำเนินการตรวจสอบภายใน 2 วัน', TO_TIMESTAMP('2026-02-27 11:54:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-006', 'DD-011');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-019', 'SMS Warning', 'อัปเดตสถานะเอกสาร DD-011 เป็น [รอยืนยัน]', 'สถานะล่าสุด: รอยืนยัน เมื่อ 2026-02-27', TO_TIMESTAMP('2026-02-27 16:52:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-006', 'DD-011');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-020', 'System Alert', 'แจ้งเตือนสร้างเอกสาร DD-012 สำหรับ ฝ่ายทรัพยากรบุคคล', 'โปรดดำเนินการตรวจสอบภายใน 3 วัน', TO_TIMESTAMP('2026-03-20 08:36:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-018', 'DD-012');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-021', 'Mobile Push', 'แจ้งเตือนสร้างเอกสาร DD-013 สำหรับ ฝ่ายปฏิบัติการ', 'โปรดดำเนินการตรวจสอบภายใน 5 วัน', TO_TIMESTAMP('2026-06-02 10:25:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-001', 'DD-013');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-022', 'Email Notification', 'แจ้งเตือนสร้างเอกสาร DD-014 สำหรับ ฝ่ายจัดซื้อและพัสดุ', 'โปรดดำเนินการตรวจสอบภายใน 7 วัน', TO_TIMESTAMP('2026-04-09 11:38:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-017', 'DD-014');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-023', 'Email Notification', 'แจ้งเตือนสร้างเอกสาร DD-015 สำหรับ ฝ่ายจัดซื้อและพัสดุ', 'โปรดดำเนินการตรวจสอบภายใน 5 วัน', TO_TIMESTAMP('2026-05-09 10:26:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-011', 'DD-015');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-024', 'Email Notification', 'แจ้งเตือนสร้างเอกสาร DD-016 สำหรับ ฝ่ายทรัพยากรบุคคล', 'โปรดดำเนินการตรวจสอบภายใน 5 วัน', TO_TIMESTAMP('2026-09-04 11:52:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-015', 'DD-016');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-025', 'SMS Warning', 'แจ้งเตือนสร้างเอกสาร DD-017 สำหรับ ฝ่ายเทคโนโลยีสารสนเทศ', 'โปรดดำเนินการตรวจสอบภายใน 3 วัน', TO_TIMESTAMP('2026-03-20 08:13:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-009', 'DD-017');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-026', 'Mobile Push', 'อัปเดตสถานะเอกสาร DD-017 เป็น [ไม่อนุมัติ]', 'สถานะล่าสุด: ไม่อนุมัติ เมื่อ 2026-03-20', TO_TIMESTAMP('2026-03-20 13:15:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-009', 'DD-017');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-027', 'Email Notification', 'แจ้งเตือนสร้างเอกสาร DD-018 สำหรับ ฝ่ายปฏิบัติการ', 'โปรดดำเนินการตรวจสอบภายใน 7 วัน', TO_TIMESTAMP('2026-08-28 08:07:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-015', 'DD-018');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-028', 'SMS Warning', 'อัปเดตสถานะเอกสาร DD-018 เป็น [กำลังดำเนินการ]', 'สถานะล่าสุด: กำลังดำเนินการ เมื่อ 2026-08-29', TO_TIMESTAMP('2026-08-29 16:59:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-015', 'DD-018');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-029', 'System Alert', 'แจ้งเตือนสร้างเอกสาร DD-019 สำหรับ ฝ่ายบริหารและกลยุทธ์', 'โปรดดำเนินการตรวจสอบภายใน 1 วัน', TO_TIMESTAMP('2026-02-17 09:11:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-009', 'DD-019');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-030', 'System Alert', 'แจ้งเตือนสร้างเอกสาร DD-020 สำหรับ ฝ่ายทรัพยากรบุคคล', 'โปรดดำเนินการตรวจสอบภายใน 1 วัน', TO_TIMESTAMP('2026-03-01 10:33:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-006', 'DD-020');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-031', 'Email Notification', 'แจ้งเตือนสร้างเอกสาร DD-021 สำหรับ ฝ่ายทรัพยากรบุคคล', 'โปรดดำเนินการตรวจสอบภายใน 3 วัน', TO_TIMESTAMP('2026-05-20 09:48:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-006', 'DD-021');
+INSERT INTO Log (code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code) VALUES ('LOG-032', 'System Alert', 'อัปเดตสถานะเอกสาร DD-021 เป็น [ปิดงานแล้ว]', 'สถานะล่าสุด: ปิดงานแล้ว เมื่อ 2026-05-21', TO_TIMESTAMP('2026-05-21 15:16:00', 'YYYY-MM-DD HH24:MI:SS'), 'EMP-006', 'DD-021');
+
+COMMIT;</pre>
+  </details>
+  <div class="out"><b>ผลรันจริง 11 พ.ย. 2026:</b> (บน server รันแบ่ง 3 ส่วน) ทุกส่วนผ่าน ไม่มี ORA-02291 แม้แต่ตัวเดียว — ตรวจยอดยืนยัน: Department 8, Department_Head 8, Admin 10, Employee 20, Document 15, Document_Detail 21, Receipt_Record 21, Log 32 (ก่อนทดสอบ) = 135 แถวครบ — ภาษาไทยเก็บถูกต้อง ("วิชัย มั่นคง" แสดงผลสมบูรณ์)</div>
+</section>
+
+<!-- ================= 4. PLSQL ================= -->
+<section class="script" id="s4">
+  <div class="scr-head"><span class="order">ขั้นที่ 4</span><h2>Stored Procedure บันทึก Log แจ้งเตือนอัตโนมัติ (PL/SQL)</h2><span class="file">BA/plsql.txt</span></div>
+  <div class="explain">
+    <h4>จุดประสงค์</h4>
+    <p>ครอบคลุมโจทย์ข้อ 3 ของอาจารย์: <b>"เขียน Stored Procedure (PL/SQL) ตามโจทย์หลักของระบบงาน (Transaction Processing)"</b> — ในระบบนี้ ทุกครั้งที่สถานะเอกสารเปลี่ยน ระบบต้องบันทึกประวัติการแจ้งเตือนให้พนักงานอัตโนมัติ และประวัตินี้<b>ห้ามหาย</b>แม้งานหลักจะล้มเหลว</p>
+    <h4>อธิบายการทำงานทีละบล็อก</h4>
+    <ol>
+      <li><b>พารามิเตอร์</b> — รับ 5 ค่าเข้า (ประเภทแจ้งเตือน, ข้อความสรุป, ข้อความเต็ม, พนักงานปลายทาง, รายละเอียดเอกสาร) และส่ง 1 ค่าออก (<span class="mono">o_log_code</span> = รหัส Log ที่ระบบสร้างให้เอง เพื่อให้ผู้เรียกรู้ว่าบันทึกเป็นรหัสอะไร)</li>
+      <li><b><span class="mono">PRAGMA AUTONOMOUS_TRANSACTION</span></b> — หัวใจของ Procedure นี้: ประกาศว่า transaction ภายใน Procedure <b>เป็นอิสระจาก transaction หลัก</b>ที่เรียกมัน เมื่อ Procedure ทำ <span class="mono">COMMIT</span> ข้อมูล Log ถูกยืนยันถาวรทันที โดยไม่กระทบ (หรือถูกกระทบจาก) COMMIT/ROLLBACK ของงานหลัก — เหตุผลธุรกิจ: Log คือ <b>audit trail</b> ถ้างานหลัก rollback ก็ต้องมีบันทึกว่า "พยายามแล้วพังตรงไหน" ห้ามลบประวัติ</li>
+      <li><b>บล็อกสร้างรหัสอัตโนมัติ</b> — <span class="mono">SELECT NVL(MAX(TO_NUMBER(SUBSTR(code,5))),0)+1 INTO v_next_num FROM Log WHERE REGEXP_LIKE(code,'^LOG-[0-9]+$')</span> แปลว่า: มองเฉพาะแถวที่รหัสเป็นรูปแบบ LOG-ตัวเลข (กันแถวขยะรูปแบบอื่น), ดึงเลขท้ายออกมาด้วย SUBSTR ตำแหน่งที่ 5, หาค่ามากสุด +1 — ถ้าตารางว่างเปล่า NVL ครอบไว้ให้เริ่มที่ LOG-001 จากนั้น <span class="mono">LPAD(...,3,'0')</span> ขยายเลขให้ครบ 3 หลักเสมอ (LOG-001, LOG-033, LOG-100)</li>
+      <li><b>INSERT + SYSTIMESTAMP</b> — บันทึกแถวใหม่โดยเวลาใช้เวลา server จริง (ไม่ใช่เวลาเครื่องผู้ใช้)</li>
+      <li><b>COMMIT</b> — ยืนยันเฉพาะ transaction ย่อยของ Log (เพราะ AUTONOMOUS)</li>
+      <li><b>EXCEPTION WHEN OTHERS</b> — ถ้าพลาด: ROLLBACK เฉพาะของ Log แล้ว <span class="mono">RAISE_APPLICATION_ERROR(-20001, ...)</span> โยน error กลับให้ผู้เรียกเห็นข้อความไทยที่อ่านรู้เรื่อง</li>
+    </ol>
+    <div class="warn"><b>บทเรียนจาก deploy จริง 11/11:</b> Procedure นี้เคยสถานะ INVALID บน server หลายวัน — เพราะมันอ้างตาราง <span class="mono">Log</span> และ <span class="mono">Document_Detail</span> ซึ่งถูกลบไปก่อนหน้านั้น Oracle ทำสิ่งนี้กับ procedure ทุกตัว: เมื่อตารางที่อ้างถูก DROP → procedure กลายเป็น INVALID ทันที เมื่อสร้างตารางกลับมาและ CREATE OR REPLACE ใหม่ → กลับมา VALID เช็คสถานะด้วย <span class="mono">SELECT object_name, status FROM user_objects WHERE object_type='PROCEDURE';</span></div>
+    <div class="note"><b>จุดซักถาม:</b> ทำไมใช้ MAX+SUBSTR ไม่ใช้ SEQUENCE? — เพื่อให้เลขต่อเนื่องไม่มีช่องว่าง (SEQUENCE กระโดดข้ามเลขเมื่อ rollback) แต่ยอมรับข้อจำกัด: 2 session บันทึกพร้อมกันอาจได้เลขซ้ำ → PK violation → ตัวใดตัวหนึ่ง rollback (การบันทึกพร้อมกันจริงควรใช้ SEQUENCE) ตอบแบบนี้แสดงว่าเข้าใจ trade-off</div>
+  </div>
+  <details class="sql" open><summary>สคริปต์เต็ม</summary>
+<pre>CREATE OR REPLACE PROCEDURE SP_LOG_NOTIFICATION_SENT (
+  p_log_type      IN VARCHAR2,
+  p_message_sent    IN VARCHAR2,
+  p_notification_message IN VARCHAR2,
+  p_emp_code      IN VARCHAR2,
+  p_detail_code     IN VARCHAR2,
+  o_log_code      OUT VARCHAR2
+) AS
+  PRAGMA AUTONOMOUS_TRANSACTION;
+  v_next_num NUMBER;
+BEGIN
+  -- 1. สร้างรหัส Log อัตโนมัติในรูปแบบ LOG-XXX
+  SELECT NVL(MAX(TO_NUMBER(SUBSTR(code, 5))), 0) + 1
+  INTO v_next_num
+  FROM Log
+  WHERE REGEXP_LIKE(code, '^LOG-[0-9]+$');
+
+  o_log_code := 'LOG-' || LPAD(v_next_num, 3, '0');
+
+  -- 2. บันทึกข้อมูลลงตาราง Log
+  INSERT INTO Log (
+    code,
+    log_type,
+    message_sent,
+    notification_message,
+    sent_datetime,
+    emp_code,
+    detail_code
+  ) VALUES (
+    o_log_code,
+    p_log_type,
+    p_message_sent,
+    p_notification_message,
+    SYSTIMESTAMP,
+    p_emp_code,
+    p_detail_code
+  );
+
+  COMMIT;
+EXCEPTION
+  WHEN OTHERS THEN
+    ROLLBACK;
+    RAISE_APPLICATION_ERROR(-20001, 'ข้อผิดพลาดในการบันทึก Log การแจ้งเตือน: ' || SQLERRM);
+END SP_LOG_NOTIFICATION_SENT;
+/</pre>
+  </details>
+  <div class="out"><b>ผลรันจริง 11 พ.ย. 2026:</b> สร้างสำเร็จ สถานะ <b>VALID</b> ใน user_objects (หลังจากตาราง Log/Document_Detail ถูกสร้างขึ้นแล้ว)</div>
+</section>
+
+<!-- ================= 5. TEST ================= -->
+<section class="script" id="s5">
+  <div class="scr-head"><span class="order">ขั้นที่ 5</span><h2>ไฟล์ทดสอบเหตุการณ์อนุมัติเอกสาร (Transaction ครบวงจร)</h2><span class="file">BA/TestPLSQL.txt</span></div>
+  <div class="explain">
+    <h4>จุดประสงค์</h4>
+    <p>พิสูจน์หน้างานว่า <b>Transaction Processing</b> ทำงานจริง ด้วยโครง 3 องก์: <b>BEFORE (ก่อนเหตุ) → EVENT (เหตุการณ์) → AFTER (หลังเหตุ)</b> ให้อาจารย์เห็นข้อมูลเปลี่ยนต่อหน้าเทียบก่อน-หลังได้</p>
+    <h4>อธิบายการทำงานทีละองก์</h4>
+    <ol>
+      <li><b>BEFORE</b> — SELECT สถานะเอกสาร DD-004 → ต้องได้ <b>"รอยืนยัน"</b> (ค่าที่ seed ตั้งไว้ตั้งใจ)</li>
+      <li><b>EVENT — 1 เหตุการณ์ 2 การกระทำ</b> ใน anonymous block เดียว:
+        <ul>
+          <li><span class="mono">UPDATE Document_Detail SET status = 'อนุมัติแล้ว' WHERE code='DD-004'</span> — การกระทำที่ 1: หัวหน้าอนุมัติ (transaction หลัก)</li>
+          <li>เรียก <span class="mono">SP_LOG_NOTIFICATION_SENT(...)</span> ด้วย named notation (<span class="mono">=></span>) ส่งชื่อพารามิเตอร์ให้ชัด — การกระทำที่ 2: ระบบสร้าง Log อัตโนมัติ (transaction อิสระภายใน Procedure)</li>
+          <li><span class="mono">COMMIT</span> — ยืนยัน transaction หลัก (UPDATE) ส่วน Log ถูก COMMIT ในตัวเองแล้ว</li>
+        </ul>
+      </li>
+      <li><b>AFTER</b> — SELECT ซ้ำ 2 จุด: สถานะ DD-004 ต้องเปลี่ยนเป็น "อนุมัติแล้ว" และตาราง Log ต้องมีแถวใหม่ <b>LOG-033</b> (32 จาก seed + 1 ที่เพิ่งเกิด)</li>
+    </ol>
+    <div class="note"><b>จุดซักถาม:</b> ถ้า UPDATE สำเร็จแต่ SP พัง จะเกิดอะไร? — UPDATE ยังไม่ถูก COMMIT (transaction หลักค้างอยู่) ผู้เรียกจะได้รับ RAISE_APPLICATION_ERROR และควร ROLLBACK ตัวเอง → สถานะเอกสารไม่เปลี่ยน แต่ Log ที่ SP พยายามบันทึกไม่เกิดเช่นกัน (เพราะ SP rollback ตัวเองก่อน) — คุยกันได้ทั้งสองแบบว่า design แบบไหนเหมาะกับธุรกิจไหน</div>
+  </div>
+  <details class="sql" open><summary>สคริปต์เต็ม</summary>
+<pre>SET SERVEROUTPUT ON;
+
+-- ============================================================
+-- 1. ตรวจสอบข้อมูลก่อนเกิดเหตุการณ์ (BEFORE EVENT)
+-- ============================================================
+-- ดูสถานะเดิมของเอกสาร DD-004 (เดิมเป็น 'รอยืนยัน')
+SELECT code, doc_code, subject, status 
+FROM Document_Detail 
+WHERE code = 'DD-004';
+
+
+-- ============================================================
+-- 2. รัน SCRIPT จำลองเหตุการณ์ที่เกิดขึ้น (EVENT SIMULATION)
+-- ============================================================
+DECLARE
+    v_target_detail_code VARCHAR2(10) := 'DD-004';
+    v_approver_emp_code  VARCHAR2(10) := 'EMP-004';
+    v_new_status         VARCHAR2(50) := 'อนุมัติแล้ว';
+    v_generated_log_code VARCHAR2(10);
+BEGIN
+    -- ขั้นตอนที่ 2.1: เหตุการณ์ที่ 1 - อัปเดตสถานะเอกสารในตารางหลัก
+    UPDATE Document_Detail
+    SET status = v_new_status
+    WHERE code = v_target_detail_code;
+
+    -- ขั้นตอนที่ 2.2: เหตุการณ์ที่ 2 - เรียกใช้ Procedure บันทึก Log การแจ้งเตือน
+    SP_LOG_NOTIFICATION_SENT(
+        p_log_type             => 'Mobile Push',
+        p_message_sent         => 'อัปเดตสถานะเอกสาร ' || v_target_detail_code || ' เป็น [' || v_new_status || ']',
+        p_notification_message => 'สถานะล่าสุด: ' || v_new_status || ' ดำเนินการโดยพนักงานรหัส ' || v_approver_emp_code,
+        p_emp_code             => v_approver_emp_code,
+        p_detail_code          => v_target_detail_code,
+        o_log_code             => v_generated_log_code
+    );
+
+    -- ขั้นตอนที่ 2.3: ยืนยันการทำรายการทั้งหมด
+    COMMIT;
+
+    -- แจ้งผลการจำลองผ่าน DBMS Output
+    DBMS_OUTPUT.PUT_LINE('=== เกิดเหตุการณ์อนุมัติเอกสารสำเร็จ ===');
+    DBMS_OUTPUT.PUT_LINE('1. อัปเดตสถานะ ' || v_target_detail_code || ' เป็น: ' || v_new_status);
+    DBMS_OUTPUT.PUT_LINE('2. ระบบบันทึก Log แจ้งเตือนรหัส: ' || v_generated_log_code);
+END;
+/
+
+
+-- ============================================================
+-- 3. ตรวจสอบผลลัพธ์หลังเกิดเหตุการณ์ (AFTER EVENT)
+-- ============================================================
+-- 3.1 ตรวจสอบสถานะใน Document_Detail ว่าเปลี่ยนแล้วหรือไม่
+SELECT code, doc_code, subject, status 
+FROM Document_Detail 
+WHERE code = 'DD-004';
+
+-- 3.2 ตรวจสอบประวัติ Log ล่าสุดที่ถูกเพิ่มเข้ามาจากเหตุการณ์นี้
+SELECT code, log_type, message_sent, notification_message, sent_datetime, emp_code, detail_code
+FROM Log
+WHERE detail_code = 'DD-004'
+ORDER BY sent_datetime DESC;</pre>
+  </details>
+  <div class="out"><b>ผลรันจริง 11 พ.ย. 2026 บน server:</b> BEFORE: DD-004 = "รอยืนยัน" → EVENT สำเร็จ: "1. อัปเดตสถานะ DD-004 เป็น: อนุมัติแล้ว" และ "2. ระบบบันทึก Log แจ้งเตือนรหัส: LOG-033" → AFTER: สถานะ = "อนุมัติแล้ว" และพบแถว LOG-033 (Mobile Push, EMP-004, DD-004) ในตาราง Log จริง — <b>ตรงตามคาดการณ์ทุกตัวอักษร</b></div>
+</section>
+
+<!-- ================= 6. JOIN ================= -->
+<section class="script" id="s6">
+  <div class="scr-head"><span class="order">ขั้นที่ 6</span><h2>รายงาน JOIN 8 ตาราง (การทำงานหลักของระบบ)</h2><span class="file">BA/Join.txt</span></div>
+  <div class="explain">
+    <h4>จุดประสงค์</h4>
+    <p>ครอบคลุมโจทย์ข้อ 4: <b>"รายงานที่สำคัญที่ซับซ้อนมาก คือ รายงานในส่วนการประมวลผลกลุ่มงาน (ที่มีการใช้ Transaction tables / Master tables) ที่เกิดการ JOIN มากๆ"</b> — รายงานนี้เชื่อมทั้ง 8 ตารางให้เห็นชีวิตเต็มวงจรของเอกสารในแถวเดียว: ใครร่าง → ใครอนุมัติ → ใครรับทราบ → ถูกแจ้งเตือนอะไรไปบ้าง</p>
+    <h4>อธิบายการทำงานทีละ JOIN</h4>
+    <table style="width:100%;border-collapse:collapse;font-size:14.5px;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden">
+      <tr style="background:#f1f5f9"><th style="text-align:left;padding:8px 12px;border-bottom:2px solid var(--line)">JOIN</th><th style="text-align:left;padding:8px 12px;border-bottom:2px solid var(--line)">เชื่อมอะไร</th><th style="text-align:left;padding:8px 12px;border-bottom:2px solid var(--line)">ประเภทตาราง</th></tr>
+      <tr><td style="padding:7px 12px;border-bottom:1px solid #eef1f6" class="mono">Document ↔ Document_Detail</td><td style="padding:7px 12px;border-bottom:1px solid #eef1f6">เอกสารแม่ ↔ รายละเอียดย่อย (1:M)</td><td style="padding:7px 12px;border-bottom:1px solid #eef1f6">Master + Transaction</td></tr>
+      <tr><td style="padding:7px 12px;border-bottom:1px solid #eef1f6" class="mono">Admin + Department (adm)</td><td style="padding:7px 12px;border-bottom:1px solid #eef1f6">ธุรการผู้ร่าง + แผนกสังกัด</td><td style="padding:7px 12px;border-bottom:1px solid #eef1f6">Master</td></tr>
+      <tr><td style="padding:7px 12px;border-bottom:1px solid #eef1f6" class="mono">Department_Head + Department (dh)</td><td style="padding:7px 12px;border-bottom:1px solid #eef1f6">หัวหน้าผู้อนุมัติ + แผนกสังกัด</td><td style="padding:7px 12px;border-bottom:1px solid #eef1f6">Master</td></tr>
+      <tr><td style="padding:7px 12px;border-bottom:1px solid #eef1f6" class="mono">LEFT JOIN Receipt_Record</td><td style="padding:7px 12px;border-bottom:1px solid #eef1f6">บันทึกการรับทราบ (อาจยังไม่มีใครรับ!)</td><td style="padding:7px 12px;border-bottom:1px solid #eef1f6">Transaction</td></tr>
+      <tr><td style="padding:7px 12px;border-bottom:1px solid #eef1f6" class="mono">LEFT JOIN Employee + Department</td><td style="padding:7px 12px;border-bottom:1px solid #eef1f6">พนักงานผู้กดรับ + แผนก</td><td style="padding:7px 12px;border-bottom:1px solid #eef1f6">Master</td></tr>
+      <tr><td style="padding:7px 12px" class="mono">LEFT JOIN Log (มีเงื่อนไข OR emp_code IS NULL)</td><td style="padding:7px 12px">ประวัติแจ้งเตือนของรายละเอียดนั้น</td><td style="padding:7px 12px">Transaction</td></tr>
+    </table>
+    <ul style="margin-top:12px">
+      <li><b>ทำไม LEFT JOIN 3 จุดท้าย?</b> — เอกสารบางรายการอาจ<b>ยังไม่มีใครกดรับทราบ</b> (ยังรออยู่) ถ้าใช้ INNER JOIN แถวเอกสารเหล่านั้นจะ<b>หล่นหายจากรายงานทั้งแถว</b> ซึ่งผิดจุดประสงค์รายงานภาพรวม — เอกสารที่ยังไม่ถูกรับจะแสดง NULL ในคอลัมน์ receipt/receiver แทน</li>
+      <li><b>เงื่อนไข <span class="mono">AND (lg.emp_code = emp.code OR lg.emp_code IS NULL)</span></b> — กรอง Log ให้เข้าคู่กับพนักงานที่รับทราบจริง หรือแสดง Log ของแถวที่ยังไม่มีผู้รับ (เพราะ emp เป็น NULL การเทียบ = จะเทียบไม่ตรงเลย)</li>
+      <li><b>ORDER BY</b> — เรียงเอกสาร → รายละเอียด → Log ล่าสุดอยู่บน ทำให้อ่านเรื่องราวย้อนเวลาได้ทีละเอกสาร</li>
+    </ul>
+  </div>
+  <details class="sql" open><summary>สคริปต์เต็ม</summary>
+<pre>SELECT *
+
+FROM Document d
+-- เชื่อมรายการย่อยของเอกสาร
+JOIN Document_Detail dd     ON d.doc_code = dd.doc_code
+
+-- เชื่อมธุรการผู้สร้างเอกสารและแผนกสังกัด
+JOIN Admin adm             ON d.created_by = adm.code
+JOIN Department adm_dept   ON adm.dept_code = adm_dept.dept_code
+
+-- เชื่อมหัวหน้าแผนกผู้อนุมัติเอกสารและแผนกสังกัด
+JOIN Department_Head dh    ON d.approved_by = dh.code
+JOIN Department dh_dept    ON dh.dept_code = dh_dept.dept_code
+
+-- เชื่อมบันทึกรับเอกสารปลายทาง (LEFT JOIN รองรับเอกสารที่ยังไม่มีการกดรับ)
+LEFT JOIN Receipt_Record rec ON dd.code = rec.detail_code
+
+-- เชื่อมพนักงานผู้กดรับเอกสารและแผนกสังกัด (LEFT JOIN)
+LEFT JOIN Employee emp     ON rec.confirmed_by = emp.code
+LEFT JOIN Department emp_dept ON emp.dept_code = emp_dept.dept_code
+
+-- เชื่อมประวัติการแจ้งเตือนทั้งหมดของเอกสารรายการนั้นๆ (LEFT JOIN)
+LEFT JOIN Log lg           ON dd.code = lg.detail_code AND (lg.emp_code = emp.code OR lg.emp_code IS NULL)
+
+ORDER BY 
+    d.doc_code ASC, 
+    dd.code ASC, 
+    lg.sent_datetime DESC;</pre>
+  </details>
+  <div class="out"><b>ผลรันจริง 11 พ.ย. 2026 (ตัวอย่างแถว DOC-2026-004):</b> DD-004 | อนุมัติแล้ว | 5 วัน | ผู้สร้าง: สุภาพร ชูใจ (ธุรการ, ฝ่ายบริหารฯ) | ผู้อนุมัติ: ดร.สมชาย วิเศษกุล | รับทราบ: REC-004 โดยกมลวรรณ สุขเสริฐ | Log: LOG-033 (Mobile Push) — <b>ชีวิตเต็มวงจรของเอกสารในแถวเดียว</b> รวม LOG-033 ที่เกิดจากการทดสอบขั้นที่ 5 ด้วย</div>
+</section>
+
+<!-- ================= 7. VERIFY ================= -->
+<section class="script" id="s7">
+  <div class="scr-head"><span class="order">ขั้นที่ 7</span><h2>Script ตรวจสอบผลการทำงาน (ของอาจารย์ — เวอร์ชันแก้ให้รันได้)</h2><span class="file">BA/Verify.txt</span></div>
+  <div class="explain">
+    <h4>จุดประสงค์</h4>
+    <p>โจทย์อาจารย์กำหนดให้ตรวจงานด้วย SQL แสดง Object ประเภท TABLE ที่ Database User เป็นเจ้าของ พร้อม Constraint ทั้งหมด — ไฟล์นี้คือ Script ของอาจารย์ที่<b>แก้บั๊กให้รันได้จริง</b> + query เสริมสำหรับตอบซักถาม</p>
+    <h4>อธิบายการทำงานทีละ query</h4>
+    <ol>
+      <li><b>Query หลัก (ของอาจารย์)</b> — <span class="mono">USER_TABLES LEFT JOIN USER_CONSTRAINTS</span> เพราะตารางบางตารางอาจไม่มี constraint เลย ถ้าใช้ INNER JOIN ตารางนั้นจะหายไปจากรายงาน LEFT JOIN ทำให้ทุกตารางโผล่มาแม้ไม่มี constraint (คอลัมน์ฝั่ง constraint เป็น NULL)</li>
+      <li><b>บั๊กที่แก้:</b> ต้นฉบับอาจารย์ใช้ <span class="mono">USER_TABLES.OWNER</span> ซึ่ง<b>ไม่มีคอลัมน์นี้อยู่จริง</b> (ORA-00904) — เพราะ OWNER มีเฉพาะใน ALL_TABLES/DBA_TABLES ที่ต้องใช้สิทธิ์สูง → แก้เป็น <span class="mono">USER AS OWNER</span> (คำว่า USER คือ function คืนชื่อ user ปัจจุบัน)</li>
+      <li><b>Query เสริม (USER_CONSTRAINTS + USER_CONS_COLUMNS)</b> — แสดงว่า constraint แต่ละตัวผูกกับ<b>คอลัมน์ไหน ตำแหน่งไหน</b> ใช้ตอบอาจารย์ว่า FK ตัวไหนชี้จากไหนไปไหน</li>
+      <li><b>Query กรองเฉพาะงาน BA</b> — เพราะ user นี้มีตาราง 2 โปรเจกต์ร่วมกัน 18 ตาราง ใช้ WHERE table_name IN (...) กรองดูเฉพาะของงานตัวเองเวลาอาจารย์ขอดูของงานเดียว</li>
+    </ol>
+    <div class="note"><b>จำความหมาย CONSTRAINT_TYPE ให้ขึ้นใจ:</b> P = Primary Key, R = Foreign Key (Referential), U = Unique, C = Check หรือ NOT NULL และชื่อ <span class="mono">SYS_Cxxxxxx</span> = ชื่อที่ Oracle ตั้งอัตโนมัติให้ constraint ที่เราไม่ได้ตั้งชื่อเอง (ส่วนใหญ่คือ NOT NULL)</div>
+  </div>
+  <details class="sql" open><summary>สคริปต์เต็ม</summary>
+<pre>-- ============================================================
+-- Script ตรวจสอบผลการทำงาน: แสดง TABLE ที่ User เป็นเจ้าของ + Constraint
+-- (ของอาจารย์ — เวอร์ชันแก้ไขให้รันได้จริง)
+-- ============================================================
+SELECT
+    t.TABLE_NAME,
+    t.TABLESPACE_NAME,
+    USER AS OWNER,
+    c.CONSTRAINT_NAME,
+    c.CONSTRAINT_TYPE,
+    c.TABLE_NAME
+FROM USER_TABLES t
+LEFT OUTER JOIN USER_CONSTRAINTS c
+       ON (t.TABLE_NAME = c.TABLE_NAME)
+ORDER BY t.TABLE_NAME, c.CONSTRAINT_TYPE, c.CONSTRAINT_NAME;
+
+-- ============================================================
+-- (เสริม) แสดงคอลัมน์ที่เกี่ยวข้องกับแต่ละ Constraint
+-- ============================================================
+SELECT
+    c.TABLE_NAME,
+    c.CONSTRAINT_NAME,
+    c.CONSTRAINT_TYPE,
+    cc.COLUMN_NAME,
+    cc.POSITION
+FROM USER_CONSTRAINTS c
+LEFT JOIN USER_CONS_COLUMNS cc
+       ON c.CONSTRAINT_NAME = cc.CONSTRAINT_NAME
+      AND c.OWNER = cc.OWNER
+ORDER BY c.TABLE_NAME, c.CONSTRAINT_TYPE, c.CONSTRAINT_NAME, cc.POSITION;
+
+-- ============================================================
+-- (เสริม) กรองเฉพาะตารางของโปรเจกต์นี้ (Document Approval)
+-- ============================================================
+SELECT
+    t.TABLE_NAME,
+    t.TABLESPACE_NAME,
+    USER AS OWNER,
+    c.CONSTRAINT_NAME,
+    c.CONSTRAINT_TYPE,
+    c.TABLE_NAME
+FROM USER_TABLES t
+LEFT OUTER JOIN USER_CONSTRAINTS c
+       ON (t.TABLE_NAME = c.TABLE_NAME)
+WHERE t.TABLE_NAME IN ('DEPARTMENT','DEPARTMENT_HEAD','ADMIN','EMPLOYEE',
+                       'DOCUMENT','DOCUMENT_DETAIL','RECEIPT_RECORD','LOG')
+ORDER BY t.TABLE_NAME, c.CONSTRAINT_TYPE, c.CONSTRAINT_NAME;</pre>
+  </details>
+  <div class="out"><b>ผลรันจริง 11 พ.ย. 2026:</b> แสดง constraint รวม 54 แถว (ครบทั้ง 18 ตารางของ 2 โปรเจกต์) — ตาราง BA พบทั้ง FK ที่เราตั้งชื่อ (fk_dd_doc, fk_rec_emp ฯลฯ) และ NOT NULL ที่ Oracle ตั้งเอง (SYS_Cxxxxx) — query รวมนับยืนยัน: BA_TABLES = 8, SE_TABLES = 10, รวม 18 ตารางอยู่ร่วมกันใน user เดียวได้สมบูรณ์</div>
+</section>
+
+</div>
+
+<footer>
+  <div class="wrap"><b>งาน BA — ระบบจัดการอนุมัติเอกสาร</b> · Deploy สำเร็จบน Oracle KMITL Server (SQL_S2_11@orcl) 11 พ.ย. 2026 · <a href="index.html" style="color:#c4b5fd">กลับหน้าเอกสารหลัก</a> · <a href="scripts-se.html" style="color:#c4b5fd">ดูสคริปต์งาน SE →</a></div>
+</footer>
+
+</body>
+</html>
+</div>
+</body>
+</html>

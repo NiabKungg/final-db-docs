@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สคริปต์ทั้งหมด + คำอธิบาย — งาน SE (ระบบขนส่งสาธารณะอัจฉริยะ)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f7fb; --card:#fff; --ink:#1e2430; --muted:#5b6472; --line:#e3e7ef;
+  --se:#0e7490; --se-soft:#e6f6fa; --gold:#b45309; --gold-bg:#fef3c7;
+  --green:#047857; --green-bg:#d1fae5; --red:#b91c1c; --red-bg:#fee2e2;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--ink);line-height:1.75;font-size:16px}
+h1,h2,h3,h4{font-family:'Kanit',sans-serif;line-height:1.4}
+code,.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+.hero{background:linear-gradient(135deg,#082f49,#155e75);color:#fff;padding:44px 0 40px;text-align:center}
+.hero h1{font-size:clamp(24px,3.5vw,34px)}
+.hero p{color:#cffafe;max-width:780px;margin:8px auto 0;font-size:16px}
+.hero .back{display:inline-block;color:#67e8f9;margin-bottom:12px;font-size:14px;text-decoration:none}
+.hero .back:hover{color:#fff}
+nav{position:sticky;top:0;z-index:50;background:#ffffffee;backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;gap:4px;flex-wrap:wrap;padding:9px 20px}
+nav a{color:var(--muted);text-decoration:none;font-size:13.5px;padding:6px 12px;border-radius:999px;font-weight:500}
+nav a:hover{background:var(--se-soft);color:var(--se)}
+nav a .n{display:inline-flex;width:19px;height:19px;background:var(--se);color:#fff;border-radius:50%;align-items:center;justify-content:center;font-size:11px;margin-right:5px;font-family:'Kanit'}
+section.script{padding:42px 0 6px}
+.scr-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.scr-head .order{background:var(--se);color:#fff;font-family:'Kanit';font-weight:600;font-size:14px;padding:4px 14px;border-radius:999px}
+.scr-head h2{font-size:22px;color:var(--se)}
+.scr-head .file{font-family:'JetBrains Mono';font-size:13px;background:#fff;border:1px solid var(--line);padding:3px 10px;border-radius:8px;color:var(--muted)}
+.explain{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--se);border-radius:14px;padding:20px 24px;margin-bottom:14px}
+.explain h4{color:var(--se);font-size:16px;margin:14px 0 6px}
+.explain h4:first-child{margin-top:0}
+.explain ul,.explain ol{margin:6px 0 6px 22px}
+.explain li{margin-bottom:5px;font-size:15px}
+.explain .mono{font-size:13px;background:#f1f5f9;padding:1px 6px;border-radius:5px}
+.note{margin-top:12px;background:var(--gold-bg);border:1px solid #fde68a;border-radius:10px;padding:10px 14px;font-size:14.5px}
+.note b{color:var(--gold)}
+.out{margin-top:12px;background:var(--green-bg);border:1px solid #a7f3d0;border-radius:10px;padding:10px 14px;font-size:14.5px}
+.out b{color:var(--green)}
+.warn{margin-top:12px;background:var(--red-bg);border:1px solid #fecaca;border-radius:10px;padding:10px 14px;font-size:14.5px}
+.warn b{color:var(--red)}
+details.sql{background:#0f172a;border-radius:12px;margin:10px 0 26px;overflow:hidden;border:1px solid #1e293b}
+details.sql summary{cursor:pointer;padding:13px 18px;font-family:'Kanit';font-weight:600;color:#93c5fd;font-size:15px;list-style-position:inside}
+details.sql summary:hover{color:#bfdbfe}
+details.sql[open] summary{border-bottom:1px solid #1e293b}
+details.sql pre{padding:14px 20px 18px;overflow-x:auto;font-size:12.8px;line-height:1.6;color:#e2e8f0;font-family:'JetBrains Mono',monospace}
+.flowline{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.flowline span{background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px 12px;font-size:13.5px;font-family:'Kanit'}
+.flowline .arr{border:none;background:none;color:var(--muted);padding:5px 2px}
+footer{margin-top:60px;background:#111827;color:#94a3b8;padding:26px 0;font-size:14px;text-align:center}
+footer b{color:#e2e8f0}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <a class="back" href="index.html">← กลับหน้าเอกสารหลัก</a>
+    <h1>สคริปต์ทั้งหมด + คำอธิบายการทำงาน — งาน SE</h1>
+    <p>ระบบขนส่งสาธารณะอัจฉริยะ (Smart Transit System) — ทุกไฟล์เรียงตามลำดับที่ต้องรันบน Oracle พร้อมคำอธิบายละเอียดและผลรันจริงจาก server (11 พ.ย. 2026)</p>
+  </div>
+</header>
+
+<nav>
+  <div class="wrap">
+    <a href="#s0"><span class="n">0</span>DropOldObjects</a>
+    <a href="#s1"><span class="n">1</span>DropTable</a>
+    <a href="#s2"><span class="n">2</span>DDL</a>
+    <a href="#s3"><span class="n">3</span>DML</a>
+    <a href="#s4"><span class="n">4</span>PLSQL1</a>
+    <a href="#s5"><span class="n">5</span>PLSQL2</a>
+    <a href="#s6"><span class="n">6</span>TestPLSQL2</a>
+    <a href="#s7"><span class="n">7</span>Join (5 รายงาน)</a>
+    <a href="#s8"><span class="n">8</span>Verify</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ================= 0. DROP OLD ================= -->
+<section class="script" id="s0">
+  <div class="scr-head"><span class="order">ขั้นที่ 0</span><h2>ตรวจและเคลียร์ object เก่าตกค้าง (ทำก่อนเสมอ)</h2><span class="file">SE/DropOldObjects.txt</span></div>
+  <div class="explain">
+    <h4>จุดประสงค์</h4>
+    <p>ตรวจว่ามีตาราง/Sequence/Procedure <b>ของเวอร์ชันเก่าหรืองานอื่น</b> ตกค้างอยู่ใน user หรือไม่ — เพราะ Script ตรวจสอบของอาจารย์ (USER_TABLES) แสดง<b>ทุก</b>ตารางที่ user เป็นเจ้าของ ถ้ามีขยะตกค้างจะโชว์ปนมาในผลตรวจทันที</p>
+    <h4>อธิบายการทำงาน</h4>
+    <ul>
+      <li><b>ขั้นตอนที่ 1: SELECT ก่อนเสมอ</b> — <span class="mono">SELECT object_type, object_name FROM user_objects WHERE object_type IN ('TABLE','SEQUENCE','PROCEDURE','VIEW')</span> — ดูก่อนว่ามีอะไรอยู่จริง <b>ห้ามลบมั่ว</b></li>
+      <li><b>ขั้นตอนที่ 2: DROP เฉพาะของเราเท่านั้น</b> — รายการ DROP ในไฟล์ comment ไว้ แกะใช้เฉพาะชื่อที่เจอจริงในผลตรวจ (ตารางเก่า เช่น USER_TYPE, VEHICLE, BELL_REQUEST, IOT_BOX, ALERT_STATISTICS ฯลฯ)</li>
+      <li><b>สิ่งที่ห้ามแตะ</b> — ตาราง BA (ADMIN, DEPARTMENT, LOG ฯลฯ) และของงานคอร์สอื่นใน user เดียวกัน (SEQ_TUTOR, SEQ_STUDENT, procedure ตระกูล ADD_*/DIS_*)</li>
+    </ul>
+    <div class="out"><b>ผลรันจริง 11 พ.ย. 2026:</b> พบของเก่าของ SE ตกค้างจริง 5 procedure (SP_CANCEL_BELL, SP_COMPLETE_ALIGHT, SP_LOG_NOTIFICATION, SP_PRESS_BELL, SP_SEND_DIGITAL_SIGNAL — ล้วน INVALID เพราะอ้างตารางเก่าที่ถูกลบไปแล้ว) → DROP ทิ้งสำเร็จทั้งหมด และยืนยันว่าตารางเก่า (BELL_REQUEST, ALERT_STATISTICS ฯลฯ) ถูกเคลียร์ไปก่อนหน้าแล้ว เหลือแค่ procedure เก่า</div>
+    <div class="note"><b>จุดซักถาม:</b> ทำไม procedure เก่าถึง INVALID? — Oracle ผูก dependency ระหว่าง procedure กับตารางที่อ้าง เมื่อตารางถูก DROP → ทุก procedure ที่อ้างมันกลายเป็น INVALID ทันที (ไม่ถูกลบ แค่พัง) ต้อง DROP เองเพื่อเคลียร์</div>
+  </div>
+  <details class="sql"><summary>สคริปต์เต็ม (SELECT ตรวจ + รายการ DROP แบบ comment)</summary>
+<pre>-- (สำรอง) ลบ object ตกค้างจากการ deploy เวอร์ชันเก่า — ใช้เมื่อจำเป็นเท่านั้น
+-- ขั้นตอน: 1) รัน SELECT ดูก่อน  2) ถ้าเจอของเก่าจึงแกะ DROP ใช้
+-- ห้ามลบตารางงาน BA (ADMIN, DEPARTMENT, DOCUMENT, LOG ฯลฯ)
+
+-- 1) ตรวจสอบ object ทั้งหมดที่ user เป็นเจ้าของ
+SELECT object_type, object_name
+FROM   user_objects
+WHERE  object_type IN ('TABLE','SEQUENCE','PROCEDURE','VIEW')
+ORDER  BY object_type, object_name;
+
+-- 2) (รันเฉพาะถ้าเจอของเก่าตกค้าง)
+-- DROP TABLE VEHICLE_BELL_BUTTON CASCADE CONSTRAINTS;
+-- DROP TABLE BELL_BUTTON CASCADE CONSTRAINTS;
+-- DROP TABLE IOT_BOX CASCADE CONSTRAINTS;
+-- DROP TABLE ALERT_STATISTICS CASCADE CONSTRAINTS;
+-- DROP TABLE VEHICLE_DIGITAL_SIGNAL CASCADE CONSTRAINTS;
+-- DROP TABLE DIGITAL_BELL_SIGNAL CASCADE CONSTRAINTS;
+-- DROP TABLE VEHICLE_BELL_REQUEST CASCADE CONSTRAINTS;
+-- DROP TABLE BELL_REQUEST CASCADE CONSTRAINTS;
+-- DROP TABLE VEHICLE CASCADE CONSTRAINTS;
+-- DROP TABLE USER_TYPE CASCADE CONSTRAINTS;
+
+-- 3) ลบ Procedure เวอร์ชันเก่า (ถ้ามี) เช่น
+-- DROP PROCEDURE SP_PRESS_BELL;</pre>
+  </details>
+</section>
+
+<!-- ================= 1. DROP ================= -->
+<section class="script" id="s1">
+  <div class="scr-head"><span class="order">ขั้นที่ 1</span><h2>ลบตาราง SE เดิมทั้ง 10</h2><span class="file">SE/DropTable.txt</span></div>
+  <div class="explain">
+    <h4>จุดประสงค์</h4>
+    <p>เคลียร์โครงสร้าง SE เดิมออกทั้งหมดก่อนสร้างใหม่ตามเงื่อนไขอาจารย์ (DROP แล้วสร้างใหม่หน้างาน)</p>
+    <h4>อธิบายการทำงาน</h4>
+    <ul>
+      <li><b>ลำดับลบจากลูกไปแม่</b> — ALERT_LOGS → DIGITAL_BELLS → EMERGENCY_BUTTONS → VEHICLES → IoT_Boxes → Route_Stops → Bus_Stops → Routes → Users → User_Types</li>
+      <li><b><span class="mono">CASCADE CONSTRAINTS</span></b> — ลบ FK ที่ชี้มาที่ตารางนี้พร้อมกัน กัน ORA-02266 และยังตัด FK ข้ามตารางที่อาจค้างจากการทดลองเก่า ๆ</li>
+      <li><b>เกร็ดจากวันนี้:</b> วันนี้ตาราง SE มีอยู่ครบ 10 บน server อยู่แล้วจาก deploy เดิม → รัน DROP ชุดนี้แล้วผ่านหมดโดยไม่มี ORA-00942 เลย แล้วจึงเริ่มสร้างใหม่จากศูนย์</li>
+    </ul>
+  </div>
+  <details class="sql" open><summary>สคริปต์เต็ม</summary>
+<pre>DROP TABLE Alert_Logs CASCADE CONSTRAINTS;
+DROP TABLE Digital_Bells CASCADE CONSTRAINTS;
+DROP TABLE Emergency_Buttons CASCADE CONSTRAINTS;
+DROP TABLE Vehicles CASCADE CONSTRAINTS;
+DROP TABLE IoT_Boxes CASCADE CONSTRAINTS;
+DROP TABLE Route_Stops CASCADE CONSTRAINTS;
+DROP TABLE Bus_Stops CASCADE CONSTRAINTS;
+DROP TABLE Routes CASCADE CONSTRAINTS;
+DROP TABLE Users CASCADE CONSTRAINTS;
+DROP TABLE User_Types CASCADE CONSTRAINTS;</pre>
+  </details>
+</section>
+
+<!-- ================= 2. DDL ================= -->
+<section class="script" id="s2">
+  <div class="scr-head"><span class="order">ขั้นที่ 2</span><h2>สร้างตารางทั้ง 10 (DDL)</h2><span class="file">SE/DDL.txt</span></div>
+  <div class="explain">
+    <h4>จุดประสงค์</h4>
+    <p>แปลง ER Diagram 10 เอนทิตี (Strong 9 + Weak 1) เป็นตาราง Oracle พร้อม PK/FK/UNIQUE/DEFAULT ครบตามความสัมพันธ์ 8 จุดใน ER</p>
+    <h4>อธิบายการทำงานทีละตาราง</h4>
+    <ol>
+      <li><b>User_Types</b> — ตาราง lookup ประเภทผู้ใช้ (Admin / พนักงานขับรถ / ผู้รับบริการ) สร้างก่อนเพราะ Users จะชี้มา</li>
+      <li><b>Users</b> — ผู้ใช้งานระบบ; Composite Attribute "ชื่อ" ใน ER แตกเป็น first_name + last_name; FK <span class="mono">fk_users_usertype</span>; DEFAULT 'Active' ให้ status</li>
+      <li><b>Routes</b> — สายเดินรถ (แม่ของรถและรายการจุดจอด)</li>
+      <li><b>Bus_Stops</b> — ป้ายจอด; พิกัดจาก ER แยกเป็น latitude/longitude สองคอลัมน์ NUMBER(10,6)</li>
+      <li><b>Route_Stops</b> — <b>Weak Entity</b> จาก ER แตกความสัมพันธ์ M:N ระหว่างสายกับป้าย — <b>PK รวม (route_id, seq)</b>: route_id = PK เจ้าของ, seq = Partial Key (ลำดับป้ายในสาย) + FK สองเส้น (fk_rs_route, fk_rs_stop)</li>
+      <li><b>IoT_Boxes</b> — กล่อง IoT พร้อมพิกัด GPS ที่จะถูกอัปเดตสดผ่าน Procedure</li>
+      <li><b>Vehicles</b> — รถ; FK 3 เส้น (สาย / IoT / คนขับ); <span class="mono">iot_id UNIQUE</span> ทำให้ 1 รถติดกล่องเดียว (ER เขียน M:N แต่การใช้จริง 1:1); <span class="mono">passenger_count DEFAULT 0</span> = Derived Attribute เก็บเป็นค่า cache</li>
+      <li><b>Emergency_Buttons</b> — ปุ่มฉุกเฉินกายภาพบนรถ (1 คันหลายปุ่ม)</li>
+      <li><b>Digital_Bells</b> — <b>Transaction table หลักของระบบ</b>: ทุกครั้งที่ผู้โดยสารกดกริ่งขอลงรถจะเกิด 1 แถว (FK user + vehicle)</li>
+      <li><b>Alert_Logs</b> — บันทึกเหตุฉุกเฉินจากการกดปุ่ม; <b>คอลัมน์เวลาชื่อ alert_time ไม่ใช่ timestamp</b> (อ่านเหตุผลในกล่องเตือนด้านล่าง)</li>
+    </ol>
+    <div class="warn"><b>บทเรียนจริงจาก deploy 11/11 — ห้ามตั้งชื่อคอลัมน์ว่า timestamp:</b> ตอนแรกคอลัมน์นี้ชื่อ "timestamp" ใช้ใน SQL ปกติได้ผลทุกอย่าง (สร้างตาราง/INSERT ผ่านหมด) แต่พอ compile <span class="mono">sp_report_emergency_alert</span> ที่ INSERT ลงตารางนี้ เกิด <b>PLS-320</b> (การประกาศประเภท expression ไม่สมบูรณ์) — เพราะ "timestamp" ชนกับชื่อ datatype ของ PL/SQL บน Oracle 10g ตรวจจุดพังได้จาก <span class="mono">SELECT line, position, text FROM user_errors WHERE name='SP_REPORT_EMERGENCY_ALERT';</span> แล้วแก้ด้วย <span class="mono">ALTER TABLE Alert_Logs RENAME COLUMN timestamp TO alert_time;</span> จึง compile ผ่าน — บทเรียน: <b>อย่าตั้งชื่อคอลัมน์ตรงกับชื่อ datatype (DATE, TIMESTAMP, NUMBER, LEVEL ฯลฯ)</b></div>
+    <div class="note"><b>จุดซักถาม:</b> ทำไม passenger_count ยังเก็บคอลัมน์ทั้งที่เป็น Derived Attribute (วงรีเส้นประใน ER)? — เก็บเป็นค่า cache ที่เปลี่ยนผ่าน Procedure เท่านั้น ไม่ใช่ข้อมูลดิบ ประโยชน์คือ query สถานะรถเร็วมาก (อ่านคอลัมน์เดียว) เทียบเท่า denormalization เพื่อ performance</div>
+  </div>
+  <details class="sql" open><summary>สคริปต์เต็ม (10 ตาราง)</summary>
+<pre>-- ==========================================
+-- 2. CREATE TABLES
+-- ==========================================
+
+-- 1. ตารางประเภทผู้ใช้งาน (User_Types)
+CREATE TABLE User_Types (
+    user_type_id VARCHAR2(10) PRIMARY KEY,
+    type_name    VARCHAR2(100) NOT NULL,
+    description  VARCHAR2(255)
+);
+
+-- 2. ตารางผู้ใช้งานระบบ (Users)
+CREATE TABLE Users (
+    user_id      VARCHAR2(20) PRIMARY KEY,
+    first_name   VARCHAR2(100) NOT NULL,
+    last_name    VARCHAR2(100) NOT NULL,
+    phone_number VARCHAR2(20),
+    email        VARCHAR2(100),
+    user_type_id VARCHAR2(10),
+    status       VARCHAR2(20) DEFAULT 'Active',
+    CONSTRAINT fk_users_usertype FOREIGN KEY (user_type_id) REFERENCES User_Types(user_type_id)
+);
+
+-- 3. ตารางเส้นทางเดินรถ (Routes)
+CREATE TABLE Routes (
+    route_id    VARCHAR2(20) PRIMARY KEY,
+    route_name  VARCHAR2(100) NOT NULL,
+    description VARCHAR2(255),
+    start_time  VARCHAR2(8),
+    end_time    VARCHAR2(8),
+    status      VARCHAR2(20) DEFAULT 'Active'
+);
+
+-- 4. ตารางจุดจอดรถ (Bus_Stops)
+CREATE TABLE Bus_Stops (
+    stop_id     VARCHAR2(20) PRIMARY KEY,
+    stop_name   VARCHAR2(100) NOT NULL,
+    latitude    NUMBER(10, 6),
+    longitude   NUMBER(10, 6),
+    description VARCHAR2(255)
+);
+
+-- 5. ตารางรายการจุดจอดในเส้นทาง (Route_Stops)
+CREATE TABLE Route_Stops (
+    route_id            VARCHAR2(20),
+    seq                 NUMBER,
+    stop_id             VARCHAR2(20),
+    est_time_offset_min NUMBER,
+    note                VARCHAR2(255),
+    PRIMARY KEY (route_id, seq),
+    CONSTRAINT fk_rs_route FOREIGN KEY (route_id) REFERENCES Routes(route_id),
+    CONSTRAINT fk_rs_stop FOREIGN KEY (stop_id) REFERENCES Bus_Stops(stop_id)
+);
+
+-- 6. ตารางกล่อง IoT (IoT_Boxes)
+CREATE TABLE IoT_Boxes (
+    iot_id           VARCHAR2(20) PRIMARY KEY,
+    latitude         NUMBER(10, 6),
+    longitude        NUMBER(10, 6),
+    firmware_version VARCHAR2(50),
+    network_type     VARCHAR2(50),
+    status           VARCHAR2(20) DEFAULT 'Active'
+);
+
+-- 7. ตารางยานพาหนะ (Vehicles)
+CREATE TABLE Vehicles (
+    vehicle_id      VARCHAR2(20) PRIMARY KEY,
+    license_plate   VARCHAR2(20) NOT NULL,
+    vehicle_model   VARCHAR2(100),
+    capacity        NUMBER,
+    passenger_count NUMBER DEFAULT 0,
+    route_id        VARCHAR2(20),
+    iot_id          VARCHAR2(20) UNIQUE,
+    driver_user_id  VARCHAR2(20),
+    status          VARCHAR2(20) DEFAULT 'Active',
+    CONSTRAINT fk_v_route FOREIGN KEY (route_id) REFERENCES Routes(route_id),
+    CONSTRAINT fk_v_iot FOREIGN KEY (iot_id) REFERENCES IoT_Boxes(iot_id),
+    CONSTRAINT fk_v_driver FOREIGN KEY (driver_user_id) REFERENCES Users(user_id)
+);
+
+-- 8. ตารางปุ่มกดแจ้งเตือนฉุกเฉิน (Emergency_Buttons)
+CREATE TABLE Emergency_Buttons (
+    button_id       VARCHAR2(20) PRIMARY KEY,
+    vehicle_id      VARCHAR2(20),
+    button_location VARCHAR2(100),
+    status          VARCHAR2(20) DEFAULT 'Active',
+    CONSTRAINT fk_eb_vehicle FOREIGN KEY (vehicle_id) REFERENCES Vehicles(vehicle_id)
+);
+
+-- 9. ตารางการกดกริ่งดิจิตอล (Digital_Bells)
+CREATE TABLE Digital_Bells (
+    bell_id     VARCHAR2(20) PRIMARY KEY,
+    date_time   TIMESTAMP,
+    bell_status VARCHAR2(50),
+    user_id     VARCHAR2(20),
+    vehicle_id  VARCHAR2(20),
+    note        VARCHAR2(255),
+    CONSTRAINT fk_db_user FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    CONSTRAINT fk_db_vehicle FOREIGN KEY (vehicle_id) REFERENCES Vehicles(vehicle_id)
+);
+
+-- 10. ตารางบันทึกการแจ้งเตือนฉุกเฉิน (Alert_Logs)
+CREATE TABLE Alert_Logs (
+    log_id     VARCHAR2(20) PRIMARY KEY,
+    vehicle_id VARCHAR2(20),
+    button_id  VARCHAR2(20),
+    alert_time TIMESTAMP,
+    status     VARCHAR2(20),
+    note       VARCHAR2(255),
+    CONSTRAINT fk_al_vehicle FOREIGN KEY (vehicle_id) REFERENCES Vehicles(vehicle_id),
+    CONSTRAINT fk_al_button FOREIGN KEY (button_id) REFERENCES Emergency_Buttons(button_id)
+);</pre>
+  </details>
+  <div class="out"><b>ผลรันจริง 11 พ.ย. 2026:</b> สร้างครบ 10 ตาราง ไม่มี error — และหลัง deploy เสร็จ Script ตรวจสอบแสดง constraint ครบ: รวมเห็น SYS_Cxxxx (PK/NOT NULL อัตโนมัติ), FK ทุกเส้นที่ตั้งชื่อไว้ และ constraint <b>U (UNIQUE)</b> ของ iot_id บน VEHICLES</div>
+</section>
+
+<!-- ================= 3. DML ================= -->
+<section class="script" id="s3">
+  <div class="scr-head"><span class="order">ขั้นที่ 3</span><h2>ใส่ข้อมูลจำลอง 74 แถว (DML)</h2><span class="file">SE/DML.txt</span></div>
+  <div class="explain">
+    <h4>จุดประสงค์</h4>
+    <p>เติมข้อมูลระบบรถเมล์ที่สอดคล้องกันครบ 10 ตาราง (รวม 74 แถว) — <b>FK integrity ตรวจแล้วทุกแถวไม่มี reference แขวนลอย</b> และข้อมูลถูกออกแบบให้มีเรื่องราวพร้อมทดสอบ</p>
+    <h4>โครงสร้างไฟล์ (10 ส่วน)</h4>
+    <div class="flowline">
+      <span>User_Types (3)</span><span class="arr">→</span>
+      <span>Users (10)</span><span class="arr">→</span>
+      <span>Routes (3)</span><span class="arr">→</span>
+      <span>Bus_Stops (10)</span><span class="arr">→</span>
+      <span>Route_Stops (13)</span><span class="arr">→</span>
+      <span>IoT_Boxes (6)</span><span class="arr">→</span>
+      <span>Vehicles (6)</span><span class="arr">→</span>
+      <span>Emergency_Buttons (8)</span><span class="arr">→</span>
+      <span>Digital_Bells (10)</span><span class="arr">→</span>
+      <span>Alert_Logs (5)</span><span class="arr">→</span>
+      <span>COMMIT</span>
+    </div>
+    <h4>อธิบายการทำงานทีละจุด</h4>
+    <ul>
+      <li><b>ประเภทผู้ใช้ 3 แบบ</b> — UT-001 ผู้ดูแลระบบ / UT-002 พนักงานขับรถ / UT-003 ผู้รับบริการ — รหัสพวกนี้สำคัญมาก เพราะ <b>Business Rule ของ Procedure ใช้ UT-003 ในการตรวจว่าใครกดกริ่งได้</b></li>
+      <li><b>ผู้ใช้ 10 คนแบ่งบทบาทชัด</b> — U-1001 แอดมิน, U-1002–1004 คนขับ (ประจำรถ), U-1005–1010 ผู้โดยสาร — ในไฟล์ทดสอบ U-1009 (ผู้โดยสาร) จะกดกริ่งได้ ส่วน U-1002 (คนขับ) ต้องโดนปฏิเสธ</li>
+      <li><b>เส้นทาง 3 สาย / ป้าย 10 ป้าย / รายการจอด 13 รายการ</b> — บางป้ายถูกหลายสายผ่าน (เช่น BS-04 ศูนย์อาหารกลาง อยู่ทั้งสาย 1, 2, 3) แสดงความสัมพันธ์ M:N ที่แตกด้วย Route_Stops; seq เริ่ม 1 ทุกสาย (PK รวม route_id+seq จึงไม่ชนกัน)</li>
+      <li><b>รถ 6 คัน / IoT 6 กล่อง / ปุ่ม 8 ปุ่ม</b> — รถทุกคันมี IoT ประจำคัน (UNIQUE) และคนขับประจำคัน; VEH-01, VEH-02 มี 2 ปุ่ม คันอื่น 1 ปุ่ม; <b>BTN-05 คือปุ่มตัวแรกของ VEH-03</b> ซึ่งเป็นพระเอกของไฟล์ทดสอบ</li>
+      <li><b>กริ่ง 10 เหตุการณ์ + เหตุฉุกเฉิน 5 เหตุการณ์</b> — สถานะกริ่งหลากหลาย (สำเร็จ/รอดำเนินการ/รับทราบแล้ว/ยกเลิก) ไว้ให้รายงาน GROUP BY เห็นสีสัน; เหตุฉุกเฉิน ALT-1001–1005 เรียงวันที่</li>
+      <li><b>COMMIT ปิดท้าย</b> — ยืนยันทั้งชุดใน transaction เดียว</li>
+    </ul>
+    <div class="note"><b>จุดซักถาม:</b> ทำไม VEH-03 ไม่ใส่ passenger_count ตอน INSERT? — ใช้ DEFAULT 0 ตาม DDL (ไม่ระบุคอลัมน์) ค่าจะเปลี่ยนด้วย Procedure เท่านั้น — เทียบก่อน-หลังทดสอบจะเห็น 0 → 2 → 1 ชัดเจน</div>
+  </div>
+  <details class="sql" open><summary>สคริปต์เต็ม (74 คำสั่ง + COMMIT)</summary>
+<pre>-- 1. User_Types
+INSERT INTO User_Types (user_type_id, type_name) VALUES ('UT-001', 'ผู้ดูแลระบบ (Admin)');
+INSERT INTO User_Types (user_type_id, type_name) VALUES ('UT-002', 'พนักงานขับรถ');
+INSERT INTO User_Types (user_type_id, type_name) VALUES ('UT-003', 'ผู้รับบริการ');
+
+-- 2. Users
+INSERT INTO Users (user_id, first_name, last_name, phone_number, user_type_id, status) VALUES ('U-1001', 'สมชาย', 'ใจดี', '081-234-5678', 'UT-001', 'Active');
+INSERT INTO Users (user_id, first_name, last_name, phone_number, user_type_id, status) VALUES ('U-1002', 'วิชัย', 'มั่นคง', '082-345-6789', 'UT-002', 'Active');
+INSERT INTO Users (user_id, first_name, last_name, phone_number, user_type_id, status) VALUES ('U-1003', 'อนันต์', 'สายทอง', '083-456-7890', 'UT-002', 'Active');
+INSERT INTO Users (user_id, first_name, last_name, phone_number, user_type_id, status) VALUES ('U-1004', 'สมศักดิ์', 'ขับดี', '084-567-8901', 'UT-002', 'Active');
+INSERT INTO Users (user_id, first_name, last_name, phone_number, user_type_id, status) VALUES ('U-1005', 'กนกวรรณ', 'รักเรียน', '085-678-9012', 'UT-003', 'Active');
+INSERT INTO Users (user_id, first_name, last_name, phone_number, user_type_id, status) VALUES ('U-1006', 'ธีรภัทร', 'สุขเจริญ', '086-789-0123', 'UT-003', 'Active');
+INSERT INTO Users (user_id, first_name, last_name, phone_number, user_type_id, status) VALUES ('U-1007', 'นภา', 'แจ่มใส', '087-890-1234', 'UT-003', 'Active');
+INSERT INTO Users (user_id, first_name, last_name, phone_number, user_type_id, status) VALUES ('U-1008', 'ปิติ', 'ยินดี', '088-901-2345', 'UT-003', 'Active');
+INSERT INTO Users (user_id, first_name, last_name, phone_number, user_type_id, status) VALUES ('U-1009', 'ชลธิชา', 'ศรีสุข', '089-012-3456', 'UT-003', 'Active');
+INSERT INTO Users (user_id, first_name, last_name, phone_number, user_type_id, status) VALUES ('U-1010', 'วรวุฒิ', 'มีมาก', '080-123-4567', 'UT-003', 'Active');
+
+-- 3. Routes
+INSERT INTO Routes (route_id, route_name, status) VALUES ('RT-01', 'สาย 1: รอบมหาวิทยาลัย - อาคารเรียนรวม', 'Active');
+INSERT INTO Routes (route_id, route_name, status) VALUES ('RT-02', 'สาย 2: หอพักนักศึกษา - ศูนย์กีฬา', 'Active');
+INSERT INTO Routes (route_id, route_name, status) VALUES ('RT-03', 'สาย 3: โรงพยาบาล - สถานีรถไฟฟ้า', 'Active');
+
+-- 4. Bus_Stops
+INSERT INTO Bus_Stops (stop_id, stop_name, latitude, longitude) VALUES ('BS-01', 'หน้าประตูใหญ่ (Main Gate)', 13.75630, 100.50180);
+INSERT INTO Bus_Stops (stop_id, stop_name, latitude, longitude) VALUES ('BS-02', 'อาคารเรียนรวม 1', 13.75710, 100.50250);
+INSERT INTO Bus_Stops (stop_id, stop_name, latitude, longitude) VALUES ('BS-03', 'สำนักหอสมุดกลาง', 13.75820, 100.50310);
+INSERT INTO Bus_Stops (stop_id, stop_name, latitude, longitude) VALUES ('BS-04', 'ศูนย์อาหารกลาง', 13.75900, 100.50400);
+INSERT INTO Bus_Stops (stop_id, stop_name, latitude, longitude) VALUES ('BS-05', 'กลุ่มหอพักชาย', 13.76010, 100.50520);
+INSERT INTO Bus_Stops (stop_id, stop_name, latitude, longitude) VALUES ('BS-06', 'กลุ่มหอพักหญิง', 13.76120, 100.50610);
+INSERT INTO Bus_Stops (stop_id, stop_name, latitude, longitude) VALUES ('BS-07', 'ศูนย์กีฬาและฟิตเนส', 13.76200, 100.50730);
+INSERT INTO Bus_Stops (stop_id, stop_name, latitude, longitude) VALUES ('BS-08', 'โรงพยาบาลมหาวิทยาลัย', 13.76350, 100.50850);
+INSERT INTO Bus_Stops (stop_id, stop_name, latitude, longitude) VALUES ('BS-09', 'อาคารวิจัยและนวัตกรรม', 13.76410, 100.50920);
+INSERT INTO Bus_Stops (stop_id, stop_name, latitude, longitude) VALUES ('BS-10', 'เชื่อมต่อสถานีรถไฟฟ้า', 13.76500, 100.51000);
+
+-- 5. Route_Stops
+INSERT INTO Route_Stops (route_id, seq, stop_id) VALUES ('RT-01', 1, 'BS-01');
+INSERT INTO Route_Stops (route_id, seq, stop_id) VALUES ('RT-01', 2, 'BS-02');
+INSERT INTO Route_Stops (route_id, seq, stop_id) VALUES ('RT-01', 3, 'BS-03');
+INSERT INTO Route_Stops (route_id, seq, stop_id) VALUES ('RT-01', 4, 'BS-04');
+INSERT INTO Route_Stops (route_id, seq, stop_id) VALUES ('RT-01', 5, 'BS-09');
+INSERT INTO Route_Stops (route_id, seq, stop_id) VALUES ('RT-02', 1, 'BS-05');
+INSERT INTO Route_Stops (route_id, seq, stop_id) VALUES ('RT-02', 2, 'BS-06');
+INSERT INTO Route_Stops (route_id, seq, stop_id) VALUES ('RT-02', 3, 'BS-04');
+INSERT INTO Route_Stops (route_id, seq, stop_id) VALUES ('RT-02', 4, 'BS-07');
+INSERT INTO Route_Stops (route_id, seq, stop_id) VALUES ('RT-03', 1, 'BS-08');
+INSERT INTO Route_Stops (route_id, seq, stop_id) VALUES ('RT-03', 2, 'BS-02');
+INSERT INTO Route_Stops (route_id, seq, stop_id) VALUES ('RT-03', 3, 'BS-04');
+INSERT INTO Route_Stops (route_id, seq, stop_id) VALUES ('RT-03', 4, 'BS-10');
+
+-- 6. IoT_Boxes
+INSERT INTO IoT_Boxes (iot_id, latitude, longitude, status) VALUES ('IOT-001', 13.75712, 100.50255, 'Active');
+INSERT INTO IoT_Boxes (iot_id, latitude, longitude, status) VALUES ('IOT-002', 13.75825, 100.50315, 'Active');
+INSERT INTO IoT_Boxes (iot_id, latitude, longitude, status) VALUES ('IOT-003', 13.76015, 100.50525, 'Active');
+INSERT INTO IoT_Boxes (iot_id, latitude, longitude, status) VALUES ('IOT-004', 13.75630, 100.50180, 'Active');
+INSERT INTO IoT_Boxes (iot_id, latitude, longitude, status) VALUES ('IOT-005', 13.76355, 100.50855, 'Active');
+INSERT INTO IoT_Boxes (iot_id, latitude, longitude, status) VALUES ('IOT-006', 13.75000, 100.50000, 'Active');
+
+-- 7. Vehicles
+INSERT INTO Vehicles (vehicle_id, license_plate, route_id, iot_id, driver_user_id, status) VALUES ('VEH-01', 'กข-1001', 'RT-01', 'IOT-001', 'U-1002', 'Active');
+INSERT INTO Vehicles (vehicle_id, license_plate, route_id, iot_id, driver_user_id, status) VALUES ('VEH-02', 'กข-1002', 'RT-01', 'IOT-002', 'U-1003', 'Active');
+INSERT INTO Vehicles (vehicle_id, license_plate, route_id, iot_id, driver_user_id, status) VALUES ('VEH-03', 'กข-2001', 'RT-02', 'IOT-003', 'U-1004', 'Active');
+INSERT INTO Vehicles (vehicle_id, license_plate, route_id, iot_id, driver_user_id, status) VALUES ('VEH-04', 'กข-2002', 'RT-02', 'IOT-004', 'U-1002', 'Active');
+INSERT INTO Vehicles (vehicle_id, license_plate, route_id, iot_id, driver_user_id, status) VALUES ('VEH-05', 'กข-3001', 'RT-03', 'IOT-005', 'U-1003', 'Active');
+INSERT INTO Vehicles (vehicle_id, license_plate, route_id, iot_id, driver_user_id, status) VALUES ('VEH-06', 'กข-3002', 'RT-03', 'IOT-006', 'U-1004', 'Active');
+
+-- 8. Emergency_Buttons
+INSERT INTO Emergency_Buttons (button_id, vehicle_id, button_location, status) VALUES ('BTN-01', 'VEH-01', 'ปุ่มกดแจ้งเตือน 1', 'Active');
+INSERT INTO Emergency_Buttons (button_id, vehicle_id, button_location, status) VALUES ('BTN-02', 'VEH-01', 'ปุ่มกดแจ้งเตือน 2', 'Active');
+INSERT INTO Emergency_Buttons (button_id, vehicle_id, button_location, status) VALUES ('BTN-03', 'VEH-02', 'ปุ่มกดแจ้งเตือน 1', 'Active');
+INSERT INTO Emergency_Buttons (button_id, vehicle_id, button_location, status) VALUES ('BTN-04', 'VEH-02', 'ปุ่มกดแจ้งเตือน 2', 'Active');
+INSERT INTO Emergency_Buttons (button_id, vehicle_id, button_location, status) VALUES ('BTN-05', 'VEH-03', 'ปุ่มกดแจ้งเตือน 1', 'Active');
+INSERT INTO Emergency_Buttons (button_id, vehicle_id, button_location, status) VALUES ('BTN-06', 'VEH-04', 'ปุ่มกดแจ้งเตือน 1', 'Active');
+INSERT INTO Emergency_Buttons (button_id, vehicle_id, button_location, status) VALUES ('BTN-07', 'VEH-05', 'ปุ่มกดแจ้งเตือน 1', 'Active');
+INSERT INTO Emergency_Buttons (button_id, vehicle_id, button_location, status) VALUES ('BTN-08', 'VEH-06', 'ปุ่มกดแจ้งเตือน 1', 'Active');
+
+-- 9. Digital_Bells
+INSERT INTO Digital_Bells (bell_id, date_time, bell_status, user_id, vehicle_id) VALUES ('BELL-001', TO_TIMESTAMP('2026-11-10 08:15:22', 'YYYY-MM-DD HH24:MI:SS'), 'สำเร็จ', 'U-1005', 'VEH-01');
+INSERT INTO Digital_Bells (bell_id, date_time, bell_status, user_id, vehicle_id) VALUES ('BELL-002', TO_TIMESTAMP('2026-11-10 08:22:10', 'YYYY-MM-DD HH24:MI:SS'), 'สำเร็จ', 'U-1006', 'VEH-01');
+INSERT INTO Digital_Bells (bell_id, date_time, bell_status, user_id, vehicle_id) VALUES ('BELL-003', TO_TIMESTAMP('2026-11-10 09:05:40', 'YYYY-MM-DD HH24:MI:SS'), 'รับทราบแล้ว', 'U-1007', 'VEH-02');
+INSERT INTO Digital_Bells (bell_id, date_time, bell_status, user_id, vehicle_id) VALUES ('BELL-004', TO_TIMESTAMP('2026-11-10 10:12:15', 'YYYY-MM-DD HH24:MI:SS'), 'สำเร็จ', 'U-1008', 'VEH-03');
+INSERT INTO Digital_Bells (bell_id, date_time, bell_status, user_id, vehicle_id) VALUES ('BELL-005', TO_TIMESTAMP('2026-11-10 11:30:00', 'YYYY-MM-DD HH24:MI:SS'), 'รอดำเนินการ', 'U-1009', 'VEH-03');
+INSERT INTO Digital_Bells (bell_id, date_time, bell_status, user_id, vehicle_id) VALUES ('BELL-006', TO_TIMESTAMP('2026-11-10 13:45:10', 'YYYY-MM-DD HH24:MI:SS'), 'สำเร็จ', 'U-1010', 'VEH-05');
+INSERT INTO Digital_Bells (bell_id, date_time, bell_status, user_id, vehicle_id) VALUES ('BELL-007', TO_TIMESTAMP('2026-11-10 14:10:05', 'YYYY-MM-DD HH24:MI:SS'), 'รับทราบแล้ว', 'U-1005', 'VEH-05');
+INSERT INTO Digital_Bells (bell_id, date_time, bell_status, user_id, vehicle_id) VALUES ('BELL-008', TO_TIMESTAMP('2026-11-10 15:20:30', 'YYYY-MM-DD HH24:MI:SS'), 'สำเร็จ', 'U-1006', 'VEH-02');
+INSERT INTO Digital_Bells (bell_id, date_time, bell_status, user_id, vehicle_id) VALUES ('BELL-009', TO_TIMESTAMP('2026-11-10 16:05:00', 'YYYY-MM-DD HH24:MI:SS'), 'รอดำเนินการ', 'U-1007', 'VEH-01');
+INSERT INTO Digital_Bells (bell_id, date_time, bell_status, user_id, vehicle_id) VALUES ('BELL-010', TO_TIMESTAMP('2026-11-10 17:15:45', 'YYYY-MM-DD HH24:MI:SS'), 'ยกเลิก', 'U-1008', 'VEH-03');
+
+-- 10. Alert_Logs
+INSERT INTO Alert_Logs (log_id, vehicle_id, button_id, alert_time, status) VALUES ('ALT-1001', 'VEH-01', 'BTN-02', TO_TIMESTAMP('2026-11-08 10:15:00', 'YYYY-MM-DD HH24:MI:SS'), 'Completed');
+INSERT INTO Alert_Logs (log_id, vehicle_id, button_id, alert_time, status) VALUES ('ALT-1002', 'VEH-03', 'BTN-05', TO_TIMESTAMP('2026-11-08 14:30:22', 'YYYY-MM-DD HH24:MI:SS'), 'Completed');
+INSERT INTO Alert_Logs (log_id, vehicle_id, button_id, alert_time, status) VALUES ('ALT-1003', 'VEH-05', 'BTN-07', TO_TIMESTAMP('2026-11-09 09:20:11', 'YYYY-MM-DD HH24:MI:SS'), 'Completed');
+INSERT INTO Alert_Logs (log_id, vehicle_id, button_id, alert_time, status) VALUES ('ALT-1004', 'VEH-06', 'BTN-08', TO_TIMESTAMP('2026-11-10 17:50:00', 'YYYY-MM-DD HH24:MI:SS'), 'Completed');
+INSERT INTO Alert_Logs (log_id, vehicle_id, button_id, alert_time, status) VALUES ('ALT-1005', 'VEH-02', 'BTN-04', TO_TIMESTAMP('2026-11-10 18:05:40', 'YYYY-MM-DD HH24:MI:SS'), 'Completed');
+
+COMMIT;</pre>
+  </details>
+  <div class="out"><b>ผลรันจริง 11 พ.ย. 2026:</b> ผ่านทั้ง 74 แถว ไม่มี ORA-02291 — เช็คภาษาไทย: "วิชัย มั่นคง", "ชลธิชา ศรีสุข" อ่านกลับได้สมบูรณ์ (encoding ถูกต้องทั้งสาย UTF-8)</div>
+</section>
+
+<!-- ================= 4. PLSQL1 ================= -->
+<section class="script" id="s4">
+  <div class="scr-head"><span class="order">ขั้นที่ 4</span><h2>Procedure: อัปเดตพิกัดจากกล่อง IoT</h2><span class="file">SE/PLSQL1.txt</span></div>
+  <div class="explain">
+    <h4>จุดประสงค์</h4>
+    <p>จำลองรับข้อมูลจากอุปกรณ์ IoT ติดรถ (GPS ส่งพิกัดเข้ามาตลอดเวลา) — Procedure นี้คือ "ช่องทางเข้า" ของข้อมูลตำแหน่งรถแบบเรียลไทม์</p>
+    <h4>อธิบายการทำงานทีละบล็อก</h4>
+    <ol>
+      <li><b>พารามิเตอร์</b> — รับรหัสกล่อง + พิกัดใหม่ (lat/long ใช้ <span class="mono">%TYPE</span> ผูกชนิดข้อมูลกับคอลัมน์จริง ถ้าแก้ DDL ให้ Procedure ตามอัตโนมัติ) และส่งสถานะออกเป็นข้อความ</li>
+      <li><b>UPDATE พิกัด</b> — อัปเดต lat/long และกลับสถานะเป็น 'Active' (พิงว่ากล่องที่ส่งพิกัดได้แปลว่าออนไลน์)</li>
+      <li><b><span class="mono">IF SQL%ROWCOUNT = 0</span></b> — cursor attribute ที่บอกจำนวนแถวที่ UPDATE กระทบ ถ้า = 0 แปลว่า<b>รหัสกล่องไม่มีอยู่จริง</b> → คืนข้อความ ERROR (ไม่ใช้ SELECT INTO จึงไม่โยน NO_DATA_FOUND เอง)</li>
+      <li><b>COMMIT / ROLLBACK</b> — สำเร็จยืนยัน, พลาด (WHEN OTHERS) ย้อนกลับ + รายงาน SQLERRM</li>
+    </ol>
+    <div class="note"><b>จุดซักถาม:</b> ทำไมไม่มี SELECT ตรวจก่อน UPDATE? — เพราะใช้ SQL%ROWCOUNT ตรวจผลหลัง UPDATE แทน ประหยัด 1 รอบ query และไม่มี race condition ระหว่าง check กับ update</div>
+  </div>
+  <details class="sql" open><summary>สคริปต์เต็ม</summary>
+<pre>CREATE OR REPLACE PROCEDURE sp_update_iot_location (
+    p_iot_id    IN IoT_Boxes.iot_id%TYPE,
+    p_latitude  IN IoT_Boxes.latitude%TYPE,
+    p_longitude IN IoT_Boxes.longitude%TYPE,
+    o_status    OUT VARCHAR2
+) IS
+BEGIN
+    UPDATE IoT_Boxes
+    SET latitude  = p_latitude,
+        longitude = p_longitude,
+        status    = 'Active'
+    WHERE iot_id  = p_iot_id;
+
+    IF SQL%ROWCOUNT = 0 THEN
+        o_status := 'ERROR: ไม่พบกล่อง IoT รหัสนี้ในระบบ';
+    ELSE
+        o_status := 'SUCCESS';
+        COMMIT;
+    END IF;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        o_status := 'ERROR: ' || SQLERRM;
+END sp_update_iot_location;
+/</pre>
+  </details>
+  <div class="out"><b>ผลรันจริง 11 พ.ย. 2026:</b> สร้างสำเร็จ สถานะ VALID (ไฟล์ทดสอบของไฟล์นี้คือ SE/PLSQL_Test.txt — จำลองส่งพิกัดใหม่ให้ IOT-001 แล้ว SELECT ดูผล)</div>
+</section>
+
+<!-- ================= 5. PLSQL2 ================= -->
+<section class="script" id="s5">
+  <div class="scr-head"><span class="order">ขั้นที่ 5</span><h2>Procedures หลัก 4 ตัว (Transaction Processing ของโจทย์หลัก)</h2><span class="file">SE/PLSQL2.txt</span></div>
+  <div class="explain">
+    <h4>จุดประสงค์</h4>
+    <p>โจทย์หลักของระบบคือ <b>"การกดกริ่งดิจิตอลขอลงรถ"</b> — 4 Procedure นี้ครอบคลุมวงจรชีวิตทั้งหมด: กดกริ่ง → ยืนยัน → ขึ้น/ลงรถ + บันทึกเหตุฉุกเฉิน โดยแต่ละตัวคือ 1 transaction เต็มรูปแบบ (ตรวจเงื่อนไข → ทำงาน → COMMIT/ROLLBACK)</p>
+    <h4>① sp_press_digital_bell — ผู้โดยสารกดกริ่งขอลงรถ</h4>
+    <ul>
+      <li><b>ตรวจ 3 เงื่อนไขตามลำดับ</b> ด้วย SELECT INTO: (1) ผู้ใช้มีอยู่จริงหรือไม่ — ถ้าไม่มีจะโยน NO_DATA_FOUND เข้า EXCEPTION ทันที (2) สถานะบัญชีต้อง Active (3) <b>ประเภทต้องเป็น UT-003 (ผู้รับบริการ)</b> — Business Rule: คนขับ/แอดมินกดกริ่งไม่ได้</li>
+      <li>ตรวจรถว่า Active (พร้อมให้บริการ)</li>
+      <li><b>สร้างรหัสกริ่งอัตโนมัติ</b> — MAX(TO_NUMBER(SUBSTR(bell_id,6)))+1 เฉพาะแถวที่ REGEXP_LIKE รูปแบบ BELL-เลข + LPAD 3 หลัก</li>
+      <li>INSERT สถานะเริ่มต้น <b>"รอดำเนินการ"</b> แล้ว COMMIT คืนรหัสที่สร้างให้ผู้เรียก</li>
+    </ul>
+    <h4>② sp_confirm_digital_bell — คนขับยืนยันรับสัญญาณ</h4>
+    <ul>
+      <li><b>เทคนิคเดียวใน UPDATE เดียว</b>: ใส่เงื่อนไข <span class="mono">bell_status = 'รอดำเนินการ'</span> ใน WHERE — ถ้ากริ่งไม่ได้อยู่สถานะนี้ (ยืนยันไปแล้ว/ยกเลิก) จะไม่มีแถวไหนโดนกระทบ</li>
+      <li>ตรวจ <span class="mono">SQL%ROWCOUNT = 0</span> → ไม่มีแถวโดนกระทบ = ยืนยันไม่ได้ (ไม่มีรหัส / ยืนยันซ้ำ) → ROLLBACK + ERROR; ถ้า > 0 → COMMIT</li>
+    </ul>
+    <h4>③ sp_report_emergency_alert — บันทึกเหตุฉุกเฉินจากปุ่ม</h4>
+    <ul>
+      <li><b>รหัสรถดึงจากปุ่มโดยตรง</b> — SELECT vehicle_id จาก Emergency_Buttons ตาม button_id ที่รับมา ทำให้<b>บันทึกผิดคันไม่ได้</b> (ไม่รับ vehicle_id จากผู้เรียกเลย)</li>
+      <li>ตรวจปุ่มต้อง Active (ปุ่มชำรุดกดไม่ได้) → สร้างรหัส ALT-XXXX → INSERT ลง Alert_Logs → COMMIT</li>
+    </ul>
+    <h4>④ sp_update_passenger_count — อัปเดตจำนวนคนบนรถ (+ขึ้น / −ลง)</h4>
+    <ul>
+      <li><b><span class="mono">SELECT ... FOR UPDATE</span></b> — ล็อกแถวรถไว้ตั้งแต่อ่าน กัน 2 session อัปเดตพร้อมกันจนข้อมูลเพี้ยน (row-level lock ปลดตอน COMMIT/ROLLBACK)</li>
+      <li><b>Business Rule: ห้ามติดลบ</b> — ถ้า v_current + p_delta &lt; 0 → ROLLBACK + ERROR พร้อมบอกจำนวนคนปัจจุบัน</li>
+      <li>UPDATE ค่าใหม่ (ใช้ passenger_count + p_delta คำนวณฝั่ง SQL) → COMMIT</li>
+    </ul>
+    <div class="note"><b>จุดซักถาม:</b> ทำไมรหัสสร้างด้วย SUBSTR+MAX+1 ไม่ใช้ SEQUENCE? — ให้เลขต่อเนื่องอ่านง่ายและไม่มีรู (SEQUENCE กระโดดข้ามเมื่อ rollback) แต่ยอมรับข้อจำกัด: 2 session กดพร้อมกันอาจชนกันเป็น PK violation แล้วตัวใดตัวหนึ่ง ROLLBACK — ควรพูดข้อจำกัดนี้เองตอนถูกถาม</div>
+  </div>
+  <details class="sql" open><summary>สคริปต์เต็ม (4 Procedures)</summary>
+<pre>CREATE OR REPLACE PROCEDURE sp_press_digital_bell (
+    p_user_id    IN Digital_Bells.user_id%TYPE,
+    p_vehicle_id IN Digital_Bells.vehicle_id%TYPE,
+    o_bell_id    OUT VARCHAR2,
+    o_status     OUT VARCHAR2
+) IS
+    v_user_type_id   Users.user_type_id%TYPE;
+    v_user_status    Users.status%TYPE;
+    v_vehicle_status Vehicles.status%TYPE;
+    v_next_num       NUMBER;
+BEGIN
+    -- ตรวจสอบผู้ใช้งานว่ามีอยู่จริงและใช้งานได้
+    SELECT user_type_id, status
+    INTO   v_user_type_id, v_user_status
+    FROM   Users
+    WHERE  user_id = p_user_id;
+
+    IF v_user_status <> 'Active' THEN
+        o_status := 'ERROR: บัญชีผู้ใช้ถูกระงับ ไม่สามารถกดกริ่งได้';
+        RETURN;
+    END IF;
+
+    -- Business Rule: กดกริ่งได้เฉพาะผู้รับบริการ (ผู้โดยสาร)
+    IF v_user_type_id <> 'UT-003' THEN
+        o_status := 'ERROR: เฉพาะผู้โดยสาร (ประเภทผู้รับบริการ) เท่านั้นที่กดกริ่งได้';
+        RETURN;
+    END IF;
+
+    -- ตรวจสอบสถานะยานพาหนะ
+    SELECT status
+    INTO   v_vehicle_status
+    FROM   Vehicles
+    WHERE  vehicle_id = p_vehicle_id;
+
+    IF v_vehicle_status <> 'Active' THEN
+        o_status := 'ERROR: ยานพาหนะไม่พร้อมให้บริการ';
+        RETURN;
+    END IF;
+
+    -- สร้างรหัสกริ่งอัตโนมัติ BELL-XXX (ต่อจากเลขมากที่สุดเดิม)
+    SELECT NVL(MAX(TO_NUMBER(SUBSTR(bell_id, 6))), 0) + 1
+    INTO   v_next_num
+    FROM   Digital_Bells
+    WHERE  REGEXP_LIKE(bell_id, '^BELL-[0-9]+$');
+
+    o_bell_id := 'BELL-' || LPAD(TO_CHAR(v_next_num), 3, '0');
+
+    -- บันทึกเหตุการณ์กดกริ่ง
+    INSERT INTO Digital_Bells (bell_id, date_time, bell_status, user_id, vehicle_id)
+    VALUES (o_bell_id, SYSTIMESTAMP, 'รอดำเนินการ', p_user_id, p_vehicle_id);
+
+    COMMIT;
+    o_status := 'SUCCESS: กดกริ่งสำเร็จ รหัส ' || o_bell_id;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        ROLLBACK;
+        o_status := 'ERROR: ไม่พบผู้ใช้งานหรือยานพาหนะรหัสนี้ในระบบ';
+    WHEN OTHERS THEN
+        ROLLBACK;
+        o_status := 'ERROR: ' || SQLERRM;
+END sp_press_digital_bell;
+/
+
+CREATE OR REPLACE PROCEDURE sp_confirm_digital_bell (
+    p_bell_id IN Digital_Bells.bell_id%TYPE,
+    o_status  OUT VARCHAR2
+) IS
+BEGIN
+    UPDATE Digital_Bells
+    SET    bell_status = 'รับทราบแล้ว'
+    WHERE  bell_id     = p_bell_id
+    AND    bell_status = 'รอดำเนินการ';
+
+    IF SQL%ROWCOUNT = 0 THEN
+        ROLLBACK;
+        o_status := 'ERROR: ไม่พบรหัสกริ่ง หรือยืนยันได้เฉพาะสถานะ "รอดำเนินการ" เท่านั้น';
+    ELSE
+        COMMIT;
+        o_status := 'SUCCESS: ยืนยันรับสัญญาณกริ่ง ' || p_bell_id || ' เรียบร้อย';
+    END IF;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        o_status := 'ERROR: ' || SQLERRM;
+END sp_confirm_digital_bell;
+/
+
+CREATE OR REPLACE PROCEDURE sp_report_emergency_alert (
+    p_button_id IN Emergency_Buttons.button_id%TYPE,
+    o_log_id    OUT VARCHAR2,
+    o_status    OUT VARCHAR2
+) IS
+    v_vehicle_id Vehicles.vehicle_id%TYPE;
+    v_btn_status Emergency_Buttons.status%TYPE;
+    v_next_num   NUMBER;
+BEGIN
+    -- ตรวจสอบปุ่มและหารถที่ปุ่มติดตั้งอยู่
+    SELECT vehicle_id, status
+    INTO   v_vehicle_id, v_btn_status
+    FROM   Emergency_Buttons
+    WHERE  button_id = p_button_id;
+
+    IF v_btn_status <> 'Active' THEN
+        o_status := 'ERROR: ปุ่มนี้อยู่ในสถานะชำรุด/ปิดใช้งาน';
+        RETURN;
+    END IF;
+
+    -- สร้างรหัสบันทึกอัตโนมัติ ALT-XXXX
+    SELECT NVL(MAX(TO_NUMBER(SUBSTR(log_id, 5))), 0) + 1
+    INTO   v_next_num
+    FROM   Alert_Logs
+    WHERE  REGEXP_LIKE(log_id, '^ALT-[0-9]+$');
+
+    o_log_id := 'ALT-' || LPAD(TO_CHAR(v_next_num), 4, '0');
+
+    INSERT INTO Alert_Logs (log_id, vehicle_id, button_id, alert_time, status)
+    VALUES (o_log_id, v_vehicle_id, p_button_id, SYSTIMESTAMP, 'Completed');
+
+    COMMIT;
+    o_status := 'SUCCESS: บันทึกเหตุฉุกเฉิน รหัส ' || o_log_id;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        ROLLBACK;
+        o_status := 'ERROR: ไม่พบปุ่มกดแจ้งเตือนรหัสนี้';
+    WHEN OTHERS THEN
+        ROLLBACK;
+        o_status := 'ERROR: ' || SQLERRM;
+END sp_report_emergency_alert;
+/
+
+CREATE OR REPLACE PROCEDURE sp_update_passenger_count (
+    p_vehicle_id IN Vehicles.vehicle_id%TYPE,
+    p_delta      IN NUMBER,
+    o_status     OUT VARCHAR2
+) IS
+    v_current NUMBER;
+BEGIN
+    -- ล็อกแถวรถและอ่านจำนวนคนปัจจุบัน
+    SELECT passenger_count
+    INTO   v_current
+    FROM   Vehicles
+    WHERE  vehicle_id = p_vehicle_id
+    FOR UPDATE;
+
+    IF v_current + p_delta < 0 THEN
+        ROLLBACK;
+        o_status := 'ERROR: จำนวนคนบนรถห้ามติดลบ (ปัจจุบัน = ' || v_current || ' คน)';
+    ELSE
+        UPDATE Vehicles
+        SET    passenger_count = passenger_count + p_delta
+        WHERE  vehicle_id = p_vehicle_id;
+
+        COMMIT;
+        o_status := 'SUCCESS: จำนวนคนบนรถ ' || p_vehicle_id || ' ตอนนี้ = '
+                    || (v_current + p_delta) || ' คน';
+    END IF;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        ROLLBACK;
+        o_status := 'ERROR: ไม่พบยานพาหนะรหัสนี้';
+    WHEN OTHERS THEN
+        ROLLBACK;
+        o_status := 'ERROR: ' || SQLERRM;
+END sp_update_passenger_count;
+/</pre>
+  </details>
+  <div class="out"><b>ผลรันจริง 11 พ.ย. 2026:</b> สร้างครบ 4 ตัว สถานะ <b>VALID ทั้งหมด</b> — ยกเว้นรอบแรกที่ sp_report_emergency_alert เป็น INVALID เพราะคอลัมน์ timestamp (PLS-320) ซึ่งแก้เป็น alert_time แล้วจึง VALID</div>
+</section>
+
+<!-- ================= 6. TEST ================= -->
+<section class="script" id="s6">
+  <div class="scr-head"><span class="order">ขั้นที่ 6</span><h2>ไฟล์ทดสอบวงจรกดกริ่งครบวงจร 7 เหตุการณ์</h2><span class="file">SE/TestPLSQL2.txt</span></div>
+  <div class="explain">
+    <h4>จุดประสงค์</h4>
+    <p>พิสูจน์หน้างานด้วยโครง <b>BEFORE → EVENT ×7 → AFTER</b> จำลองเหตุการณ์จริง 1 รอบการให้บริการบนรถ VEH-03 ทั้งเคสสำเร็จ<b>และเคสผิดกฎ</b> (Business Rule ต้อง ERROR ตามที่ออกแบบ)</p>
+    <h4>สรุปเหตุการณ์ทั้ง 7</h4>
+    <ol>
+      <li><b>2.1</b> U-1009 (ผู้โดยสาร) กดกริ่ง VEH-03 → สำเร็จ ได้ BELL-011 สถานะ "รอดำเนินการ"</li>
+      <li><b>2.2</b> คนขับยืนยันกริ่ง BELL-011 → สถานะเปลี่ยน "รับทราบแล้ว"</li>
+      <li><b>2.3</b> ขึ้นรถ +2 → คนบนรถ 0 → <b>2</b></li>
+      <li><b>2.4</b> ลงรถ −1 (ผู้ที่กดกริ่งลงจริง) → คนบนรถ 2 → <b>1</b></li>
+      <li><b>2.5</b> กดปุ่มฉุกเฉิน BTN-05 → เกิด ALT-1006 (รหัสรถ VEH-03 ระบบหาเองจากปุ่ม)</li>
+      <li><b>2.6 (ทดสอบกฎ)</b> คนขับ U-1002 พยายามกดกริ่ง → <b>ต้อง ERROR</b> "เฉพาะผู้โดยสารเท่านั้นที่กดกริ่งได้" และต้องไม่มี BELL-012 เกิดขึ้น</li>
+      <li><b>2.7 (ทดสอบกฎ)</b> ลงรถ −10 ทั้งที่บนรถมี 1 คน → <b>ต้อง ERROR</b> "ห้ามติดลบ" และคนบนรถต้องคงเป็น 1</li>
+    </ol>
+    <div class="note"><b>จุดซักถาม:</b> ทำไมตั้งเคส ERROR ไว้ในไฟล์ทดสอบ? — เพื่อพิสูจน์ว่า Business Rules ทำงานจริง ไม่ใช่แค่ประกาศไว้ — การแสดงว่าระบบ<b>ปฏิเสธถูกเคส</b>สำคัญเท่ากับการแสดงว่าทำงานถูกเคส (คะแนนเพิ่มชัวร์ในเกณฑ์ข้อ 3 + ข้อ 6 ของอาจารย์)</div>
+  </div>
+  <details class="sql" open><summary>สคริปต์เต็ม</summary>
+<pre>SET SERVEROUTPUT ON;
+
+-- ============================================================
+-- 1. ตรวจสอบข้อมูลก่อนเกิดเหตุการณ์ (BEFORE EVENT)
+-- ============================================================
+SELECT vehicle_id, license_plate, passenger_count, status
+FROM   Vehicles
+WHERE  vehicle_id = 'VEH-03';
+
+SELECT COUNT(*) AS total_bells
+FROM   Digital_Bells
+WHERE  vehicle_id = 'VEH-03';
+
+SELECT COUNT(*) AS total_alerts
+FROM   Alert_Logs;
+
+-- ============================================================
+-- 2. จำลองเหตุการณ์ (EVENT SIMULATION)
+--    2.1 ผู้โดยสาร U-1009 กดกริ่งขอลงรถ VEH-03
+--    2.2 คนขับยืนยันรับสัญญาณกริ่ง
+--    2.3 ผู้โดยสารขึ้นรถ +2 คน
+--    2.4 ผู้โดยสารลงรถ -1 คน (หลังรถจอดถึงป้ายที่กดกริ่งไว้)
+--    2.5 เกิดเหตุฉุกเฉิน มีการกดปุ่ม BTN-05 (บน VEH-03)
+--    2.6 ทดสอบ Business Rule: คนขับ U-1002 พยายามกดกริ่ง -> ต้อง ERROR
+--    2.7 ทดสอบ Business Rule: ลงรถเกินจนติดลบ -> ต้อง ERROR
+-- ============================================================
+DECLARE
+    v_bell_id VARCHAR2(20);
+    v_log_id  VARCHAR2(20);
+    v_status  VARCHAR2(255);
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('=== เหตุการณ์ 2.1: ผู้โดยสาร U-1009 กดกริ่งขอลงรถ VEH-03 ===');
+    sp_press_digital_bell(
+        p_user_id    => 'U-1009',
+        p_vehicle_id => 'VEH-03',
+        o_bell_id    => v_bell_id,
+        o_status     => v_status
+    );
+    DBMS_OUTPUT.PUT_LINE(v_status);
+
+    DBMS_OUTPUT.PUT_LINE('=== เหตุการณ์ 2.2: คนขับยืนยันรับสัญญาณกริ่ง ' || v_bell_id || ' ===');
+    sp_confirm_digital_bell(
+        p_bell_id => v_bell_id,
+        o_status  => v_status
+    );
+    DBMS_OUTPUT.PUT_LINE(v_status);
+
+    DBMS_OUTPUT.PUT_LINE('=== เหตุการณ์ 2.3: มีผู้โดยสารขึ้นรถที่ป้าย +2 คน ===');
+    sp_update_passenger_count(
+        p_vehicle_id => 'VEH-03',
+        p_delta      => 2,
+        o_status     => v_status
+    );
+    DBMS_OUTPUT.PUT_LINE(v_status);
+
+    DBMS_OUTPUT.PUT_LINE('=== เหตุการณ์ 2.4: ผู้โดยสารที่กดกริ่งลงรถ -1 คน ===');
+    sp_update_passenger_count(
+        p_vehicle_id => 'VEH-03',
+        p_delta      => -1,
+        o_status     => v_status
+    );
+    DBMS_OUTPUT.PUT_LINE(v_status);
+
+    DBMS_OUTPUT.PUT_LINE('=== เหตุการณ์ 2.5: กดปุ่มฉุกเฉิน BTN-05 บน VEH-03 ===');
+    sp_report_emergency_alert(
+        p_button_id => 'BTN-05',
+        o_log_id    => v_log_id,
+        o_status    => v_status
+    );
+    DBMS_OUTPUT.PUT_LINE(v_status);
+
+    DBMS_OUTPUT.PUT_LINE('=== เหตุการณ์ 2.6: คนขับ U-1002 พยายามกดกริ่ง (ต้องไม่สำเร็จ) ===');
+    sp_press_digital_bell(
+        p_user_id    => 'U-1002',
+        p_vehicle_id => 'VEH-03',
+        o_bell_id    => v_bell_id,
+        o_status     => v_status
+    );
+    DBMS_OUTPUT.PUT_LINE(v_status);
+
+    DBMS_OUTPUT.PUT_LINE('=== เหตุการณ์ 2.7: ลงรถ -10 คน ทั้งที่บนรถมี 1 คน (ต้องไม่สำเร็จ) ===');
+    sp_update_passenger_count(
+        p_vehicle_id => 'VEH-03',
+        p_delta      => -10,
+        o_status     => v_status
+    );
+    DBMS_OUTPUT.PUT_LINE(v_status);
+END;
+/
+
+-- ============================================================
+-- 3. ตรวจสอบผลหลังเกิดเหตุการณ์ (AFTER EVENT)
+-- ============================================================
+-- 3.1 กริ่งของ VEH-03: ต้องมีรายการใหม่ (BELL-011) สถานะ "รับทราบแล้ว"
+SELECT bell_id, date_time, bell_status, user_id
+FROM   Digital_Bells
+WHERE  vehicle_id = 'VEH-03'
+ORDER  BY date_time DESC;
+
+-- 3.2 จำนวนคนบนรถ VEH-03: 0 + 2 - 1 = 1 (คงที่เพราะรายการติดลบถูก ROLLBACK)
+SELECT vehicle_id, passenger_count
+FROM   Vehicles
+WHERE  vehicle_id = 'VEH-03';
+
+-- 3.3 บันทึกเหตุฉุกเฉิน: ต้องมีรายการใหม่ (ALT-1006)
+SELECT log_id, vehicle_id, button_id, alert_time, status
+FROM   Alert_Logs
+ORDER  BY alert_time DESC;</pre>
+  </details>
+  <div class="out"><b>ผลรันจริง 11 พ.ย. 2026 บน server (ผ่านครบทั้ง 7):</b> 2.1 SUCCESS BELL-011 · 2.2 SUCCESS รับทราบแล้ว · 2.3 SUCCESS = 2 คน · 2.4 SUCCESS = 1 คน · 2.5 SUCCESS ALT-1006 · 2.6 <b>ERROR</b> เฉพาะผู้โดยสารเท่านั้นที่กดกริ่งได้ · 2.7 <b>ERROR</b> ห้ามติดลบ (ปัจจุบัน = 1 คน) — AFTER: BELL-011 "รับทราบแล้ว" U-1009/VEH-03 ✓, passenger_count = 1 ✓, ALT-1006 VEH-03/BTN-05 ✓, ไม่มี BELL-012 เกิดขึ้น ✓</div>
+</section>
+
+<!-- ================= 7. JOIN ================= -->
+<section class="script" id="s7">
+  <div class="scr-head"><span class="order">ขั้นที่ 7</span><h2>รายงาน JOIN หลายตาราง 5 ฉบับ</h2><span class="file">SE/Join.txt</span></div>
+  <div class="explain">
+    <h4>จุดประสงค์</h4>
+    <p>โจทย์ข้อ 4 ของอาจารย์ — รายงานซับซ้อนที่ JOIN Transaction tables กับ Master tables มาก ๆ ครบ 5 ฉบับ ไล่จากง่ายไปยาก (5 → 6 → GROUP BY → WITH → 7 ตาราง)</p>
+    <h4>อธิบายทีละรายงาน</h4>
+    <ol>
+      <li><b>รายงาน 1 (JOIN 5 ตาราง)</b> — ประวัติกดกริ่ง: ใครกด (Users + User_Types) ขอลงรถคันไหน (Vehicles) วิ่งสายอะไร (Routes) — INNER JOIN ทั้งหมดเพราะข้อมูลกริ่งต้องมีครบทุกส่วนอยู่แล้วตาม FK</li>
+      <li><b>รายงาน 2 (JOIN 6 ตาราง)</b> — เหตุฉุกเฉิน: เพิ่ม Emergency_Buttons + ใช้ <b>LEFT JOIN</b> กับ Users (คนขับ) และ IoT_Boxes เพราะรถอาจยังไม่มีคนขับประจำ/ไม่มีกล่อง — รายงานต้องไม่ทิ้งแถวเหตุฉุกเฉินแม้ข้อมูลรถไม่สมบูรณ์</li>
+      <li><b>รายงาน 3 (JOIN 4 + GROUP BY + Analytic)</b> — ภาพรวมสาย: จำนวนรถ จำนวนป้าย ป้ายแรก-ป้ายสุดท้าย ใช้ <span class="mono">MIN/MAX(...) KEEP (DENSE_RANK FIRST/LAST ORDER BY rs.seq)</span> — analytic function เลือกค่าจากแถว seq น้อยสุด/มากสุดโดยไม่ต้อง subquery ซ้อน <b>⚠️ นับจำนวนป้ายต้องใช้ COUNT(DISTINCT rs.seq) ไม่ใช่ COUNT(rs.seq)</b> เพราะ LEFT JOIN กับ Vehicles ทำให้ 1 ป้ายถูกนับซ้ำเท่าจำนวนรถในสาย (fan-out) — บั๊กจริงที่จับได้วันนี้: RT-01 โชว์ 10 ป้ายทั้งที่จริง 5</li>
+      <li><b>รายงาน 4 (WITH clause)</b> — สถิติเหตุการณ์ต่อสาย: รวมกริ่ง (Bell_Stats) กับฉุกเฉิน (Alert_Stats) <b>แยกกันก่อน 2 CTE แล้วจึง JOIN เข้า Routes</b> — เหตุผล: (1) กัน fan-out ข้อมูลซ้ำจากการ JOIN ตรงหลายตาราง (2) NVL ครอบค่า 0 สำหรับสายที่ไม่มีเหตุการณ์ (3) ใช้ WITH แทน CREATE VIEW เพราะ user ไม่มีสิทธิ์ CREATE VIEW (ORA-01031)</li>
+      <li><b>รายงาน 5 (JOIN 7 ตาราง — มากที่สุด)</b> — เหตุกริ่งแต่ละครั้ง + จุดจอดทั้งสายของคันนั้น: Digital_Bells → Users → User_Types → Vehicles → Routes → Route_Stops → Bus_Stops — แสดงว่ากริ่งเกิดบนสายอะไร และรถต้องแวะป้ายไหนตามลำดับ seq</li>
+    </ol>
+  </div>
+  <details class="sql" open><summary>สคริปต์เต็ม (5 รายงาน)</summary>
+<pre>-- ============================================================
+-- รายงานที่ 1: ประวัติการกดกริ่งดิจิตอลขอลงรถ (JOIN 5 ตาราง)
+-- ============================================================
+SELECT
+    db.bell_id,
+    db.date_time,
+    db.bell_status,
+    u.user_id,
+    u.first_name || ' ' || u.last_name AS passenger_name,
+    ut.type_name                       AS user_type,
+    v.vehicle_id,
+    v.license_plate,
+    r.route_id,
+    r.route_name
+FROM Digital_Bells db
+JOIN Users      u  ON db.user_id     = u.user_id
+JOIN User_Types ut ON u.user_type_id = ut.user_type_id
+JOIN Vehicles   v  ON db.vehicle_id  = v.vehicle_id
+JOIN Routes     r  ON v.route_id     = r.route_id
+ORDER BY db.date_time DESC;
+
+-- ============================================================
+-- รายงานที่ 2: ประวัติเหตุการณ์ฉุกเฉินบนรถ (JOIN 6 ตาราง)
+-- ============================================================
+SELECT
+    al.log_id,
+    al.alert_time,
+    al.status,
+    eb.button_id,
+    eb.button_location,
+    v.license_plate,
+    r.route_name,
+    u.first_name || ' ' || u.last_name AS driver_name,
+    iot.iot_id                         AS iot_box_id
+FROM Alert_Logs al
+JOIN Emergency_Buttons eb ON al.button_id      = eb.button_id
+JOIN Vehicles   v         ON al.vehicle_id     = v.vehicle_id
+JOIN Routes     r         ON v.route_id        = r.route_id
+LEFT JOIN Users u         ON v.driver_user_id  = u.user_id
+LEFT JOIN IoT_Boxes iot   ON v.iot_id          = iot.iot_id
+ORDER BY al.alert_time DESC;
+
+-- ============================================================
+-- รายงานที่ 3: สรุปภาพรวมแต่ละสายเดินรถ (JOIN 4 ตาราง + GROUP BY)
+-- ============================================================
+SELECT
+    r.route_id,
+    r.route_name,
+    COUNT(DISTINCT v.vehicle_id)                              AS total_vehicles,
+    COUNT(DISTINCT rs.seq)                                    AS total_stops,
+    MIN(bs.stop_name) KEEP (DENSE_RANK FIRST ORDER BY rs.seq) AS first_stop,
+    MAX(bs.stop_name) KEEP (DENSE_RANK LAST  ORDER BY rs.seq) AS last_stop
+FROM Routes r
+LEFT JOIN Vehicles    v  ON r.route_id = v.route_id
+LEFT JOIN Route_Stops rs ON r.route_id = rs.route_id
+LEFT JOIN Bus_Stops   bs ON rs.stop_id = bs.stop_id
+GROUP BY r.route_id, r.route_name
+ORDER BY r.route_id;
+
+-- ============================================================
+-- รายงานที่ 4: สรุปจำนวนเหตุการณ์แยกตามสาย (WITH clause + JOIN)
+-- ============================================================
+WITH Bell_Stats AS (
+    SELECT v.route_id, COUNT(*) AS bell_count
+    FROM Digital_Bells db
+    JOIN Vehicles v ON db.vehicle_id = v.vehicle_id
+    GROUP BY v.route_id
+),
+Alert_Stats AS (
+    SELECT v.route_id, COUNT(*) AS alert_count
+    FROM Alert_Logs al
+    JOIN Vehicles v ON al.vehicle_id = v.vehicle_id
+    GROUP BY v.route_id
+)
+SELECT
+    r.route_id,
+    r.route_name,
+    NVL(bs.bell_count, 0)   AS total_bell_presses,
+    NVL(ast.alert_count, 0) AS total_emergency_alerts
+FROM Routes r
+LEFT JOIN Bell_Stats  bs  ON r.route_id = bs.route_id
+LEFT JOIN Alert_Stats ast ON r.route_id = ast.route_id
+ORDER BY r.route_id;
+
+-- ============================================================
+-- รายงานที่ 5: เหตุการณ์กดกริ่ง + จุดจอดทั้งหมดในเส้นทางของคันนั้น
+-- (JOIN มากที่สุด 7 ตาราง)
+-- ============================================================
+SELECT
+    db.bell_id,
+    db.date_time,
+    db.bell_status,
+    u.first_name || ' ' || u.last_name AS passenger_name,
+    ut.type_name,
+    v.license_plate,
+    r.route_name,
+    rs.seq,
+    bs.stop_name
+FROM Digital_Bells db
+JOIN Users        u  ON db.user_id     = u.user_id
+JOIN User_Types   ut ON u.user_type_id = ut.user_type_id
+JOIN Vehicles     v  ON db.vehicle_id  = v.vehicle_id
+JOIN Routes       r  ON v.route_id     = r.route_id
+LEFT JOIN Route_Stops rs ON r.route_id = rs.route_id
+LEFT JOIN Bus_Stops   bs ON rs.stop_id = bs.stop_id
+ORDER BY db.date_time DESC, r.route_id, rs.seq;</pre>
+  </details>
+  <div class="out"><b>ผลรันจริง 11 พ.ย. 2026:</b> รายงาน 1 โชว์ BELL-011 ล่าสุด (ชลธิชา ศรีสุข / กข-2001 / สาย 2) · รายงาน 2 โชว์ ALT-1006 พร้อมคนขับ สมศักดิ์ ขับดี และ IOT-003 · รายงาน 3 (หลังแก้ DISTINCT): RT-01 = 2 รถ 5 ป้าย, RT-02 = 2 รถ 4 ป้าย, RT-03 = 2 รถ 4 ป้าย ✓ · รายงาน 4: RT-01 = 5 กริ่ง/2 ฉุกเฉิน, RT-02 = 4/2, RT-03 = 2/2 (ตรวจย้อน seed ถูกทุกตัว) · รายงาน 5: BELL-011 โชว์ครบ 4 ป้ายของสาย 2 เรียง seq 1→4 ✓</div>
+</section>
+
+<!-- ================= 8. VERIFY ================= -->
+<section class="script" id="s8">
+  <div class="scr-head"><span class="order">ขั้นที่ 8</span><h2>Script ตรวจสอบผลการทำงาน (ของอาจารย์ — เวอร์ชันแก้ให้รันได้)</h2><span class="file">SE/Verify.txt</span></div>
+  <div class="explain">
+    <h4>จุดประสงค์</h4>
+    <p>ตรวจงานตามโจทย์อาจารย์: แสดง TABLE ที่ user เป็นเจ้าของ + Constraint ทั้งหมด — พร้อม query เสริม 2 ตัวสำหรับตอบซักถามและกรองเฉพาะตารางงาน SE</p>
+    <h4>อธิบายการทำงาน</h4>
+    <ol>
+      <li><b>Query หลักของอาจารย์ (แก้บั๊ก)</b> — ต้นฉบับใช้ <span class="mono">USER_TABLES.OWNER</span> ซึ่งไม่มีอยู่จริง (ORA-00904) แก้เป็น <span class="mono">USER AS OWNER</span> — LEFT OUTER JOIN เพื่อให้ตารางที่ไม่มี constraint ก็โผล่ (ไม่หายจากรายงาน)</li>
+      <li><b>Query เสริม constraint รายคอลัมน์</b> — USER_CONSTRAINTS + USER_CONS_COLUMNS แสดงว่า constraint แต่ละตัวอยู่ที่คอลัมน์ไหน ลำดับไหน (POSITION สำคัญกับ PK/FK composite เช่น (ROUTE_ID, SEQ))</li>
+      <li><b>Query กรองเฉพาะงาน SE</b> — WHERE table_name IN (...10 ตาราง...) เพราะ user มีตาราง BA ปนอยู่ (รวม 18 ตาราง)</li>
+    </ol>
+    <div class="note"><b>จำ CONSTRAINT_TYPE:</b> P = Primary Key · R = Foreign Key · U = Unique · C = Check/NOT NULL · SYS_Cxxxx = Oracle ตั้งชื่อให้เอง</div>
+  </div>
+  <details class="sql" open><summary>สคริปต์เต็ม</summary>
+<pre>-- ============================================================
+-- Script ตรวจสอบผลการทำงาน: แสดง TABLE ที่ User เป็นเจ้าของ + Constraint
+-- (ของอาจารย์ — เวอร์ชันแก้ไขให้รันได้จริง)
+-- ============================================================
+SELECT
+    t.TABLE_NAME,
+    t.TABLESPACE_NAME,
+    USER AS OWNER,
+    c.CONSTRAINT_NAME,
+    c.CONSTRAINT_TYPE,
+    c.TABLE_NAME
+FROM USER_TABLES t
+LEFT OUTER JOIN USER_CONSTRAINTS c
+       ON (t.TABLE_NAME = c.TABLE_NAME)
+ORDER BY t.TABLE_NAME, c.CONSTRAINT_TYPE, c.CONSTRAINT_NAME;
+
+-- ============================================================
+-- (เสริม) แสดงคอลัมน์ที่เกี่ยวข้องกับแต่ละ Constraint
+-- ============================================================
+SELECT
+    c.TABLE_NAME,
+    c.CONSTRAINT_NAME,
+    c.CONSTRAINT_TYPE,
+    cc.COLUMN_NAME,
+    cc.POSITION
+FROM USER_CONSTRAINTS c
+LEFT JOIN USER_CONS_COLUMNS cc
+       ON c.CONSTRAINT_NAME = cc.CONSTRAINT_NAME
+      AND c.OWNER = cc.OWNER
+ORDER BY c.TABLE_NAME, c.CONSTRAINT_TYPE, c.CONSTRAINT_NAME, cc.POSITION;
+
+-- ============================================================
+-- (เสริม) กรองเฉพาะตารางของโปรเจกต์นี้ (Smart Transit)
+-- ============================================================
+SELECT
+    t.TABLE_NAME,
+    t.TABLESPACE_NAME,
+    USER AS OWNER,
+    c.CONSTRAINT_NAME,
+    c.CONSTRAINT_TYPE,
+    c.TABLE_NAME
+FROM USER_TABLES t
+LEFT OUTER JOIN USER_CONSTRAINTS c
+       ON (t.TABLE_NAME = c.TABLE_NAME)
+WHERE t.TABLE_NAME IN ('USER_TYPES','USERS','ROUTES','BUS_STOPS','ROUTE_STOPS',
+                       'IOT_BOXES','VEHICLES','EMERGENCY_BUTTONS',
+                       'DIGITAL_BELLS','ALERT_LOGS')
+ORDER BY t.TABLE_NAME, c.CONSTRAINT_TYPE, c.CONSTRAINT_NAME;</pre>
+  </details>
+  <div class="out"><b>ผลรันจริง 11 พ.ย. 2026:</b> แสดง constraint ครบ 54 แถว (18 ตาราง) — ตาราง SE เห็น FK ครบทุกเส้นที่ตั้งชื่อไว้ (fk_users_usertype, fk_rs_route, fk_v_driver, fk_db_user, fk_al_button ฯลฯ) + constraint U (iot_id UNIQUE) + SYS_Cxxxx ของ PK/NOT NULL</div>
+</section>
+
+</div>
+
+<footer>
+  <div class="wrap"><b>งาน SE — ระบบขนส่งสาธารณะอัจฉริยะ</b> · Deploy สำเร็จบน Oracle KMITL Server (SQL_S2_11@orcl) 11 พ.ย. 2026 · <a href="index.html" style="color:#67e8f9">กลับหน้าเอกสารหลัก</a> · <a href="scripts-ba.html" style="color:#67e8f9">ดูสคริปต์งาน BA →</a></div>
+</footer>
+
+</body>
+</html>
+</div>
+</body>
+</html>
