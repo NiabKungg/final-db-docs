@@ -344,7 +344,7 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
         <tr><td class="mono">doc_date</td><td class="mono">DATE</td><td>—</td><td>วันที่ร่างเอกสาร</td></tr>
         <tr><td class="mono">expire_date</td><td class="mono">DATE</td><td>—</td><td>วันหมดอายุ / กำหนดเส้นตายการรับทราบ (ใช้เทียบ SLA)</td></tr>
         <tr><td class="mono">sla_limit</td><td class="mono">VARCHAR2(20)</td><td>—</td><td>เกณฑ์เวลา SLA เช่น "1 วัน", "3 วัน", "7 วัน"</td></tr>
-        <tr><td class="mono">month</td><td class="mono">VARCHAR2(20)</td><td>—</td><td>เดือนที่ออกเอกสาร (ใช้จัดกลุ่มรายงาน)</td></tr>
+        <tr><td class="mono">month</td><td class="mono">VARCHAR2(30)</td><td>—</td><td>เดือนที่ออกเอกสาร (ใช้จัดกลุ่มรายงาน) — ขนาด 30 กันชื่อเดือนไทยล้นบน charset UTF-8</td></tr>
         <tr><td class="mono">status</td><td class="mono">VARCHAR2(50)</td><td>—</td><td>สถานะ: รอยืนยัน / อนุมัติแล้ว / ไม่อนุมัติ / กำลังดำเนินการ / ปิดงานแล้ว</td></tr>
       </table>
       <div class="note"><b>จุดซักถาม:</b> 1 เอกสารมีได้หลายรายละเอียด (1:M Identifying) สาเหตุที่แยกตาราง เพราะ SLA / สถานะ / กลุ่มเป้าหมาย เปลี่ยนตามแต่ละรอบการแจ้ง ไม่ใช่ข้อมูลหัวเอกสาร</div>

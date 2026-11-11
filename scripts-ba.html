@@ -228,7 +228,7 @@ CREATE TABLE Document_Detail (
     doc_date DATE,
     expire_date DATE,
     sla_limit VARCHAR2(20),
-    month VARCHAR2(20),
+    month VARCHAR2(30),
     status VARCHAR2(50),
     CONSTRAINT fk_dd_doc FOREIGN KEY (doc_code) REFERENCES Document(doc_code),
     CONSTRAINT fk_dd_sender FOREIGN KEY (sender_code) REFERENCES Admin(code)
