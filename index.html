@@ -408,9 +408,10 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
     <!-- PLSQL -->
     <h3 style="margin:34px 0 14px">5) Stored Procedure (PL/SQL — Transaction Processing)</h3>
     <div class="proc">
-      <h4><code>SP_LOG_NOTIFICATION_SENT</code> <span class="tag tag-tx">AUTONOMOUS_TRANSACTION</span> <span class="tag tag-out">OUT: o_log_code</span></h4>
-      <p>บันทึกประวัติการแจ้งเตือนอัตโนมัติ — หัวใจของขั้นตอนที่ 3 ในวงจร</p>
+      <h4><code>SP_LOG_NOTIFICATION_SENT</code> <span class="tag tag-tx">AUTONOMOUS_TRANSACTION</span> <span class="tag tag-out">OUT: o_log_code</span> <span class="tag tag-out">IN: p_state (ใหม่)</span></h4>
+      <p>บันทึกประวัติการแจ้งเตือนอัตโนมัติ — หัวใจของขั้นตอนที่ 3 ในวงจร · <b>เพิ่ม p_state เลือกสถานะเอกสารได้ 4 แบบ: การอนุมัติ / ขอข้อมูลเพิ่ม / ไม่อนุมัติ / รอการแก้ไข</b> (สถานะผิด → ORA-20002, รหัสไม่พบ → ORA-20003, DEFAULT 'การอนุมัติ')</p>
       <ul>
+        <li><b>[เพิ่มใหม่] p_state:</b> ถ้าส่งสถานะมา → UPDATE <span class="mono">DOCUMENT_DETAIL.status</span> อัตโนมัติก่อนบันทึก Log (state + log เป็น atomic ใน transaction เดียวกัน)</li>
         <li><b>สร้างรหัสอัตโนมัติ:</b> หา <span class="mono">MAX(TO_NUMBER(SUBSTR(code,5)))</span> เฉพาะแถวที่ <span class="mono">REGEXP_LIKE(code,'^LOG-[0-9]+$')</span> แล้ว +1 → <span class="mono">LPAD</span> เป็น LOG-033</li>
         <li><b>INSERT</b> ลงตาราง LOG พร้อมเวลา <span class="mono">SYSTIMESTAMP</span> แล้ว <span class="mono">COMMIT</span></li>
         <li><b>PRAGMA AUTONOMOUS_TRANSACTION:</b> transaction ของ Log เป็นอิสระจากงานหลัก — ถ้างานหลัก ROLLBACK ประวัติ Log ที่บันทึกแล้ว<b>ยังอยู่</b> (audit trail ต้องไม่หาย)</li>
@@ -826,16 +827,38 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
     <details class="sql">
       <summary>BA — plsql.txt : SP_LOG_NOTIFICATION_SENT (Procedure บันทึก Log แจ้งเตือน)</summary>
       <pre>CREATE OR REPLACE PROCEDURE SP_LOG_NOTIFICATION_SENT (
-  p_log_type      IN VARCHAR2,
-  p_message_sent    IN VARCHAR2,
+  p_log_type           IN VARCHAR2,
+  p_message_sent       IN VARCHAR2,
   p_notification_message IN VARCHAR2,
-  p_emp_code      IN VARCHAR2,
-  p_detail_code     IN VARCHAR2,
-  o_log_code      OUT VARCHAR2
+  p_emp_code           IN VARCHAR2,
+  p_detail_code        IN VARCHAR2,
+  o_log_code           OUT VARCHAR2,
+  p_state              IN VARCHAR2 DEFAULT 'การอนุมัติ'   -- [เพิ่มใหม่] เลือกสถานะเอกสาร
 ) AS
   PRAGMA AUTONOMOUS_TRANSACTION;
   v_next_num NUMBER;
+  v_status   DOCUMENT_DETAIL.status%TYPE;        -- [เพิ่มใหม่] สถานะที่จะตั้ง
 BEGIN
+  -- [เพิ่มใหม่] ถ้าเลือกสถานะ: ตรวจความถูกต้อง แล้ว UPDATE สถานะเอกสาร
+  IF p_state IS NOT NULL THEN
+    IF p_state NOT IN ('การอนุมัติ', 'ขอข้อมูลเพิ่ม', 'ไม่อนุมัติ', 'รอการแก้ไข') THEN
+      RAISE_APPLICATION_ERROR(-20002,
+        'สถานะไม่ถูกต้อง: เลือกได้จาก อนุมัติ / ไม่อนุมัติ / ขอข้อมูลเพิ่ม / รอการแก้ไข เท่านั้น');
+    END IF;
+
+    v_status := CASE p_state WHEN 'การอนุมัติ' THEN 'อนุมัติแล้ว' ELSE p_state END;
+
+    UPDATE Document_Detail
+    SET    status = v_status
+    WHERE  code = p_detail_code;
+
+    IF SQL%ROWCOUNT = 0 THEN
+      RAISE_APPLICATION_ERROR(-20003,
+        'ไม่พบรายละเอียดเอกสารรหัส ' || p_detail_code || ' ในระบบ');
+    END IF;
+  END IF;
+
+  -- ===== BASE CODE เดิม (ไม่แก้) =====
   -- 1. สร้างรหัส Log อัตโนมัติในรูปแบบ LOG-XXX
   SELECT NVL(MAX(TO_NUMBER(SUBSTR(code, 5))), 0) + 1
   INTO v_next_num

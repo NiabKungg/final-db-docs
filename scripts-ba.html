@@ -534,7 +534,9 @@ COMMIT;</pre>
     <p>ครอบคลุมโจทย์ข้อ 3 ของอาจารย์: <b>"เขียน Stored Procedure (PL/SQL) ตามโจทย์หลักของระบบงาน (Transaction Processing)"</b> — ในระบบนี้ ทุกครั้งที่สถานะเอกสารเปลี่ยน ระบบต้องบันทึกประวัติการแจ้งเตือนให้พนักงานอัตโนมัติ และประวัตินี้<b>ห้ามหาย</b>แม้งานหลักจะล้มเหลว</p>
     <h4>อธิบายการทำงานทีละบล็อก</h4>
     <ol>
-      <li><b>พารามิเตอร์</b> — รับ 5 ค่าเข้า (ประเภทแจ้งเตือน, ข้อความสรุป, ข้อความเต็ม, พนักงานปลายทาง, รายละเอียดเอกสาร) และส่ง 1 ค่าออก (<span class="mono">o_log_code</span> = รหัส Log ที่ระบบสร้างให้เอง เพื่อให้ผู้เรียกรู้ว่าบันทึกเป็นรหัสอะไร)</li>
+      <li><b>พารามิเตอร์</b> — รับ 6 ค่าเข้า (ประเภทแจ้งเตือน, ข้อความสรุป, ข้อความเต็ม, พนักงานปลายทาง, รายละเอียดเอกสาร + <b>p_state</b> เลือกสถานะ DEFAULT NULL) และส่ง 1 ค่าออก (<span class="mono">o_log_code</span> = รหัส Log ที่ระบบสร้างให้เอง เพื่อให้ผู้เรียกรู้ว่าบันทึกเป็นรหัสอะไร)</li>
+      <li><b>[เพิ่มใหม่] p_state เลือกสถานะเอกสาร 4 แบบ:</b> 'การอนุมัติ' → อนุมัติแล้ว · 'ขอข้อมูลเพิ่ม' → ขอข้อมูลเพิ่ม · 'ไม่อนุมัติ' → ไม่อนุมัติ · 'รอการแก้ไข' → รอการแก้ไข — Procedure จะ UPDATE <span class="mono">DOCUMENT_DETAIL.status</span> ให้อัตโนมัติก่อนบันทึก Log และ <b>สถานะผิด</b> โยน ORA-20002 / <b>รหัสเอกสารไม่พบ</b> โยน ORA-20003</li>
+      <li><b>[เพิ่มใหม่] DEFAULT 'การอนุมัติ'</b> — เรียกโดยไม่ส่งสถานะ = อนุมัติให้อัตโนมัติ (สถานะเปลี่ยน + Log เกิดใน transaction เดียวกัน atomic ทั้งคู่)</li>
       <li><b><span class="mono">PRAGMA AUTONOMOUS_TRANSACTION</span></b> — หัวใจของ Procedure นี้: ประกาศว่า transaction ภายใน Procedure <b>เป็นอิสระจาก transaction หลัก</b>ที่เรียกมัน เมื่อ Procedure ทำ <span class="mono">COMMIT</span> ข้อมูล Log ถูกยืนยันถาวรทันที โดยไม่กระทบ (หรือถูกกระทบจาก) COMMIT/ROLLBACK ของงานหลัก — เหตุผลธุรกิจ: Log คือ <b>audit trail</b> ถ้างานหลัก rollback ก็ต้องมีบันทึกว่า "พยายามแล้วพังตรงไหน" ห้ามลบประวัติ</li>
       <li><b>บล็อกสร้างรหัสอัตโนมัติ</b> — <span class="mono">SELECT NVL(MAX(TO_NUMBER(SUBSTR(code,5))),0)+1 INTO v_next_num FROM Log WHERE REGEXP_LIKE(code,'^LOG-[0-9]+$')</span> แปลว่า: มองเฉพาะแถวที่รหัสเป็นรูปแบบ LOG-ตัวเลข (กันแถวขยะรูปแบบอื่น), ดึงเลขท้ายออกมาด้วย SUBSTR ตำแหน่งที่ 5, หาค่ามากสุด +1 — ถ้าตารางว่างเปล่า NVL ครอบไว้ให้เริ่มที่ LOG-001 จากนั้น <span class="mono">LPAD(...,3,'0')</span> ขยายเลขให้ครบ 3 หลักเสมอ (LOG-001, LOG-033, LOG-100)</li>
       <li><b>INSERT + SYSTIMESTAMP</b> — บันทึกแถวใหม่โดยเวลาใช้เวลา server จริง (ไม่ใช่เวลาเครื่องผู้ใช้)</li>
@@ -546,16 +548,38 @@ COMMIT;</pre>
   </div>
   <details class="sql" open><summary>สคริปต์เต็ม</summary>
 <pre>CREATE OR REPLACE PROCEDURE SP_LOG_NOTIFICATION_SENT (
-  p_log_type      IN VARCHAR2,
-  p_message_sent    IN VARCHAR2,
+  p_log_type           IN VARCHAR2,
+  p_message_sent       IN VARCHAR2,
   p_notification_message IN VARCHAR2,
-  p_emp_code      IN VARCHAR2,
-  p_detail_code     IN VARCHAR2,
-  o_log_code      OUT VARCHAR2
+  p_emp_code           IN VARCHAR2,
+  p_detail_code        IN VARCHAR2,
+  o_log_code           OUT VARCHAR2,
+  p_state              IN VARCHAR2 DEFAULT 'การอนุมัติ'   -- [เพิ่มใหม่] เลือกสถานะเอกสาร
 ) AS
   PRAGMA AUTONOMOUS_TRANSACTION;
   v_next_num NUMBER;
+  v_status   DOCUMENT_DETAIL.status%TYPE;        -- [เพิ่มใหม่] สถานะที่จะตั้ง
 BEGIN
+  -- [เพิ่มใหม่] ถ้าเลือกสถานะ: ตรวจความถูกต้อง แล้ว UPDATE สถานะเอกสาร
+  IF p_state IS NOT NULL THEN
+    IF p_state NOT IN ('การอนุมัติ', 'ขอข้อมูลเพิ่ม', 'ไม่อนุมัติ', 'รอการแก้ไข') THEN
+      RAISE_APPLICATION_ERROR(-20002,
+        'สถานะไม่ถูกต้อง: เลือกได้จาก อนุมัติ / ไม่อนุมัติ / ขอข้อมูลเพิ่ม / รอการแก้ไข เท่านั้น');
+    END IF;
+
+    v_status := CASE p_state WHEN 'การอนุมัติ' THEN 'อนุมัติแล้ว' ELSE p_state END;
+
+    UPDATE Document_Detail
+    SET    status = v_status
+    WHERE  code = p_detail_code;
+
+    IF SQL%ROWCOUNT = 0 THEN
+      RAISE_APPLICATION_ERROR(-20003,
+        'ไม่พบรายละเอียดเอกสารรหัส ' || p_detail_code || ' ในระบบ');
+    END IF;
+  END IF;
+
+  -- ===== BASE CODE เดิม (ไม่แก้) =====
   -- 1. สร้างรหัส Log อัตโนมัติในรูปแบบ LOG-XXX
   SELECT NVL(MAX(TO_NUMBER(SUBSTR(code, 5))), 0) + 1
   INTO v_next_num
