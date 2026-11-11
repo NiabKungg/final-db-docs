@@ -602,7 +602,7 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
         <tr><td class="mono">log_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-pk">PK</span></td><td>รหัสบันทึก เช่น ALT-1001</td></tr>
         <tr><td class="mono">vehicle_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-fk">FK</span> → VEHICLES</td><td>รถที่เกิดเหตุการณ์</td></tr>
         <tr><td class="mono">button_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-fk">FK</span> → EMERGENCY_BUTTONS</td><td>ปุ่มที่ถูกกด</td></tr>
-        <tr><td class="mono">timestamp</td><td class="mono">TIMESTAMP</td><td>—</td><td>วัน-เวลาที่เกิดเหตุ</td></tr>
+        <tr><td class="mono">alert_time</td><td class="mono">TIMESTAMP</td><td>—</td><td>วัน-เวลาที่เกิดเหตุ ⚠️ เดิมชื่อ <span class="mono">timestamp</span> แต่ชนกับ datatype ของ PL/SQL (PLS-320 บน Oracle 10g) จึงเปลี่ยนชื่อ</td></tr>
         <tr><td class="mono">status</td><td class="mono">VARCHAR2(20)</td><td>—</td><td>สถานะการจัดการเหตุการณ์ เช่น Completed</td></tr>
         <tr><td class="mono">note</td><td class="mono">VARCHAR2(255)</td><td>—</td><td>หมายเหตุ</td></tr>
       </table>
@@ -802,7 +802,7 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
       </ul>
     </div>
 
-    <h3 style="margin:0 0 14px">คำถามที่อาจารย์มักถาม (17 ข้อ — ทุกคนในกลุ่มต้องตอบได้)</h3>
+    <h3 style="margin:0 0 14px">คำถามที่อาจารย์มักถาม (18 ข้อ — ทุกคนในกลุ่มต้องตอบได้)</h3>
     <div class="qa">
       <div class="item"><div class="q"><span class="qn">Q1</span>CONSTRAINT_TYPE ในผล Script ตรวจสอบหมายความว่าอะไร?</div><div class="a">P = Primary Key, R = Foreign Key, U = Unique, C = Check/NOT NULL และชื่อ <span class="mono">SYS_Cxxxx</span> คือ NOT NULL ที่ Oracle ตั้งให้อัตโนมัติ</div></div>
       <div class="item"><div class="q"><span class="qn">Q2</span>Script ตรวจสอบต้นฉบับของอาจารย์รันไม่ได้?</div><div class="a">จริง — <span class="mono">USER_TABLES.OWNER</span> / <span class="mono">CONSTRAINTS.OWNER</span> ไม่มีอยู่จริง (ORA-00904) เพราะ OWNER มีเฉพาะ ALL_TABLES/DBA_TABLES ที่ต้องสิทธิ์สูง → แก้เป็น <span class="mono">USER AS OWNER</span> (ไฟล์ Verify.txt แก้ไว้แล้ว แต่ต้องอธิบายเหตุผลหน้างานได้)</div></div>
@@ -821,6 +821,7 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
       <div class="item"><div class="q"><span class="qn">Q15</span>(SE รายงาน 3) KEEP (DENSE_RANK FIRST/LAST ...) คืออะไร?</div><div class="a">Analytic function เลือกค่าจากแถวที่มี seq น้อยสุด/มากสุด เช่น ชื่อป้ายแรก-ป้ายสุดท้ายของสาย โดยไม่ต้องเขียน subquery ซ้อน</div></div>
       <div class="item"><div class="q"><span class="qn">Q16</span>ทั้งสองงานอยู่ user เดียวกันได้จริงไหม ทำไม Script ตรวจสอบถึงเห็นตาราง 18 ตาราง?</div><div class="a">ได้ — ชื่อตาราง/ชื่อ constraint/ชื่อ procedure ของสองงานไม่ซ้ำกันเลย (BA 8 ตาราง + SE 10 ตาราง) การ deploy รอบก่อนก็อยู่ร่วมกันมาแล้ว ผล Script ตรวจสอบจึงโชว์ทุกตารางที่ user เป็นเจ้าของปนกันตามปกติ และท้ายไฟล์ Verify.txt มี query เสริมกรองเฉพาะตารางของแต่ละงาน จุดสำคัญ: DROP ต้องยิงเฉพาะไฟล์ Drop ของงานตัวเอง ห้ามลบข้ามงาน</div></div>
       <div class="item"><div class="q"><span class="qn">Q17</span>ถ้าอาจารย์สั่ง DROP แล้วตารางลบไม่หมด?</div><div class="a">เช็คด้วย <span class="mono">SELECT table_name FROM user_tables;</span> — ลบด้วย <span class="mono">DROP TABLE ชื่อ CASCADE CONSTRAINTS;</span> ตามลำดับย้อน FK (ไฟล์ Drop ทั้งสองงานเรียงลำดับไว้แล้ว) และถ้าเจอ object เก่าตกค้างจากเวอร์ชันก่อน ใช้ไฟล์ SE/DropOldObjects.txt ตรวจก่อนแล้วจึงลบเฉพาะที่เกี่ยวข้อง</div></div>
+      <div class="item"><div class="q"><span class="qn">Q18</span>(บทเรียนจากการ deploy จริง 11/11) ทำไมคอลัมน์ ALERT_LOGS ชื่อ <span class="mono">alert_time</span> ไม่ใช่ <span class="mono">timestamp</span>?</div><div class="a">เพราะ "timestamp" ชนกับชื่อ datatype ของ PL/SQL — ใช้ใน SQL ปกติได้ (INSERT/SELECT ผ่านหมด) แต่ Procedure ที่อ้างตารางนั้นจะ compile ไม่ผ่าน <b>PLS-320</b> (การประกาศประเภท expression ไม่สมบูรณ์) บน Oracle 10g เทคนิคไล่หา: ดู <span class="mono">SELECT line, position, text FROM user_errors WHERE name = 'ชื่อSP';</span> แล้วเปลี่ยนชื่อคอลัมน์ด้วย <span class="mono">ALTER TABLE ... RENAME COLUMN</span> จุดสังเกต: SP สร้างผ่านไปแล้วอาจเป็น INVALID ภายหลายถ้าตารางที่อ้างถูกแก้ — เช็คสถานะด้วย <span class="mono">user_objects.status</span> และ SP_LOG_NOTIFICATION_SENT ของ BA จะ INVALID ชั่วคราวจนกว่าตาราง BA ถูกสร้าง (ทำงานข้ามงานใน user เดียว)</div></div>
     </div>
 
     <h3 style="margin:30px 0 14px">เช็คลิสต์ก่อนเข้าห้องสอบ</h3>
@@ -1076,7 +1077,7 @@ BEGIN
 
     o_log_id := 'ALT-' || LPAD(TO_CHAR(v_next_num), 4, '0');
 
-    INSERT INTO Alert_Logs (log_id, vehicle_id, button_id, timestamp, status)
+    INSERT INTO Alert_Logs (log_id, vehicle_id, button_id, alert_time, status)
     VALUES (o_log_id, v_vehicle_id, p_button_id, SYSTIMESTAMP, 'Completed');
 
     COMMIT;
@@ -1223,8 +1224,8 @@ FROM   Digital_Bells WHERE vehicle_id = 'VEH-03' ORDER BY date_time DESC;
 
 SELECT vehicle_id, passenger_count FROM Vehicles WHERE vehicle_id = 'VEH-03';
 
-SELECT log_id, vehicle_id, button_id, timestamp, status
-FROM   Alert_Logs ORDER BY timestamp DESC;</pre>
+SELECT log_id, vehicle_id, button_id, alert_time, status
+FROM   Alert_Logs ORDER BY alert_time DESC;</pre>
     </details>
 
     <details class="sql">
@@ -1246,7 +1247,7 @@ ORDER BY db.date_time DESC;
 
 -- รายงานที่ 2: ประวัติเหตุการณ์ฉุกเฉินบนรถ (JOIN 6 ตาราง)
 SELECT
-    al.log_id, al.timestamp, al.status,
+    al.log_id, al.alert_time, al.status,
     eb.button_id, eb.button_location,
     v.license_plate, r.route_name,
     u.first_name || ' ' || u.last_name AS driver_name,
@@ -1257,13 +1258,13 @@ JOIN Vehicles   v         ON al.vehicle_id     = v.vehicle_id
 JOIN Routes     r         ON v.route_id        = r.route_id
 LEFT JOIN Users u         ON v.driver_user_id  = u.user_id
 LEFT JOIN IoT_Boxes iot   ON v.iot_id          = iot.iot_id
-ORDER BY al.timestamp DESC;
+ORDER BY al.alert_time DESC;
 
 -- รายงานที่ 3: สรุปภาพรวมแต่ละสายเดินรถ (JOIN 4 ตาราง + GROUP BY)
 SELECT
     r.route_id, r.route_name,
     COUNT(DISTINCT v.vehicle_id)                              AS total_vehicles,
-    COUNT(rs.seq)                                             AS total_stops,
+    COUNT(DISTINCT rs.seq)                                    AS total_stops,
     MIN(bs.stop_name) KEEP (DENSE_RANK FIRST ORDER BY rs.seq) AS first_stop,
     MAX(bs.stop_name) KEEP (DENSE_RANK LAST  ORDER BY rs.seq) AS last_stop
 FROM Routes r
