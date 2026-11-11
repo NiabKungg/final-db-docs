@@ -156,7 +156,7 @@ DROP TABLE User_Types CASCADE CONSTRAINTS;</pre>
 
 <!-- ================= 2. DDL ================= -->
 <section class="script" id="s2">
-  <div class="scr-head"><span class="order">ขั้นที่ 2</span><h2>สร้างตารางทั้ง 10 (DDL)</h2><span class="file">SE/DDL.txt</span></div>
+      <div class="scr-head"><span class="order">ขั้นที่ 2</span><h2>สร้างตารางทั้ง 11 (DDL)</h2><span class="file">SE/DDL.txt</span></div>
   <div class="explain">
     <h4>จุดประสงค์</h4>
     <p>แปลง ER Diagram 10 เอนทิตี (Strong 9 + Weak 1) เป็นตาราง Oracle พร้อม PK/FK/UNIQUE/DEFAULT ครบตามความสัมพันธ์ 8 จุดใน ER</p>
@@ -193,11 +193,18 @@ CREATE TABLE Users (
     user_id      VARCHAR2(20) PRIMARY KEY,
     first_name   VARCHAR2(100) NOT NULL,
     last_name    VARCHAR2(100) NOT NULL,
-    phone_number VARCHAR2(20),
     email        VARCHAR2(100),
     user_type_id VARCHAR2(10),
     status       VARCHAR2(20) DEFAULT 'Active',
     CONSTRAINT fk_users_usertype FOREIGN KEY (user_type_id) REFERENCES User_Types(user_type_id)
+);
+
+-- 2.1 ตารางย่อยเบอร์โทรผู้ใช้ (Multivalued Attribute "เบอร์" ตามหลัก 1NF)
+CREATE TABLE User_Phones (
+    user_id      VARCHAR2(20),
+    phone_number VARCHAR2(20),
+    PRIMARY KEY (user_id, phone_number),
+    CONSTRAINT fk_up_user FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
 
 -- 3. ตารางเส้นทางเดินรถ (Routes)
@@ -295,7 +302,7 @@ CREATE TABLE Alert_Logs (
 
 <!-- ================= 3. DML ================= -->
 <section class="script" id="s3">
-  <div class="scr-head"><span class="order">ขั้นที่ 3</span><h2>ใส่ข้อมูลจำลอง 74 แถว (DML)</h2><span class="file">SE/DML.txt</span></div>
+      <div class="scr-head"><span class="order">ขั้นที่ 3</span><h2>ใส่ข้อมูลจำลอง 78 แถว (DML)</h2><span class="file">SE/DML.txt</span></div>
   <div class="explain">
     <h4>จุดประสงค์</h4>
     <p>เติมข้อมูลระบบรถเมล์ที่สอดคล้องกันครบ 10 ตาราง (รวม 74 แถว) — <b>FK integrity ตรวจแล้วทุกแถวไม่มี reference แขวนลอย</b> และข้อมูลถูกออกแบบให้มีเรื่องราวพร้อมทดสอบ</p>
@@ -303,6 +310,7 @@ CREATE TABLE Alert_Logs (
     <div class="flowline">
       <span>User_Types (3)</span><span class="arr">→</span>
       <span>Users (10)</span><span class="arr">→</span>
+      <span>User_Phones (14)</span><span class="arr">→</span>
       <span>Routes (3)</span><span class="arr">→</span>
       <span>Bus_Stops (10)</span><span class="arr">→</span>
       <span>Route_Stops (13)</span><span class="arr">→</span>
@@ -331,16 +339,32 @@ INSERT INTO User_Types (user_type_id, type_name) VALUES ('UT-002', 'พนัก
 INSERT INTO User_Types (user_type_id, type_name) VALUES ('UT-003', 'ผู้รับบริการ');
 
 -- 2. Users
-INSERT INTO Users (user_id, first_name, last_name, phone_number, user_type_id, status) VALUES ('U-1001', 'สมชาย', 'ใจดี', '081-234-5678', 'UT-001', 'Active');
-INSERT INTO Users (user_id, first_name, last_name, phone_number, user_type_id, status) VALUES ('U-1002', 'วิชัย', 'มั่นคง', '082-345-6789', 'UT-002', 'Active');
-INSERT INTO Users (user_id, first_name, last_name, phone_number, user_type_id, status) VALUES ('U-1003', 'อนันต์', 'สายทอง', '083-456-7890', 'UT-002', 'Active');
-INSERT INTO Users (user_id, first_name, last_name, phone_number, user_type_id, status) VALUES ('U-1004', 'สมศักดิ์', 'ขับดี', '084-567-8901', 'UT-002', 'Active');
-INSERT INTO Users (user_id, first_name, last_name, phone_number, user_type_id, status) VALUES ('U-1005', 'กนกวรรณ', 'รักเรียน', '085-678-9012', 'UT-003', 'Active');
-INSERT INTO Users (user_id, first_name, last_name, phone_number, user_type_id, status) VALUES ('U-1006', 'ธีรภัทร', 'สุขเจริญ', '086-789-0123', 'UT-003', 'Active');
-INSERT INTO Users (user_id, first_name, last_name, phone_number, user_type_id, status) VALUES ('U-1007', 'นภา', 'แจ่มใส', '087-890-1234', 'UT-003', 'Active');
-INSERT INTO Users (user_id, first_name, last_name, phone_number, user_type_id, status) VALUES ('U-1008', 'ปิติ', 'ยินดี', '088-901-2345', 'UT-003', 'Active');
-INSERT INTO Users (user_id, first_name, last_name, phone_number, user_type_id, status) VALUES ('U-1009', 'ชลธิชา', 'ศรีสุข', '089-012-3456', 'UT-003', 'Active');
-INSERT INTO Users (user_id, first_name, last_name, phone_number, user_type_id, status) VALUES ('U-1010', 'วรวุฒิ', 'มีมาก', '080-123-4567', 'UT-003', 'Active');
+INSERT INTO Users (user_id, first_name, last_name, user_type_id, status) VALUES ('U-1001', 'สมชาย', 'ใจดี', 'UT-001', 'Active');
+INSERT INTO Users (user_id, first_name, last_name, user_type_id, status) VALUES ('U-1002', 'วิชัย', 'มั่นคง', 'UT-002', 'Active');
+INSERT INTO Users (user_id, first_name, last_name, user_type_id, status) VALUES ('U-1003', 'อนันต์', 'สายทอง', 'UT-002', 'Active');
+INSERT INTO Users (user_id, first_name, last_name, user_type_id, status) VALUES ('U-1004', 'สมศักดิ์', 'ขับดี', 'UT-002', 'Active');
+INSERT INTO Users (user_id, first_name, last_name, user_type_id, status) VALUES ('U-1005', 'กนกวรรณ', 'รักเรียน', 'UT-003', 'Active');
+INSERT INTO Users (user_id, first_name, last_name, user_type_id, status) VALUES ('U-1006', 'ธีรภัทร', 'สุขเจริญ', 'UT-003', 'Active');
+INSERT INTO Users (user_id, first_name, last_name, user_type_id, status) VALUES ('U-1007', 'นภา', 'แจ่มใส', 'UT-003', 'Active');
+INSERT INTO Users (user_id, first_name, last_name, user_type_id, status) VALUES ('U-1008', 'ปิติ', 'ยินดี', 'UT-003', 'Active');
+INSERT INTO Users (user_id, first_name, last_name, user_type_id, status) VALUES ('U-1009', 'ชลธิชา', 'ศรีสุข', 'UT-003', 'Active');
+INSERT INTO Users (user_id, first_name, last_name, user_type_id, status) VALUES ('U-1010', 'วรวุฒิ', 'มีมาก', 'UT-003', 'Active');
+
+-- 2.1 เบอร์โทรผู้ใช้ (Multivalued — ผู้ใช้ 1 คนมีได้หลายเบอร์)
+INSERT INTO User_Phones (user_id, phone_number) VALUES ('U-1001', '081-234-5678');
+INSERT INTO User_Phones (user_id, phone_number) VALUES ('U-1002', '082-345-6789');
+INSERT INTO User_Phones (user_id, phone_number) VALUES ('U-1002', '092-111-2222');
+INSERT INTO User_Phones (user_id, phone_number) VALUES ('U-1003', '083-456-7890');
+INSERT INTO User_Phones (user_id, phone_number) VALUES ('U-1004', '084-567-8901');
+INSERT INTO User_Phones (user_id, phone_number) VALUES ('U-1005', '085-678-9012');
+INSERT INTO User_Phones (user_id, phone_number) VALUES ('U-1005', '096-555-1234');
+INSERT INTO User_Phones (user_id, phone_number) VALUES ('U-1006', '086-789-0123');
+INSERT INTO User_Phones (user_id, phone_number) VALUES ('U-1007', '087-890-1234');
+INSERT INTO User_Phones (user_id, phone_number) VALUES ('U-1007', '095-222-3333');
+INSERT INTO User_Phones (user_id, phone_number) VALUES ('U-1008', '088-901-2345');
+INSERT INTO User_Phones (user_id, phone_number) VALUES ('U-1009', '089-012-3456');
+INSERT INTO User_Phones (user_id, phone_number) VALUES ('U-1009', '093-444-5555');
+INSERT INTO User_Phones (user_id, phone_number) VALUES ('U-1010', '080-123-4567');
 
 -- 3. Routes
 INSERT INTO Routes (route_id, route_name, status) VALUES ('RT-01', 'สาย 1: รอบมหาวิทยาลัย - อาคารเรียนรวม', 'Active');

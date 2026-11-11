@@ -112,7 +112,7 @@ DROP TABLE LOG CASCADE CONSTRAINTS;</pre>
 
 <!-- ================= 2. DDL ================= -->
 <section class="script" id="s2">
-  <div class="scr-head"><span class="order">ขั้นที่ 2</span><h2>สร้างตารางทั้ง 8 ตาราง (DDL)</h2><span class="file">BA/CreateTable.txt</span></div>
+      <div class="scr-head"><span class="order">ขั้นที่ 2</span><h2>สร้างตารางทั้ง 12 ตาราง (DDL)</h2><span class="file">BA/CreateTable.txt</span></div>
   <div class="explain">
     <h4>จุดประสงค์</h4>
     <p>แปลง ER Diagram (Chen Notation 8 เอนทิตี) เป็นโครงสร้างตารางจริงบน Oracle พร้อม PK, FK, NOT NULL ครบทุกความสัมพันธ์</p>
@@ -129,7 +129,7 @@ DROP TABLE LOG CASCADE CONSTRAINTS;</pre>
     </ol>
     <div class="note"><b>จุดซักถาม:</b> เบอร์โทร/สาขาใน ER เป็น Multivalued (วงรีสองชั้น) ทำไมเก็บคอลัมน์เดียว? — เลือกเก็บเบอร์หลักเบอร์เดียวเพื่อความเรียบง่ายของ dataset ถ้าต้องแก้ให้ตรงหลัก 1NF หน้างาน: แตกเป็นตารางย่อย เช่น <span class="mono">EMPLOYEE_PHONE(code, phone)</span> PK composite แล้วลบคอลัมน์เดิม</div>
   </div>
-  <details class="sql" open><summary>สคริปต์เต็ม (9 คำสั่ง: CREATE 8 + ALTER 1)</summary>
+  <details class="sql" open><summary>สคริปต์เต็ม (13 คำสั่ง: CREATE 12 + ALTER 1)</summary>
 <pre>-- ============================================================
 -- 1. DATA DEFINITION LANGUAGE (DDL) FOR ORACLE
 -- ============================================================
@@ -138,7 +138,6 @@ DROP TABLE LOG CASCADE CONSTRAINTS;</pre>
 CREATE TABLE Department (
     dept_code VARCHAR2(10) PRIMARY KEY,
     dept_name VARCHAR2(100) NOT NULL,
-    phone VARCHAR2(20),
     branch VARCHAR2(100),
     head_code VARCHAR2(10)
 );
@@ -149,7 +148,6 @@ CREATE TABLE Department_Head (
     name VARCHAR2(100) NOT NULL,
     position VARCHAR2(100),
     branch VARCHAR2(100),
-    phone VARCHAR2(20),
     dept_code VARCHAR2(10),
     CONSTRAINT fk_dh_dept FOREIGN KEY (dept_code) REFERENCES Department(dept_code)
 );
@@ -163,7 +161,6 @@ CREATE TABLE Admin (
     name VARCHAR2(100) NOT NULL,
     position VARCHAR2(100),
     branch VARCHAR2(100),
-    phone VARCHAR2(20),
     dept_code VARCHAR2(10),
     CONSTRAINT fk_admin_dept FOREIGN KEY (dept_code) REFERENCES Department(dept_code)
 );
@@ -174,9 +171,40 @@ CREATE TABLE Employee (
     name VARCHAR2(100) NOT NULL,
     position VARCHAR2(100),
     branch VARCHAR2(100),
-    phone VARCHAR2(20),
     dept_code VARCHAR2(10),
     CONSTRAINT fk_emp_dept FOREIGN KEY (dept_code) REFERENCES Department(dept_code)
+);
+
+-- 1.5.1 ตารางย่อยเบอร์โทรแผนก (Multivalued Attribute "เบอร์" ตามหลัก 1NF)
+CREATE TABLE Dept_Phones (
+    dept_code VARCHAR2(10),
+    phone     VARCHAR2(20),
+    PRIMARY KEY (dept_code, phone),
+    CONSTRAINT fk_dp_dept FOREIGN KEY (dept_code) REFERENCES Department(dept_code)
+);
+
+-- 1.5.2 ตารางย่อยเบอร์โทรหัวหน้าแผนก
+CREATE TABLE Head_Phones (
+    head_code VARCHAR2(10),
+    phone     VARCHAR2(20),
+    PRIMARY KEY (head_code, phone),
+    CONSTRAINT fk_hp_head FOREIGN KEY (head_code) REFERENCES Department_Head(code)
+);
+
+-- 1.5.3 ตารางย่อยเบอร์โทรธุรการ
+CREATE TABLE Admin_Phones (
+    admin_code VARCHAR2(10),
+    phone      VARCHAR2(20),
+    PRIMARY KEY (admin_code, phone),
+    CONSTRAINT fk_ap_admin FOREIGN KEY (admin_code) REFERENCES Admin(code)
+);
+
+-- 1.5.4 ตารางย่อยเบอร์โทรพนักงาน
+CREATE TABLE Emp_Phones (
+    emp_code VARCHAR2(10),
+    phone    VARCHAR2(20),
+    PRIMARY KEY (emp_code, phone),
+    CONSTRAINT fk_ep_emp FOREIGN KEY (emp_code) REFERENCES Employee(code)
 );
 
 -- 1.6 ตาราง Document (เอกสารหลัก)
@@ -237,7 +265,7 @@ CREATE TABLE Log (
 
 <!-- ================= 3. DML ================= -->
 <section class="script" id="s3">
-  <div class="scr-head"><span class="order">ขั้นที่ 3</span><h2>ใส่ข้อมูลจำลอง 135 แถว (DML)</h2><span class="file">BA/Insert.txt</span></div>
+      <div class="scr-head"><span class="order">ขั้นที่ 3</span><h2>ใส่ข้อมูลจำลอง 186 แถว (DML)</h2><span class="file">BA/Insert.txt</span></div>
   <div class="explain">
     <h4>จุดประสงค์</h4>
     <p>เติมข้อมูลจำลองที่สอดคล้องกันทั้ง 8 ตาราง (รวม 135 แถว) เพื่อให้รายงาน JOIN และการทดสอบ Procedure มีข้อมูลจริงให้ประมวลผล — <b>ความสอดคล้อง (FK integrity) ตรวจแล้วทุกแถว ไม่มี reference แขวนลอย</b></p>
@@ -271,24 +299,24 @@ CREATE TABLE Log (
 -- ============================================================
 
 -- 2.1 INSERT: Department (กำหนด head_code เป็น NULL ก่อน)
-INSERT INTO Department (dept_code, dept_name, phone, branch, head_code) VALUES ('DEPT-01', 'ฝ่ายบริหารและกลยุทธ์', '02-100-1001', 'สำนักงานใหญ่ (กรุงเทพฯ)', NULL);
-INSERT INTO Department (dept_code, dept_name, phone, branch, head_code) VALUES ('DEPT-02', 'ฝ่ายการเงินและบัญชี', '02-100-1002', 'สำนักงานใหญ่ (กรุงเทพฯ)', NULL);
-INSERT INTO Department (dept_code, dept_name, phone, branch, head_code) VALUES ('DEPT-03', 'ฝ่ายเทคโนโลยีสารสนเทศ', '02-200-2001', 'ศูนย์ไอที สาขาอโศก', NULL);
-INSERT INTO Department (dept_code, dept_name, phone, branch, head_code) VALUES ('DEPT-04', 'ฝ่ายทรัพยากรบุคคล', '02-100-1004', 'สำนักงานใหญ่ (กรุงเทพฯ)', NULL);
-INSERT INTO Department (dept_code, dept_name, phone, branch, head_code) VALUES ('DEPT-05', 'ฝ่ายจัดซื้อและพัสดุ', '02-300-3001', 'สาขาบางนา', NULL);
-INSERT INTO Department (dept_code, dept_name, phone, branch, head_code) VALUES ('DEPT-06', 'ฝ่ายการตลาดและสื่อสารองค์กร', '02-100-1006', 'สำนักงานใหญ่ (กรุงเทพฯ)', NULL);
-INSERT INTO Department (dept_code, dept_name, phone, branch, head_code) VALUES ('DEPT-07', 'ฝ่ายปฏิบัติการและคลังสินค้า', '02-400-4001', 'ศูนย์กระจายสินค้า วังน้อย', NULL);
-INSERT INTO Department (dept_code, dept_name, phone, branch, head_code) VALUES ('DEPT-08', 'ฝ่ายกฎหมายและกำกับดูแล', '02-100-1008', 'สำนักงานใหญ่ (กรุงเทพฯ)', NULL);
+INSERT INTO Department (dept_code, dept_name, branch, head_code) VALUES ('DEPT-01', 'ฝ่ายบริหารและกลยุทธ์', 'สำนักงานใหญ่ (กรุงเทพฯ)', NULL);
+INSERT INTO Department (dept_code, dept_name, branch, head_code) VALUES ('DEPT-02', 'ฝ่ายการเงินและบัญชี', 'สำนักงานใหญ่ (กรุงเทพฯ)', NULL);
+INSERT INTO Department (dept_code, dept_name, branch, head_code) VALUES ('DEPT-03', 'ฝ่ายเทคโนโลยีสารสนเทศ', 'ศูนย์ไอที สาขาอโศก', NULL);
+INSERT INTO Department (dept_code, dept_name, branch, head_code) VALUES ('DEPT-04', 'ฝ่ายทรัพยากรบุคคล', 'สำนักงานใหญ่ (กรุงเทพฯ)', NULL);
+INSERT INTO Department (dept_code, dept_name, branch, head_code) VALUES ('DEPT-05', 'ฝ่ายจัดซื้อและพัสดุ', 'สาขาบางนา', NULL);
+INSERT INTO Department (dept_code, dept_name, branch, head_code) VALUES ('DEPT-06', 'ฝ่ายการตลาดและสื่อสารองค์กร', 'สำนักงานใหญ่ (กรุงเทพฯ)', NULL);
+INSERT INTO Department (dept_code, dept_name, branch, head_code) VALUES ('DEPT-07', 'ฝ่ายปฏิบัติการและคลังสินค้า', 'ศูนย์กระจายสินค้า วังน้อย', NULL);
+INSERT INTO Department (dept_code, dept_name, branch, head_code) VALUES ('DEPT-08', 'ฝ่ายกฎหมายและกำกับดูแล', 'สำนักงานใหญ่ (กรุงเทพฯ)', NULL);
 
 -- 2.2 INSERT: Department_Head
-INSERT INTO Department_Head (code, name, position, branch, phone, dept_code) VALUES ('DH-001', 'ดร.สมชาย วิเศษกุล', 'ผู้อำนวยการฝ่ายบริหาร', 'สำนักงานใหญ่ (กรุงเทพฯ)', '081-111-1001', 'DEPT-01');
-INSERT INTO Department_Head (code, name, position, branch, phone, dept_code) VALUES ('DH-002', 'คุณวิภาดา รักษ์พงษ์', 'ผู้จัดการฝ่ายการเงิน', 'สำนักงานใหญ่ (กรุงเทพฯ)', '081-222-2002', 'DEPT-02');
-INSERT INTO Department_Head (code, name, position, branch, phone, dept_code) VALUES ('DH-003', 'คุณกิตติศักดิ์ มั่นคงดี', 'ผู้จัดการฝ่ายไอที', 'ศูนย์ไอที สาขาอโศก', '081-333-3003', 'DEPT-03');
-INSERT INTO Department_Head (code, name, position, branch, phone, dept_code) VALUES ('DH-004', 'คุณนภาพร เจริญสุข', 'ผู้จัดการฝ่าย HR', 'สำนักงานใหญ่ (กรุงเทพฯ)', '081-444-4004', 'DEPT-04');
-INSERT INTO Department_Head (code, name, position, branch, phone, dept_code) VALUES ('DH-005', 'คุณเกริกชัย อัครเดช', 'ผู้จัดการฝ่ายจัดซื้อ', 'สาขาบางนา', '081-555-5005', 'DEPT-05');
-INSERT INTO Department_Head (code, name, position, branch, phone, dept_code) VALUES ('DH-006', 'คุณศิริพร เลิศวณิช', 'ผู้จัดการฝ่ายการตลาด', 'สำนักงานใหญ่ (กรุงเทพฯ)', '081-666-6006', 'DEPT-06');
-INSERT INTO Department_Head (code, name, position, branch, phone, dept_code) VALUES ('DH-007', 'คุณอนุชา สมบูรณ์', 'ผู้จัดการฝ่ายปฏิบัติการ', 'ศูนย์กระจายสินค้า วังน้อย', '081-777-7007', 'DEPT-07');
-INSERT INTO Department_Head (code, name, position, branch, phone, dept_code) VALUES ('DH-008', 'คุณพีรพล สุจริตกุล', 'ผู้จัดการฝ่ายกฎหมาย', 'สำนักงานใหญ่ (กรุงเทพฯ)', '081-888-8008', 'DEPT-08');
+INSERT INTO Department_Head (code, name, position, branch, dept_code) VALUES ('DH-001', 'ดร.สมชาย วิเศษกุล', 'ผู้อำนวยการฝ่ายบริหาร', 'สำนักงานใหญ่ (กรุงเทพฯ)', 'DEPT-01');
+INSERT INTO Department_Head (code, name, position, branch, dept_code) VALUES ('DH-002', 'คุณวิภาดา รักษ์พงษ์', 'ผู้จัดการฝ่ายการเงิน', 'สำนักงานใหญ่ (กรุงเทพฯ)', 'DEPT-02');
+INSERT INTO Department_Head (code, name, position, branch, dept_code) VALUES ('DH-003', 'คุณกิตติศักดิ์ มั่นคงดี', 'ผู้จัดการฝ่ายไอที', 'ศูนย์ไอที สาขาอโศก', 'DEPT-03');
+INSERT INTO Department_Head (code, name, position, branch, dept_code) VALUES ('DH-004', 'คุณนภาพร เจริญสุข', 'ผู้จัดการฝ่าย HR', 'สำนักงานใหญ่ (กรุงเทพฯ)', 'DEPT-04');
+INSERT INTO Department_Head (code, name, position, branch, dept_code) VALUES ('DH-005', 'คุณเกริกชัย อัครเดช', 'ผู้จัดการฝ่ายจัดซื้อ', 'สาขาบางนา', 'DEPT-05');
+INSERT INTO Department_Head (code, name, position, branch, dept_code) VALUES ('DH-006', 'คุณศิริพร เลิศวณิช', 'ผู้จัดการฝ่ายการตลาด', 'สำนักงานใหญ่ (กรุงเทพฯ)', 'DEPT-06');
+INSERT INTO Department_Head (code, name, position, branch, dept_code) VALUES ('DH-007', 'คุณอนุชา สมบูรณ์', 'ผู้จัดการฝ่ายปฏิบัติการ', 'ศูนย์กระจายสินค้า วังน้อย', 'DEPT-07');
+INSERT INTO Department_Head (code, name, position, branch, dept_code) VALUES ('DH-008', 'คุณพีรพล สุจริตกุล', 'ผู้จัดการฝ่ายกฎหมาย', 'สำนักงานใหญ่ (กรุงเทพฯ)', 'DEPT-08');
 
 -- 2.3 UPDATE: Department (อัปเดต head_code ย้อนกลับเข้ามา)
 UPDATE Department SET head_code = 'DH-001' WHERE dept_code = 'DEPT-01';
@@ -301,38 +329,97 @@ UPDATE Department SET head_code = 'DH-007' WHERE dept_code = 'DEPT-07';
 UPDATE Department SET head_code = 'DH-008' WHERE dept_code = 'DEPT-08';
 
 -- 2.4 INSERT: Admin
-INSERT INTO Admin (code, name, position, branch, phone, dept_code) VALUES ('AD-001', 'นางสาวสุภาพร ชูใจ', 'เจ้าหน้าที่ธุรการอาวุโส', 'สำนักงานใหญ่ (กรุงเทพฯ)', '089-111-0001', 'DEPT-01');
-INSERT INTO Admin (code, name, position, branch, phone, dept_code) VALUES ('AD-002', 'นายอนันต์ ศรีสุข', 'เจ้าหน้าที่เอกสารและธุรการ', 'สำนักงานใหญ่ (กรุงเทพฯ)', '089-222-0002', 'DEPT-02');
-INSERT INTO Admin (code, name, position, branch, phone, dept_code) VALUES ('AD-003', 'นางสาวนภา พรหมดี', 'เจ้าหน้าที่ธุรการระบบ', 'ศูนย์ไอที สาขาอโศก', '089-333-0003', 'DEPT-03');
-INSERT INTO Admin (code, name, position, branch, phone, dept_code) VALUES ('AD-004', 'นางสาววรรณา เด่นดวง', 'เจ้าหน้าที่ธุรการบุคคล', 'สำนักงานใหญ่ (กรุงเทพฯ)', '089-444-0004', 'DEPT-04');
-INSERT INTO Admin (code, name, position, branch, phone, dept_code) VALUES ('AD-005', 'นายชัยวัฒน์ มีทรัพย์', 'เจ้าหน้าที่ธุรการพัสดุ', 'สาขาบางนา', '089-555-0005', 'DEPT-05');
-INSERT INTO Admin (code, name, position, branch, phone, dept_code) VALUES ('AD-006', 'นางสาวกานดา สมสวย', 'เจ้าหน้าที่ธุรการสื่อสาร', 'สำนักงานใหญ่ (กรุงเทพฯ)', '089-666-0006', 'DEPT-06');
-INSERT INTO Admin (code, name, position, branch, phone, dept_code) VALUES ('AD-007', 'นายสมศักดิ์ ขยันเพียร', 'เจ้าหน้าที่ธุรการคลังสินค้า', 'ศูนย์กระจายสินค้า วังน้อย', '089-777-0007', 'DEPT-07');
-INSERT INTO Admin (code, name, position, branch, phone, dept_code) VALUES ('AD-008', 'นางสาวปิยะนันท์ มั่นจิต', 'เจ้าหน้าที่ธุรการกฎหมาย', 'สำนักงานใหญ่ (กรุงเทพฯ)', '089-888-0008', 'DEPT-08');
-INSERT INTO Admin (code, name, position, branch, phone, dept_code) VALUES ('AD-009', 'นายธนพล เจริญผล', 'ผู้ช่วยเจ้าหน้าที่ธุรการ', 'สำนักงานใหญ่ (กรุงเทพฯ)', '089-999-0009', 'DEPT-01');
-INSERT INTO Admin (code, name, position, branch, phone, dept_code) VALUES ('AD-010', 'นางสาวพิมลพรรณ เปรมปรีดิ์', 'ผู้ช่วยเจ้าหน้าที่ธุรการ', 'ศูนย์ไอที สาขาอโศก', '089-000-0010', 'DEPT-03');
+INSERT INTO Admin (code, name, position, branch, dept_code) VALUES ('AD-001', 'นางสาวสุภาพร ชูใจ', 'เจ้าหน้าที่ธุรการอาวุโส', 'สำนักงานใหญ่ (กรุงเทพฯ)', 'DEPT-01');
+INSERT INTO Admin (code, name, position, branch, dept_code) VALUES ('AD-002', 'นายอนันต์ ศรีสุข', 'เจ้าหน้าที่เอกสารและธุรการ', 'สำนักงานใหญ่ (กรุงเทพฯ)', 'DEPT-02');
+INSERT INTO Admin (code, name, position, branch, dept_code) VALUES ('AD-003', 'นางสาวนภา พรหมดี', 'เจ้าหน้าที่ธุรการระบบ', 'ศูนย์ไอที สาขาอโศก', 'DEPT-03');
+INSERT INTO Admin (code, name, position, branch, dept_code) VALUES ('AD-004', 'นางสาววรรณา เด่นดวง', 'เจ้าหน้าที่ธุรการบุคคล', 'สำนักงานใหญ่ (กรุงเทพฯ)', 'DEPT-04');
+INSERT INTO Admin (code, name, position, branch, dept_code) VALUES ('AD-005', 'นายชัยวัฒน์ มีทรัพย์', 'เจ้าหน้าที่ธุรการพัสดุ', 'สาขาบางนา', 'DEPT-05');
+INSERT INTO Admin (code, name, position, branch, dept_code) VALUES ('AD-006', 'นางสาวกานดา สมสวย', 'เจ้าหน้าที่ธุรการสื่อสาร', 'สำนักงานใหญ่ (กรุงเทพฯ)', 'DEPT-06');
+INSERT INTO Admin (code, name, position, branch, dept_code) VALUES ('AD-007', 'นายสมศักดิ์ ขยันเพียร', 'เจ้าหน้าที่ธุรการคลังสินค้า', 'ศูนย์กระจายสินค้า วังน้อย', 'DEPT-07');
+INSERT INTO Admin (code, name, position, branch, dept_code) VALUES ('AD-008', 'นางสาวปิยะนันท์ มั่นจิต', 'เจ้าหน้าที่ธุรการกฎหมาย', 'สำนักงานใหญ่ (กรุงเทพฯ)', 'DEPT-08');
+INSERT INTO Admin (code, name, position, branch, dept_code) VALUES ('AD-009', 'นายธนพล เจริญผล', 'ผู้ช่วยเจ้าหน้าที่ธุรการ', 'สำนักงานใหญ่ (กรุงเทพฯ)', 'DEPT-01');
+INSERT INTO Admin (code, name, position, branch, dept_code) VALUES ('AD-010', 'นางสาวพิมลพรรณ เปรมปรีดิ์', 'ผู้ช่วยเจ้าหน้าที่ธุรการ', 'ศูนย์ไอที สาขาอโศก', 'DEPT-03');
 
 -- 2.5 INSERT: Employee
-INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-001', 'นายธนกฤต มีสุข', 'พนักงานวิเคราะห์ระบบ', 'ศูนย์ไอที สาขาอโศก', '086-100-0001', 'DEPT-03');
-INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-002', 'นางสาวปิยะดา วงศ์ใหญ่', 'พนักงานบัญชีอาวุโส', 'สำนักงานใหญ่ (กรุงเทพฯ)', '086-100-0002', 'DEPT-02');
-INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-003', 'นายรัชชานนท์ ชัยชนะ', 'พนักงานประสานงานโครงการ', 'สำนักงานใหญ่ (กรุงเทพฯ)', '086-100-0003', 'DEPT-01');
-INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-004', 'นางสาวกมลวรรณ สุขเสริฐ', 'พนักงานพัฒนาซอฟต์แวร์', 'ศูนย์ไอที สาขาอโศก', '086-100-0004', 'DEPT-03');
-INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-005', 'นายณัฐพงษ์ บุญมาก', 'พนักงานสรรหาบุคลากร', 'สำนักงานใหญ่ (กรุงเทพฯ)', '086-100-0005', 'DEPT-04');
-INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-006', 'นางสาวชนิกานต์ ใจบุญ', 'พนักงานจัดซื้อ', 'สาขาบางนา', '086-100-0006', 'DEPT-05');
-INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-007', 'นายวรวุฒิ การค้า', 'พนักงานการตลาดดิจิทัล', 'สำนักงานใหญ่ (กรุงเทพฯ)', '086-100-0007', 'DEPT-06');
-INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-008', 'นายสรวิทย์ คงทน', 'พนักงานควบคุมสต็อก', 'ศูนย์กระจายสินค้า วังน้อย', '086-100-0008', 'DEPT-07');
-INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-009', 'นางสาวศิริพร ดีจริง', 'พนักงานตรวจสอบสัญญา', 'สำนักงานใหญ่ (กรุงเทพฯ)', '086-100-0009', 'DEPT-08');
-INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-010', 'นายกิตติพงษ์ สุขสันต์', 'พนักงานดูแลเครือข่าย', 'ศูนย์ไอที สาขาอโศก', '086-100-0010', 'DEPT-03');
-INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-011', 'นางสาวอารียา ชมภู', 'พนักงานการเงิน', 'สำนักงานใหญ่ (กรุงเทพฯ)', '086-100-0011', 'DEPT-02');
-INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-012', 'นายปฏิภาณ รุ่งเรือง', 'พนักงานบริการไอที', 'ศูนย์ไอที สาขาอโศก', '086-100-0012', 'DEPT-03');
-INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-013', 'นางสาวเบญจมาศ แซ่ตั้ง', 'พนักงานฝึกอบรม', 'สำนักงานใหญ่ (กรุงเทพฯ)', '086-100-0013', 'DEPT-04');
-INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-014', 'นายภาคิน ทรัพย์เจริญ', 'พนักงานจัดซื้อเครื่องมือ', 'สาขาบางนา', '086-100-0014', 'DEPT-05');
-INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-015', 'นางสาวชนิดาภา มงคล', 'พนักงานกราฟิกดีไซน์', 'สำนักงานใหญ่ (กรุงเทพฯ)', '086-100-0015', 'DEPT-06');
-INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-016', 'นายศุภกร คุ้มครอง', 'พนักงานคลังสินค้า', 'ศูนย์กระจายสินค้า วังน้อย', '086-100-0016', 'DEPT-07');
-INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-017', 'นางสาวมณฑา สมพงษ์', 'พนักงานการเงินรับ', 'สำนักงานใหญ่ (กรุงเทพฯ)', '086-100-0017', 'DEPT-02');
-INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-018', 'นายเอกลักษณ์ ชูเกียรติ', 'พนักงานวิเคราะห์ข้อมูล', 'ศูนย์ไอที สาขาอโศก', '086-100-0018', 'DEPT-03');
-INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-019', 'นางสาวพรทิพย์ เปรมจิตต์', 'พนักงานธุรการส่วนกลาง', 'สำนักงานใหญ่ (กรุงเทพฯ)', '086-100-0019', 'DEPT-01');
-INSERT INTO Employee (code, name, position, branch, phone, dept_code) VALUES ('EMP-020', 'นายวิทวัส สายชล', 'พนักงานขนส่ง', 'ศูนย์กระจายสินค้า วังน้อย', '086-100-0020', 'DEPT-07');
+INSERT INTO Employee (code, name, position, branch, dept_code) VALUES ('EMP-001', 'นายธนกฤต มีสุข', 'พนักงานวิเคราะห์ระบบ', 'ศูนย์ไอที สาขาอโศก', 'DEPT-03');
+INSERT INTO Employee (code, name, position, branch, dept_code) VALUES ('EMP-002', 'นางสาวปิยะดา วงศ์ใหญ่', 'พนักงานบัญชีอาวุโส', 'สำนักงานใหญ่ (กรุงเทพฯ)', 'DEPT-02');
+INSERT INTO Employee (code, name, position, branch, dept_code) VALUES ('EMP-003', 'นายรัชชานนท์ ชัยชนะ', 'พนักงานประสานงานโครงการ', 'สำนักงานใหญ่ (กรุงเทพฯ)', 'DEPT-01');
+INSERT INTO Employee (code, name, position, branch, dept_code) VALUES ('EMP-004', 'นางสาวกมลวรรณ สุขเสริฐ', 'พนักงานพัฒนาซอฟต์แวร์', 'ศูนย์ไอที สาขาอโศก', 'DEPT-03');
+INSERT INTO Employee (code, name, position, branch, dept_code) VALUES ('EMP-005', 'นายณัฐพงษ์ บุญมาก', 'พนักงานสรรหาบุคลากร', 'สำนักงานใหญ่ (กรุงเทพฯ)', 'DEPT-04');
+INSERT INTO Employee (code, name, position, branch, dept_code) VALUES ('EMP-006', 'นางสาวชนิกานต์ ใจบุญ', 'พนักงานจัดซื้อ', 'สาขาบางนา', 'DEPT-05');
+INSERT INTO Employee (code, name, position, branch, dept_code) VALUES ('EMP-007', 'นายวรวุฒิ การค้า', 'พนักงานการตลาดดิจิทัล', 'สำนักงานใหญ่ (กรุงเทพฯ)', 'DEPT-06');
+INSERT INTO Employee (code, name, position, branch, dept_code) VALUES ('EMP-008', 'นายสรวิทย์ คงทน', 'พนักงานควบคุมสต็อก', 'ศูนย์กระจายสินค้า วังน้อย', 'DEPT-07');
+INSERT INTO Employee (code, name, position, branch, dept_code) VALUES ('EMP-009', 'นางสาวศิริพร ดีจริง', 'พนักงานตรวจสอบสัญญา', 'สำนักงานใหญ่ (กรุงเทพฯ)', 'DEPT-08');
+INSERT INTO Employee (code, name, position, branch, dept_code) VALUES ('EMP-010', 'นายกิตติพงษ์ สุขสันต์', 'พนักงานดูแลเครือข่าย', 'ศูนย์ไอที สาขาอโศก', 'DEPT-03');
+INSERT INTO Employee (code, name, position, branch, dept_code) VALUES ('EMP-011', 'นางสาวอารียา ชมภู', 'พนักงานการเงิน', 'สำนักงานใหญ่ (กรุงเทพฯ)', 'DEPT-02');
+INSERT INTO Employee (code, name, position, branch, dept_code) VALUES ('EMP-012', 'นายปฏิภาณ รุ่งเรือง', 'พนักงานบริการไอที', 'ศูนย์ไอที สาขาอโศก', 'DEPT-03');
+INSERT INTO Employee (code, name, position, branch, dept_code) VALUES ('EMP-013', 'นางสาวเบญจมาศ แซ่ตั้ง', 'พนักงานฝึกอบรม', 'สำนักงานใหญ่ (กรุงเทพฯ)', 'DEPT-04');
+INSERT INTO Employee (code, name, position, branch, dept_code) VALUES ('EMP-014', 'นายภาคิน ทรัพย์เจริญ', 'พนักงานจัดซื้อเครื่องมือ', 'สาขาบางนา', 'DEPT-05');
+INSERT INTO Employee (code, name, position, branch, dept_code) VALUES ('EMP-015', 'นางสาวชนิดาภา มงคล', 'พนักงานกราฟิกดีไซน์', 'สำนักงานใหญ่ (กรุงเทพฯ)', 'DEPT-06');
+INSERT INTO Employee (code, name, position, branch, dept_code) VALUES ('EMP-016', 'นายศุภกร คุ้มครอง', 'พนักงานคลังสินค้า', 'ศูนย์กระจายสินค้า วังน้อย', 'DEPT-07');
+INSERT INTO Employee (code, name, position, branch, dept_code) VALUES ('EMP-017', 'นางสาวมณฑา สมพงษ์', 'พนักงานการเงินรับ', 'สำนักงานใหญ่ (กรุงเทพฯ)', 'DEPT-02');
+INSERT INTO Employee (code, name, position, branch, dept_code) VALUES ('EMP-018', 'นายเอกลักษณ์ ชูเกียรติ', 'พนักงานวิเคราะห์ข้อมูล', 'ศูนย์ไอที สาขาอโศก', 'DEPT-03');
+INSERT INTO Employee (code, name, position, branch, dept_code) VALUES ('EMP-019', 'นางสาวพรทิพย์ เปรมจิตต์', 'พนักงานธุรการส่วนกลาง', 'สำนักงานใหญ่ (กรุงเทพฯ)', 'DEPT-01');
+INSERT INTO Employee (code, name, position, branch, dept_code) VALUES ('EMP-020', 'นายวิทวัส สายชล', 'พนักงานขนส่ง', 'ศูนย์กระจายสินค้า วังน้อย', 'DEPT-07');
+
+-- 2.5.1 เบอร์โทรแผนก (Multivalued — DEPT-01 มี 2 เบอร์)
+INSERT INTO Dept_Phones (dept_code, phone) VALUES ('DEPT-01', '02-100-1001');
+INSERT INTO Dept_Phones (dept_code, phone) VALUES ('DEPT-01', '02-100-1099');
+INSERT INTO Dept_Phones (dept_code, phone) VALUES ('DEPT-02', '02-100-1002');
+INSERT INTO Dept_Phones (dept_code, phone) VALUES ('DEPT-03', '02-200-2001');
+INSERT INTO Dept_Phones (dept_code, phone) VALUES ('DEPT-04', '02-100-1004');
+INSERT INTO Dept_Phones (dept_code, phone) VALUES ('DEPT-05', '02-300-3001');
+INSERT INTO Dept_Phones (dept_code, phone) VALUES ('DEPT-06', '02-100-1006');
+INSERT INTO Dept_Phones (dept_code, phone) VALUES ('DEPT-07', '02-400-4001');
+INSERT INTO Dept_Phones (dept_code, phone) VALUES ('DEPT-08', '02-100-1008');
+
+-- 2.5.2 เบอร์โทรหัวหน้าแผนก (DH-003 มี 2 เบอร์)
+INSERT INTO Head_Phones (head_code, phone) VALUES ('DH-001', '081-111-1001');
+INSERT INTO Head_Phones (head_code, phone) VALUES ('DH-002', '081-222-2002');
+INSERT INTO Head_Phones (head_code, phone) VALUES ('DH-003', '081-333-3003');
+INSERT INTO Head_Phones (head_code, phone) VALUES ('DH-003', '081-999-3003');
+INSERT INTO Head_Phones (head_code, phone) VALUES ('DH-004', '081-444-4004');
+INSERT INTO Head_Phones (head_code, phone) VALUES ('DH-005', '081-555-5005');
+INSERT INTO Head_Phones (head_code, phone) VALUES ('DH-006', '081-666-6006');
+INSERT INTO Head_Phones (head_code, phone) VALUES ('DH-007', '081-777-7007');
+INSERT INTO Head_Phones (head_code, phone) VALUES ('DH-008', '081-888-8008');
+
+-- 2.5.3 เบอร์โทรธุรการ (AD-002 มี 2 เบอร์)
+INSERT INTO Admin_Phones (admin_code, phone) VALUES ('AD-001', '089-111-0001');
+INSERT INTO Admin_Phones (admin_code, phone) VALUES ('AD-002', '089-222-0002');
+INSERT INTO Admin_Phones (admin_code, phone) VALUES ('AD-002', '089-222-9999');
+INSERT INTO Admin_Phones (admin_code, phone) VALUES ('AD-003', '089-333-0003');
+INSERT INTO Admin_Phones (admin_code, phone) VALUES ('AD-004', '089-444-0004');
+INSERT INTO Admin_Phones (admin_code, phone) VALUES ('AD-005', '089-555-0005');
+INSERT INTO Admin_Phones (admin_code, phone) VALUES ('AD-006', '089-666-0006');
+INSERT INTO Admin_Phones (admin_code, phone) VALUES ('AD-007', '089-777-0007');
+INSERT INTO Admin_Phones (admin_code, phone) VALUES ('AD-008', '089-888-0008');
+INSERT INTO Admin_Phones (admin_code, phone) VALUES ('AD-009', '089-999-0009');
+INSERT INTO Admin_Phones (admin_code, phone) VALUES ('AD-010', '089-000-0010');
+
+-- 2.5.4 เบอร์โทรพนักงาน (EMP-004 และ EMP-017 มี 2 เบอร์)
+INSERT INTO Emp_Phones (emp_code, phone) VALUES ('EMP-001', '086-100-0001');
+INSERT INTO Emp_Phones (emp_code, phone) VALUES ('EMP-002', '086-100-0002');
+INSERT INTO Emp_Phones (emp_code, phone) VALUES ('EMP-003', '086-100-0003');
+INSERT INTO Emp_Phones (emp_code, phone) VALUES ('EMP-004', '086-100-0004');
+INSERT INTO Emp_Phones (emp_code, phone) VALUES ('EMP-004', '086-199-0004');
+INSERT INTO Emp_Phones (emp_code, phone) VALUES ('EMP-005', '086-100-0005');
+INSERT INTO Emp_Phones (emp_code, phone) VALUES ('EMP-006', '086-100-0006');
+INSERT INTO Emp_Phones (emp_code, phone) VALUES ('EMP-007', '086-100-0007');
+INSERT INTO Emp_Phones (emp_code, phone) VALUES ('EMP-008', '086-100-0008');
+INSERT INTO Emp_Phones (emp_code, phone) VALUES ('EMP-009', '086-100-0009');
+INSERT INTO Emp_Phones (emp_code, phone) VALUES ('EMP-010', '086-100-0010');
+INSERT INTO Emp_Phones (emp_code, phone) VALUES ('EMP-011', '086-100-0011');
+INSERT INTO Emp_Phones (emp_code, phone) VALUES ('EMP-012', '086-100-0012');
+INSERT INTO Emp_Phones (emp_code, phone) VALUES ('EMP-013', '086-100-0013');
+INSERT INTO Emp_Phones (emp_code, phone) VALUES ('EMP-014', '086-100-0014');
+INSERT INTO Emp_Phones (emp_code, phone) VALUES ('EMP-015', '086-100-0015');
+INSERT INTO Emp_Phones (emp_code, phone) VALUES ('EMP-016', '086-100-0016');
+INSERT INTO Emp_Phones (emp_code, phone) VALUES ('EMP-017', '086-100-0017');
+INSERT INTO Emp_Phones (emp_code, phone) VALUES ('EMP-017', '086-188-0017');
+INSERT INTO Emp_Phones (emp_code, phone) VALUES ('EMP-018', '086-100-0018');
+INSERT INTO Emp_Phones (emp_code, phone) VALUES ('EMP-019', '086-100-0019');
+INSERT INTO Emp_Phones (emp_code, phone) VALUES ('EMP-020', '086-100-0020');
 COMMIT;
 </pre>
   </details>

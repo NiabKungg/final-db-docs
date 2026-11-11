@@ -169,8 +169,8 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
     <h1>Database Systems Project Documentation</h1>
     <p>เอกสารประกอบการสอบชิ้นงานโครงงานวิชา Database Systems — สรุปโครงสร้างตาราง ความสัมพันธ์ และ PL/SQL ของ Business Domain ทั้ง 2 งาน (อ.ประพจน์ — Business Analysis และ อ.วรางคณา — Software Engineering)</p>
     <div class="badges">
-      <span>🗂 BA — Document Approval System (8 ตาราง)</span>
-      <span>🚌 SE — Smart Transit System (10 ตาราง)</span>
+      <span>🗂 BA — Document Approval System (12 ตาราง)</span>
+      <span>🚌 SE — Smart Transit System (11 ตาราง)</span>
       <span>🐘 Oracle Database</span>
     </div>
   </div>
@@ -195,7 +195,7 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
     <div class="sec-head">
       <span class="kicker gen">Overview</span>
       <h2>ภาพรวมโปรเจกต์</h2>
-      <p class="sub">ทั้งสองงานอยู่ร่วมกันบน DB User เดียวกัน (<span class="mono">SQL_S2_11</span> บน Oracle) รวม 18 ตาราง — ตรวจแล้วว่า<b>ไม่มีชื่อตาราง / Constraint / Procedure ซ้ำกันเลย</b> จึงไม่มีข้อขัดแย้งใด ๆ และไฟล์ DROP ของแต่ละงานแยกขอบเขตกันชัดเจน</p>
+      <p class="sub">ทั้งสองงานอยู่ร่วมกันบน DB User เดียวกัน (<span class="mono">SQL_S2_11</span> บน Oracle) รวม 23 ตาราง — ตรวจแล้วว่า<b>ไม่มีชื่อตาราง / Constraint / Procedure ซ้ำกันเลย</b> จึงไม่มีข้อขัดแย้งใด ๆ และไฟล์ DROP ของแต่ละงานแยกขอบเขตกันชัดเจน · เบอร์โทรทุกจุดแปลง Multivalued เป็น<b>ตารางย่อยตามหลัก 1NF</b> แล้ว</p>
     </div>
     <div class="grid2">
       <div class="card" style="border-top:4px solid var(--ba)">
@@ -243,7 +243,7 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
     <h3 style="margin:34px 0 14px">1) การแปลง ER Diagram → ตารางจริง (Relational Schema)</h3>
     <table class="map">
       <tr><th>เอนทิตีใน ER</th><th>ประเภท</th><th>ตารางใน Oracle</th><th>หมายเหตุการแปลง</th></tr>
-      <tr><td>หัวหน้าแผนก</td><td>Strong</td><td class="mono">DEPARTMENT_HEAD</td><td>Multivalued (เบอร์, สาขา) เก็บเป็นคอลัมน์เดี่ยวของเบอร์/สาขาหลัก</td></tr>
+      <tr><td>หัวหน้าแผนก</td><td>Strong</td><td class="mono">DEPARTMENT_HEAD + HEAD_PHONES</td><td>เบอร์ (Multivalued) → แตกเป็นตารางย่อย HEAD_PHONES ตามหลัก 1NF</td></tr>
       <tr><td>แผนก</td><td>Strong</td><td class="mono">DEPARTMENT</td><td>เชื่อมกับหัวหน้าแบบ 1:1 ด้วย FK สองทาง (circular)</td></tr>
       <tr><td>ธุรการ</td><td>Strong</td><td class="mono">ADMIN</td><td>—</td></tr>
       <tr><td>พนักงาน</td><td>Strong</td><td class="mono">EMPLOYEE</td><td>—</td></tr>
@@ -262,7 +262,7 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
         <tr><th>คอลัมน์</th><th>ชนิดข้อมูล</th><th>Constraints</th><th>คำอธิบาย</th></tr>
         <tr><td class="mono">dept_code</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-pk">PK</span></td><td>รหัสแผนก เช่น DEPT-01</td></tr>
         <tr><td class="mono">dept_name</td><td class="mono">VARCHAR2(100)</td><td><span class="badge b-nn">NOT NULL</span></td><td>ชื่อแผนก เช่น ฝ่ายเทคโนโลยีสารสนเทศ</td></tr>
-        <tr><td class="mono">phone</td><td class="mono">VARCHAR2(20)</td><td>—</td><td>เบอร์ติดต่อแผนก (ใน ER เป็น Multivalued → เก็บเบอร์หลักเบอร์เดียว)</td></tr>
+        <tr><td class="mono">phone</td><td class="mono">—</td><td>ย้ายไปตารางย่อย</td><td>เบอร์แผนกเป็น Multivalued → แยกอยู่ใน <span class="mono">DEPT_PHONES(dept_code, phone)</span> ตามหลัก 1NF</td></tr>
         <tr><td class="mono">branch</td><td class="mono">VARCHAR2(100)</td><td>—</td><td>สาขาที่ตั้ง (เช่น สำนักงานใหญ่ สาขาอโศก)</td></tr>
         <tr><td class="mono">head_code</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-fk">FK</span> → DEPARTMENT_HEAD(code)</td><td>หัวหน้าแผนกประจำ — เพิ่มด้วย <span class="mono">ALTER TABLE</span> หลังสร้างตารางทั้งคู่แล้ว</td></tr>
       </table>
@@ -277,7 +277,7 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
         <tr><td class="mono">name</td><td class="mono">VARCHAR2(100)</td><td><span class="badge b-nn">NOT NULL</span></td><td>ชื่อ-นามสกุล</td></tr>
         <tr><td class="mono">position</td><td class="mono">VARCHAR2(100)</td><td>—</td><td>ตำแหน่ง เช่น ผู้จัดการฝ่ายไอที</td></tr>
         <tr><td class="mono">branch</td><td class="mono">VARCHAR2(100)</td><td>—</td><td>สาขาที่ดูแล (Multivalued ใน ER)</td></tr>
-        <tr><td class="mono">phone</td><td class="mono">VARCHAR2(20)</td><td>—</td><td>เบอร์โทรติดต่อ (Multivalued ใน ER)</td></tr>
+        <tr><td class="mono">phone</td><td class="mono">—</td><td>ย้ายไปตารางย่อย</td><td>เบอร์หัวหน้า Multivalued → อยู่ใน <span class="mono">HEAD_PHONES(head_code, phone)</span></td></tr>
         <tr><td class="mono">dept_code</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-fk">FK</span> → DEPARTMENT(dept_code)</td><td>แผนกที่สังกัด / ดูแล</td></tr>
       </table>
     </div>
@@ -290,7 +290,7 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
         <tr><td class="mono">name</td><td class="mono">VARCHAR2(100)</td><td><span class="badge b-nn">NOT NULL</span></td><td>ชื่อ-นามสกุล</td></tr>
         <tr><td class="mono">position</td><td class="mono">VARCHAR2(100)</td><td>—</td><td>ตำแหน่ง เช่น เจ้าหน้าที่ธุรการอาวุโส</td></tr>
         <tr><td class="mono">branch</td><td class="mono">VARCHAR2(100)</td><td>—</td><td>สาขาที่ปฏิบัติงาน</td></tr>
-        <tr><td class="mono">phone</td><td class="mono">VARCHAR2(20)</td><td>—</td><td>เบอร์โทรติดต่อ</td></tr>
+        <tr><td class="mono">phone</td><td class="mono">—</td><td>ย้ายไปตารางย่อย</td><td>เบอร์ธุรการ Multivalued → อยู่ใน <span class="mono">ADMIN_PHONES(admin_code, phone)</span></td></tr>
         <tr><td class="mono">dept_code</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-fk">FK</span> → DEPARTMENT(dept_code)</td><td>แผนกที่สังกัด (ธุรการประจำแผนก)</td></tr>
       </table>
     </div>
@@ -303,9 +303,21 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
         <tr><td class="mono">name</td><td class="mono">VARCHAR2(100)</td><td><span class="badge b-nn">NOT NULL</span></td><td>ชื่อ-นามสกุล</td></tr>
         <tr><td class="mono">position</td><td class="mono">VARCHAR2(100)</td><td>—</td><td>ตำแหน่งงาน</td></tr>
         <tr><td class="mono">branch</td><td class="mono">VARCHAR2(100)</td><td>—</td><td>สาขาที่ปฏิบัติงาน (Multivalued ใน ER)</td></tr>
-        <tr><td class="mono">phone</td><td class="mono">VARCHAR2(20)</td><td>—</td><td>เบอร์โทร (Multivalued ใน ER)</td></tr>
+        <tr><td class="mono">phone</td><td class="mono">—</td><td>ย้ายไปตารางย่อย</td><td>เบอร์พนักงาน Multivalued → อยู่ใน <span class="mono">EMP_PHONES(emp_code, phone)</span></td></tr>
         <tr><td class="mono">dept_code</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-fk">FK</span> → DEPARTMENT(dept_code)</td><td>แผนกที่สังกัด</td></tr>
       </table>
+    </div>
+
+    <div class="ent">
+      <h3><span class="mono">DEPT_PHONES · HEAD_PHONES · ADMIN_PHONES · EMP_PHONES</span> <span class="thainame">— ตารางย่อยเบอร์โทร (1NF)</span></h3>
+      <table>
+        <tr><th>ตาราง</th><th>โครงสร้าง</th><th>Constraints</th><th>คำอธิบาย</th></tr>
+        <tr><td class="mono">DEPT_PHONES</td><td class="mono">(dept_code, phone)</td><td><span class="badge b-pk">PK รวม</span> <span class="badge b-fk">FK</span> → DEPARTMENT</td><td>เบอร์แผนก — 1 แผนกมีได้หลายเบอร์ (DEPT-01 มี 2 เบอร์)</td></tr>
+        <tr><td class="mono">HEAD_PHONES</td><td class="mono">(head_code, phone)</td><td><span class="badge b-pk">PK รวม</span> <span class="badge b-fk">FK</span> → DEPARTMENT_HEAD</td><td>เบอร์หัวหน้าแผนก (DH-003 มี 2 เบอร์)</td></tr>
+        <tr><td class="mono">ADMIN_PHONES</td><td class="mono">(admin_code, phone)</td><td><span class="badge b-pk">PK รวม</span> <span class="badge b-fk">FK</span> → ADMIN</td><td>เบอร์ธุรการ (AD-002 มี 2 เบอร์)</td></tr>
+        <tr><td class="mono">EMP_PHONES</td><td class="mono">(emp_code, phone)</td><td><span class="badge b-pk">PK รวม</span> <span class="badge b-fk">FK</span> → EMPLOYEE</td><td>เบอร์พนักงาน (EMP-004, EMP-017 มี 2 เบอร์)</td></tr>
+      </table>
+      <div class="note"><b>จุดซักถาม:</b> Multivalued Attribute "เบอร์" ใน ER แปลงเป็นตารางย่อยโดย PK = (FK ของเจ้าของ + ค่าเบอร์) — ทำให้ 1 คนมีได้หลายเบอร์โดยไม่ซ้ำ และยังผ่าน 1NF เพราะไม่มีคอลัมน์ใดเก็บค่าหลายค่าซ้อนอีกต่อไป</div>
     </div>
 
     <div class="ent">
@@ -434,6 +446,7 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
       <div class="stat"><div class="num">21</div><div class="lbl">DOCUMENT_DETAIL</div></div>
       <div class="stat"><div class="num">21</div><div class="lbl">RECEIPT_RECORD</div></div>
       <div class="stat"><div class="num">32</div><div class="lbl">LOG</div></div>
+      <div class="stat"><div class="num">51</div><div class="lbl">เบอร์โทร (4 ตารางย่อย)</div></div>
     </div>
   </div>
 </section>
@@ -466,7 +479,7 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
     <table class="map">
       <tr><th>เอนทิตีใน ER</th><th>ประเภท</th><th>ตารางใน Oracle</th><th>หมายเหตุการแปลง</th></tr>
       <tr><td>user Type</td><td>Strong</td><td class="mono">USER_TYPES</td><td>ตาราง lookup ประเภทผู้ใช้</td></tr>
-      <tr><td>user</td><td>Strong</td><td class="mono">USERS</td><td>เบอร์โทร (Multivalued) → เก็บเบอร์หลักเบอร์เดียว</td></tr>
+      <tr><td>user</td><td>Strong</td><td class="mono">USERS + USER_PHONES</td><td>เบอร์โทร (Multivalued) → แตกเป็นตารางย่อย USER_PHONES ตามหลัก 1NF</td></tr>
       <tr><td>กริ่งดิจิตอล</td><td>Strong</td><td class="mono">DIGITAL_BELLS</td><td>ตาราง Transaction หลักของระบบ</td></tr>
       <tr><td>จุดจอดรถ</td><td>Strong</td><td class="mono">BUS_STOPS</td><td>พิกัดเก็บเป็น latitude / longitude แยกคอลัมน์</td></tr>
       <tr><td>รายการจุดจอด</td><td><span class="badge b-weak">WEAK</span></td><td class="mono">ROUTE_STOPS</td><td>แตก M:N ระหว่างเส้นทางกับจุดจอด + เก็บลำดับ (Seq)</td></tr>
@@ -497,11 +510,21 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
         <tr><td class="mono">user_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-pk">PK</span></td><td>รหัสผู้ใช้ เช่น U-1001</td></tr>
         <tr><td class="mono">first_name</td><td class="mono">VARCHAR2(100)</td><td><span class="badge b-nn">NOT NULL</span></td><td>ชื่อ (ER: Composite Attribute "ชื่อ" แตกเป็น FName)</td></tr>
         <tr><td class="mono">last_name</td><td class="mono">VARCHAR2(100)</td><td><span class="badge b-nn">NOT NULL</span></td><td>นามสกุล (LName)</td></tr>
-        <tr><td class="mono">phone_number</td><td class="mono">VARCHAR2(20)</td><td>—</td><td>เบอร์โทร (ER: Multivalued วงรีสองชั้น → เก็บเบอร์หลักเบอร์เดียว)</td></tr>
+        <tr><td class="mono">phone_number</td><td class="mono">—</td><td>ย้ายไปตารางย่อย</td><td>เบอร์ผู้ใช้เป็น Multivalued → แยกอยู่ใน <span class="mono">USER_PHONES(user_id, phone_number)</span> ตามหลัก 1NF</td></tr>
         <tr><td class="mono">email</td><td class="mono">VARCHAR2(100)</td><td>—</td><td>อีเมลผู้ใช้</td></tr>
         <tr><td class="mono">user_type_id</td><td class="mono">VARCHAR2(10)</td><td><span class="badge b-fk">FK</span> → USER_TYPES</td><td>ประเภทผู้ใช้ (ใช้เป็น Business Rule: กดกริ่งได้เฉพาะ UT-003)</td></tr>
         <tr><td class="mono">status</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-def">DEFAULT 'Active'</span></td><td>สถานะบัญชี</td></tr>
       </table>
+    </div>
+
+    <div class="ent">
+      <h3><span class="mono">USER_PHONES</span> <span class="thainame">— ตารางย่อยเบอร์โทรผู้ใช้ (1NF)</span></h3>
+      <table>
+        <tr><th>คอลัมน์</th><th>ชนิดข้อมูล</th><th>Constraints</th><th>คำอธิบาย</th></tr>
+        <tr><td class="mono">user_id</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-pk">PK ร่วม</span> <span class="badge b-fk">FK</span> → USERS</td><td>เจ้าของเบอร์ (ER: Multivalued Attribute "เบอร์" ของ user)</td></tr>
+        <tr><td class="mono">phone_number</td><td class="mono">VARCHAR2(20)</td><td><span class="badge b-pk">PK ร่วม</span></td><td>เบอร์โทร — 1 ผู้ใช้มีได้หลายเบอร์ (seed: U-1002, U-1005, U-1007, U-1009 มี 2 เบอร์ รวม 14 แถว)</td></tr>
+      </table>
+      <div class="note"><b>จุดซักถาม:</b> PK รวม (user_id, phone_number) ทำหน้าที่ทั้งกันเบอร์ซ้ำในคนเดียวและเชื่อมกลับผู้ใช้ — รูปแบบมาตรฐานของการแปลง Multivalued Attribute เป็นตารางใน Relational Model</div>
     </div>
 
     <div class="ent">
@@ -715,6 +738,7 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
     <div class="stats">
       <div class="stat"><div class="num">3</div><div class="lbl">USER_TYPES</div></div>
       <div class="stat"><div class="num">10</div><div class="lbl">USERS</div></div>
+      <div class="stat"><div class="num">14</div><div class="lbl">USER_PHONES</div></div>
       <div class="stat"><div class="num">3</div><div class="lbl">ROUTES</div></div>
       <div class="stat"><div class="num">10</div><div class="lbl">BUS_STOPS</div></div>
       <div class="stat"><div class="num">13</div><div class="lbl">ROUTE_STOPS</div></div>
@@ -742,8 +766,8 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
         <table class="run">
           <tr><th>#</th><th>ไฟล์</th><th>ทำอะไร</th></tr>
           <tr><td>1</td><td class="mono">DropTabke.txt</td><td>ลบ 8 ตารางเดิม</td></tr>
-          <tr><td>2</td><td class="mono">CreateTable.txt</td><td>สร้าง 8 ตาราง + FK</td></tr>
-          <tr><td>3</td><td class="mono">Insert.txt</td><td>ข้อมูลจำลอง 135 แถว</td></tr>
+          <tr><td>2</td><td class="mono">CreateTable.txt</td><td>สร้าง 12 ตาราง + FK (รวมตารางย่อยเบอร์โทร 4)</td></tr>
+          <tr><td>3</td><td class="mono">Insert.txt</td><td>ข้อมูลจำลอง 186 แถว (135 หลัก + 51 เบอร์)</td></tr>
           <tr><td>4</td><td class="mono">plsql.txt</td><td>สร้าง SP_LOG_NOTIFICATION_SENT</td></tr>
           <tr><td>5</td><td class="mono">TestPLSQL.txt</td><td>สาธิตเหตุการณ์อนุมัติ + Log</td></tr>
           <tr><td>6</td><td class="mono">Join.txt</td><td>รายงาน JOIN 8 ตาราง</td></tr>
@@ -756,8 +780,8 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
           <tr><th>#</th><th>ไฟล์</th><th>ทำอะไร</th></tr>
           <tr><td>0</td><td class="mono">DropOldObjects.txt</td><td>ตรวจ object เก่าตกค้าง (ถ้ามี)</td></tr>
           <tr><td>1</td><td class="mono">DropTable.txt</td><td>ลบ 10 ตารางเดิม</td></tr>
-          <tr><td>2</td><td class="mono">DDL.txt</td><td>สร้าง 10 ตาราง + FK</td></tr>
-          <tr><td>3</td><td class="mono">DML.txt</td><td>ข้อมูลจำลอง 74 แถว</td></tr>
+          <tr><td>2</td><td class="mono">DDL.txt</td><td>สร้าง 11 ตาราง + FK (รวม USER_PHONES)</td></tr>
+          <tr><td>3</td><td class="mono">DML.txt</td><td>ข้อมูลจำลอง 78 แถว (74 หลัก + 14 เบอร์)</td></tr>
           <tr><td>4</td><td class="mono">PLSQL1.txt + PLSQL2.txt</td><td>สร้าง 5 Procedures</td></tr>
           <tr><td>5</td><td class="mono">TestPLSQL2.txt</td><td>สาธิตวงจรกดกริ่งครบ + Rule</td></tr>
           <tr><td>6</td><td class="mono">Join.txt</td><td>รายงาน JOIN 5 ฉบับ</td></tr>
@@ -817,11 +841,11 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
       <div class="item"><div class="q"><span class="qn">Q9</span>(SE) ER ระบุ ยานพาหนะ M:N กล่อง IoT แต่ทำไมตารางเป็น 1:1?</div><div class="a">ตามการใช้งานจริง 1 คันติดกล่องเดียว จึงทำ <span class="mono">iot_id UNIQUE</span> ใน VEHICLES พอ — ถ้าอาจารย์สั่งแก้หน้างานให้เป็น M:N: สร้างตารางกลาง <span class="mono">VEHICLE_IOT (vehicle_id, iot_id)</span> PK composite แล้วลบ iot_id ออกจาก VEHICLES</div></div>
       <div class="item"><div class="q"><span class="qn">Q10</span>(SE) "จำนวนคนบนรถ" เป็น Derived Attribute ทำไมยังเก็บคอลัมน์?</div><div class="a">เก็บเป็น <b>ค่า cache</b> ที่อัปเดตผ่าน <span class="mono">sp_update_passenger_count</span> เท่านั้น (ไม่ใช่ข้อมูลดิบที่คีย์ตรง ๆ) เพื่อให้ query สถานะรถเร็ว — ค่าจริงมาจากเหตุการณ์ขึ้น/ลงรถ เทียบเท่าการ denormalize เพื่อ performance</div></div>
       <div class="item"><div class="q"><span class="qn">Q11</span>(SE) ทำไม ROUTE_STOPS เก็บ PK เป็น (ROUTE_ID, SEQ)?</div><div class="a">รายการจุดจอดเป็น Weak Entity แตกจากความสัมพันธ์ M:N ระหว่างสายกับป้าย — PK = PK เจ้าของ (route_id) + Partial Key (seq = ลำดับที่ป้ายในสายนั้น) เพราะสาย 1 สายมีหลายป้าย / ป้าย 1 ที่มีหลายสายผ่าน</div></div>
-      <div class="item"><div class="q"><span class="qn">Q12</span>ทำไมเบอร์โทร (Multivalued Attribute) ถึงเก็บคอลัมน์เดียว?</div><div class="a">ออกแบบให้เหลือเบอร์หลักเบอร์เดียวต่อคนเพื่อความเรียบง่ายของ dataset ตัวอย่าง — ถ้าอาจารย์ให้แก้ตามหลัก 1NF หน้างาน: แตกเป็นตารางย่อย เช่น <span class="mono">USER_PHONES (user_id, phone_number)</span> PK composite แล้วลบคอลัมน์ออก (หลักการเดียวกันกับ "สาขา" ของ BA และ "ช่องทางที่ส่ง" ของ LOG — ซึ่ง LOG แก้แล้วด้วยการทำ 1 แถวต่อ 1 ช่องทาง)</div></div>
+      <div class="item"><div class="q"><span class="qn">Q12</span>เบอร์โทร (Multivalued Attribute) แปลงเป็นตารางยังไง?</div><div class="a"><b>ทำแล้วในสคีมาปัจจุบัน</b> — แยกเบอร์ออกจากตารางหลักเป็นตารางย่อย: SE ใช้ <span class="mono">USER_PHONES(user_id, phone_number)</span>, BA ใช้ <span class="mono">DEPT_PHONES / HEAD_PHONES / ADMIN_PHONES / EMP_PHONES</span> — PK รวม = (FK เจ้าของ + เบอร์) ทำให้ 1 คนมีหลายเบอร์ได้และไม่ซ้ำ · ข้อมูลจริงมีคน 4 คนที่มี 2 เบอร์พิสูจน์บน server แล้ว · ตรรกะเดียวกันกับ "ช่องทางที่ส่ง" ของ LOG (1 แถวต่อ 1 ช่องทาง) — ถ้าอาจารย์สั่งแก้ "สาขา" เพิ่ม ก็ใช้รูปแบบเดียวกันนี้ (แตกตารางย่อย BRANCH แล้วลบคอลัมน์)</div></div>
       <div class="item"><div class="q"><span class="qn">Q13</span>ทำไมรายงานใช้ LEFT JOIN บางจุด?</div><div class="a">รองรับข้อมูลที่ยังไม่เกิดเหตุการณ์ เช่น เอกสารที่ยังไม่มีใครกดรับทราบ หรือรถที่ยังไม่มีคนขับ — INNER JOIN จะหล่นแถวพวกนั้นทิ้ง</div></div>
       <div class="item"><div class="q"><span class="qn">Q14</span>(SE รายงาน 4) ทำไมใช้ WITH clause?</div><div class="a">เก็บสถิติกริ่งและสถิติฉุกเฉินแยกกันก่อน (1 แถวต่อ 1 สาย) แล้วค่อย JOIN เข้ากับตารางสาย ไม่เกิด fan-out (ข้อมูลซ้ำจากการ JOIN ตรง ๆ หลายตาราง) และเลี่ยง CREATE VIEW ที่ user อาจไม่มีสิทธิ์ (ORA-01031)</div></div>
       <div class="item"><div class="q"><span class="qn">Q15</span>(SE รายงาน 3) KEEP (DENSE_RANK FIRST/LAST ...) คืออะไร?</div><div class="a">Analytic function เลือกค่าจากแถวที่มี seq น้อยสุด/มากสุด เช่น ชื่อป้ายแรก-ป้ายสุดท้ายของสาย โดยไม่ต้องเขียน subquery ซ้อน</div></div>
-      <div class="item"><div class="q"><span class="qn">Q16</span>ทั้งสองงานอยู่ user เดียวกันได้จริงไหม ทำไม Script ตรวจสอบถึงเห็นตาราง 18 ตาราง?</div><div class="a">ได้ — ชื่อตาราง/ชื่อ constraint/ชื่อ procedure ของสองงานไม่ซ้ำกันเลย (BA 8 ตาราง + SE 10 ตาราง) การ deploy รอบก่อนก็อยู่ร่วมกันมาแล้ว ผล Script ตรวจสอบจึงโชว์ทุกตารางที่ user เป็นเจ้าของปนกันตามปกติ และท้ายไฟล์ Verify.txt มี query เสริมกรองเฉพาะตารางของแต่ละงาน จุดสำคัญ: DROP ต้องยิงเฉพาะไฟล์ Drop ของงานตัวเอง ห้ามลบข้ามงาน</div></div>
+      <div class="item"><div class="q"><span class="qn">Q16</span>ทั้งสองงานอยู่ user เดียวกันได้จริงไหม ทำไม Script ตรวจสอบถึงเห็นตาราง 23 ตาราง?</div><div class="a">ได้ — ชื่อตาราง/ชื่อ constraint/ชื่อ procedure ของสองงานไม่ซ้ำกันเลย (BA 12 ตาราง + SE 11 ตาราง) ผล Script ตรวจสอบจึงโชว์ทุกตารางที่ user เป็นเจ้าของปนกันตามปกติ และท้ายไฟล์ Verify.txt มี query เสริมกรองเฉพาะตารางของแต่ละงาน จุดสำคัญ: DROP ต้องยิงเฉพาะไฟล์ Drop ของงานตัวเอง ห้ามลบข้ามงาน</div></div>
       <div class="item"><div class="q"><span class="qn">Q17</span>ถ้าอาจารย์สั่ง DROP แล้วตารางลบไม่หมด?</div><div class="a">เช็คด้วย <span class="mono">SELECT table_name FROM user_tables;</span> — ลบด้วย <span class="mono">DROP TABLE ชื่อ CASCADE CONSTRAINTS;</span> ตามลำดับย้อน FK (ไฟล์ Drop ทั้งสองงานเรียงลำดับไว้แล้ว) และถ้าเจอ object เก่าตกค้างจากเวอร์ชันก่อน ใช้ไฟล์ SE/DropOldObjects.txt ตรวจก่อนแล้วจึงลบเฉพาะที่เกี่ยวข้อง</div></div>
       <div class="item"><div class="q"><span class="qn">Q18</span>(บทเรียนจากการ deploy จริง 11/11) ทำไมคอลัมน์ ALERT_LOGS ชื่อ <span class="mono">alert_time</span> ไม่ใช่ <span class="mono">timestamp</span>?</div><div class="a">เพราะ "timestamp" ชนกับชื่อ datatype ของ PL/SQL — ใช้ใน SQL ปกติได้ (INSERT/SELECT ผ่านหมด) แต่ Procedure ที่อ้างตารางนั้นจะ compile ไม่ผ่าน <b>PLS-320</b> (การประกาศประเภท expression ไม่สมบูรณ์) บน Oracle 10g เทคนิคไล่หา: ดู <span class="mono">SELECT line, position, text FROM user_errors WHERE name = 'ชื่อSP';</span> แล้วเปลี่ยนชื่อคอลัมน์ด้วย <span class="mono">ALTER TABLE ... RENAME COLUMN</span> จุดสังเกต: SP สร้างผ่านไปแล้วอาจเป็น INVALID ภายหลายถ้าตารางที่อ้างถูกแก้ — เช็คสถานะด้วย <span class="mono">user_objects.status</span> และ SP_LOG_NOTIFICATION_SENT ของ BA จะ INVALID ชั่วคราวจนกว่าตาราง BA ถูกสร้าง (ทำงานข้ามงานใน user เดียว)</div></div>
     </div>
