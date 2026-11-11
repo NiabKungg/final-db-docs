@@ -649,62 +649,21 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
     <!-- WORKFLOW -->
     <h3 style="margin:34px 0 14px">4) วงจรการทำงานของระบบ (Transaction Flow)</h3>
     <div class="flow">
-      <div class="step"><span class="n">1</span><br><b>ผู้โดยสารกดกริ่ง</b><br><span class="mono">sp_press_digital_bell</span> → INSERT <span class="mono">DIGITAL_BELLS</span> สถานะ "รอดำเนินการ"</div>
+      <div class="step"><span class="n">1</span><br><b>กล่อง IoT ส่งพิกัด</b><br><span class="mono">sp_update_iot_location</span> → UPDATE <span class="mono">IOT_BOXES</span> พิกัดล่าสุด (ตรวจ SQL%ROWCOUNT)</div>
       <div class="arrow">➜</div>
-      <div class="step"><span class="n">2</span><br><b>คนขับยืนยัน</b><br><span class="mono">sp_confirm_digital_bell</span> → สถานะ "รับทราบแล้ว"</div>
+      <div class="step"><span class="n">2</span><br><b>ผู้โดยสารใช้บริการ</b><br>ข้อมูลการกดกริ่ง/เหตุฉุกเฉินถูกจัดเก็บใน <span class="mono">DIGITAL_BELLS</span> / <span class="mono">ALERT_LOGS</span></div>
       <div class="arrow">➜</div>
-      <div class="step"><span class="n">3</span><br><b>ขึ้น/ลงรถ</b><br><span class="mono">sp_update_passenger_count</span> → ปรับจำนวนคนบนรถ (+/−)</div>
-      <div class="arrow">➜</div>
-      <div class="step"><span class="n">4</span><br><b>เหตุฉุกเฉิน / IoT</b><br><span class="mono">sp_report_emergency_alert</span> บันทึกเหตุ · <span class="mono">sp_update_iot_location</span> อัปเดตพิกัด</div>
+      <div class="step"><span class="n">3</span><br><b>รายงานสรุป</b><br>JOIN 5 ตารางขึ้นไป สรุปสถิติต่อสาย/รถ/ป้าย</div>
     </div>
 
     <!-- PLSQL -->
-    <h3 style="margin:34px 0 14px">5) Stored Procedures (PL/SQL — Transaction Processing) 5 ตัว</h3>
-    <div class="proc">
-      <h4><code>sp_press_digital_bell</code> — ผู้โดยสารกดกริ่งขอลงรถ <span class="tag tag-out">OUT: o_bell_id, o_status</span></h4>
-      <ul>
-        <li><b>ตรวจ 3 เงื่อนไข:</b> บัญชี Active → ประเภทต้องเป็น UT-003 (ผู้รับบริการ) → รถต้อง Active</li>
-        <li><b>สร้างรหัสอัตโนมัติ</b> BELL-XXX จาก <span class="mono">MAX + SUBSTR + REGEXP_LIKE</span> แล้ว INSERT สถานะ "รอดำเนินการ"</li>
-        <li><b>Business Rule:</b> คนขับ/แอดมินกดกริ่งไม่ได้ → คืนข้อความ ERROR (ไม่มี INSERT เกิดขึ้น)</li>
-        <li>สำเร็จ <span class="mono">COMMIT</span> / ล้มเหลว <span class="mono">ROLLBACK</span> ทั้ง transaction</li>
-      </ul>
-    </div>
-    <div class="proc">
-      <h4><code>sp_confirm_digital_bell</code> — ยืนยันรับสัญญาณกริ่ง <span class="tag tag-out">OUT: o_status</span></h4>
-      <ul>
-        <li>UPDATE เฉพาะแถวที่สถานะ = "รอดำเนินการ" → เปลี่ยนเป็น "รับทราบแล้ว"</li>
-        <li>ใช้ <b><span class="mono">SQL%ROWCOUNT = 0</span></b> จับกรณีไม่พบรหัส หรือยืนยันซ้ำ (ยืนยันได้ครั้งเดียว)</li>
-      </ul>
-    </div>
-    <div class="proc">
-      <h4><code>sp_report_emergency_alert</code> — บันทึกเหตุฉุกเฉินจากปุ่ม <span class="tag tag-out">OUT: o_log_id, o_status</span></h4>
-      <ul>
-        <li>ตรวจว่าปุ่มมีอยู่จริงและสถานะ Active</li>
-        <li><b>รหัสรถดึงจากปุ่มโดยตรง</b> (ไม่รับ vehicle_id จากผู้เรียก) → บันทึกผิดคันไม่ได้</li>
-        <li>สร้างรหัส ALT-XXXX อัตโนมัติ แล้ว INSERT ลง <span class="mono">ALERT_LOGS</span></li>
-      </ul>
-    </div>
-    <div class="proc">
-      <h4><code>sp_update_passenger_count</code> — อัปเดตจำนวนคนบนรถ <span class="tag tag-tx">FOR UPDATE</span> <span class="tag tag-out">OUT: o_status</span></h4>
-      <ul>
-        <li><span class="mono">SELECT ... FOR UPDATE</span> ล็อกแถวรถ กัน 2 session แก้พร้อมกัน</li>
-        <li><b>Business Rule:</b> จำนวนคนบนรถห้ามติดลบ — ถ้าผลลัพธ์ติดลบ → ROLLBACK แล้วคืน ERROR</li>
-        <li>รับ <span class="mono">p_delta</span> เป็น +2 (ขึ้นรถ) หรือ −1 (ลงรถ) ได้ทั้งคู่</li>
-      </ul>
-    </div>
+    <h3 style="margin:34px 0 14px">5) Stored Procedure (PL/SQL — Transaction Processing)</h3>
     <div class="proc">
       <h4><code>sp_update_iot_location</code> — รับพิกัดจากกล่อง IoT <span class="tag tag-out">OUT: o_status</span></h4>
       <ul>
         <li>UPDATE พิกัดล่าสุดของกล่อง IoT (จำลองข้อมูล GPS ส่งเข้ามาตลอดเวลา)</li>
         <li>ใช้ <span class="mono">SQL%ROWCOUNT = 0</span> จับกรณีรหัสกล่องไม่มีในระบบ</li>
-      </ul>
-    </div>
-    <div class="proc">
-      <h4><code>TestPLSQL2.txt</code> — ไฟล์สาธิตหน้างาน (BEFORE → EVENT × 7 → AFTER)</h4>
-      <ul>
-        <li>จำลอง 1 รอบการทำงานจริง: กดกริ่ง → ยืนยัน → ขึ้นรถ +2 → ลงรถ −1 → ปุ่มฉุกเฉิน</li>
-        <li><b>ทดสอบ Business Rule สด:</b> คนขับ U-1002 พยายามกดกริ่ง (ต้อง ERROR) และลงรถ −10 จนติดลบ (ต้อง ERROR)</li>
-        <li>AFTER: เทียบผล — ได้ BELL-011 (รับทราบแล้ว), passenger_count = 1, ALT-1006 เกิดขึ้นจริง</li>
+        <li>สำเร็จ <span class="mono">COMMIT</span> / ล้มเหลว <span class="mono">ROLLBACK</span> — ทดสอบด้วยไฟล์ <span class="mono">PLSQL_Test.txt</span></li>
       </ul>
     </div>
 
@@ -782,8 +741,8 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
           <tr><td>1</td><td class="mono">DropTable.txt</td><td>ลบ 10 ตารางเดิม</td></tr>
           <tr><td>2</td><td class="mono">DDL.txt</td><td>สร้าง 11 ตาราง + FK (รวม USER_PHONES)</td></tr>
           <tr><td>3</td><td class="mono">DML.txt</td><td>ข้อมูลจำลอง 78 แถว (74 หลัก + 14 เบอร์)</td></tr>
-          <tr><td>4</td><td class="mono">PLSQL1.txt + PLSQL2.txt</td><td>สร้าง 5 Procedures</td></tr>
-          <tr><td>5</td><td class="mono">TestPLSQL2.txt</td><td>สาธิตวงจรกดกริ่งครบ + Rule</td></tr>
+          <tr><td>4</td><td class="mono">PLSQL1.txt</td><td>สร้าง sp_update_iot_location</td></tr>
+          <tr><td>5</td><td class="mono">PLSQL_Test.txt</td><td>ทดสอบอัปเดตพิกัด IoT</td></tr>
           <tr><td>6</td><td class="mono">Join.txt</td><td>รายงาน JOIN 5 ฉบับ</td></tr>
           <tr><td>7</td><td class="mono">Verify.txt</td><td>Script ตรวจสอบของอาจารย์</td></tr>
         </table>
@@ -835,11 +794,11 @@ details.sql pre{padding:2px 20px 18px;overflow-x:auto;font-size:13px;line-height
       <div class="item"><div class="q"><span class="qn">Q3</span>(BA) ทำไมต้องมีตาราง DOCUMENT_DETAIL แยกจาก DOCUMENT?</div><div class="a">1 เอกสารมีได้หลายรายละเอียด/หลายรอบการแจ้ง (1:M Identifying Relationship — Weak Entity) รายละเอียดเก็บ SLA, สถานะ, กลุ่มเป้าหมาย ซึ่งเปลี่ยนต่อรอบ ไม่ใช่ข้อมูลหัวเอกสาร</div></div>
       <div class="item"><div class="q"><span class="qn">Q4</span>(BA) PRAGMA AUTONOMOUS_TRANSACTION ใน SP_LOG_NOTIFICATION_SENT ทำอะไร?</div><div class="a">ทำให้ transaction ของการบันทึก Log เป็นอิสระจาก transaction หลัก — ถ้างานหลัก ROLLBACK ประวัติ Log ที่บันทึกไปแล้วยังอยู่ (audit trail ต้องไม่หาย)</div></div>
       <div class="item"><div class="q"><span class="qn">Q5</span>(BA) Transaction Processing อยู่ตรงไหน?</div><div class="a">เหตุการณ์อนุมัติเอกสาร = 2 การกระทำใน 1 เหตุการณ์: <span class="mono">UPDATE DOCUMENT_DETAIL สถานะ</span> + <span class="mono">INSERT LOG</span> แจ้งเตือนอัตโนมัติผ่าน SP (ไฟล์ TestPLSQL.txt) — สำเร็จ COMMIT ทั้งคู่ / พลาด ROLLBACK</div></div>
-      <div class="item"><div class="q"><span class="qn">Q6</span>(SE) Transaction Processing อยู่ตรงไหน?</div><div class="a"><span class="mono">sp_press_digital_bell</span> = ตรวจ 3 เงื่อนไข (ผู้ใช้ Active / ประเภท UT-003 / รถ Active) แล้ว INSERT ใน 1 transaction · <span class="mono">sp_update_passenger_count</span> = <span class="mono">SELECT FOR UPDATE</span> (ล็อกแถวกันแข่งกันแก้) + ตรวจไม่ให้ติดลบ + UPDATE — ทุกตัว COMMIT เมื่อสำเร็จ / ROLLBACK เมื่อพลาด</div></div>
-      <div class="item"><div class="q"><span class="qn">Q7</span>(SE) Business Rule ที่เขียนไว้ใน PL/SQL?</div><div class="a">1) กดกริ่งได้เฉพาะประเภท "ผู้รับบริการ" UT-003 (คนขับ/แอดมินกดไม่ได้) 2) ยืนยันกริ่งได้เฉพาะสถานะ "รอดำเนินการ" (ใช้ <span class="mono">SQL%ROWCOUNT = 0</span> จับ) 3) จำนวนคนบนรถห้ามติดลบ 4) ปุ่มฉุกเฉินต้อง Active และรหัสรถดึงจากปุ่มโดยตรง ทำให้บันทึกผิดคันไม่ได้</div></div>
-      <div class="item"><div class="q"><span class="qn">Q8</span>(SE) ทำไมรหัส BELL-011 / ALT-1006 สร้างด้วย SUBSTR+MAX+1 ไม่ใช้ SEQUENCE?</div><div class="a">เพื่อให้เลขต่อเนื่องอ่านง่ายและไม่มีช่องว่างเมื่อเกิด ROLLBACK (SEQUENCE จะกระโดดข้ามเลขที่ถูก rollback) — ข้อจำกัด: ถ้า 2 session กดพร้อมกันอาจได้เลขซ้ำและโดน PK violation → ROLLBACK (production จริงควรใช้ SEQUENCE) ควรพูดข้อจำกัดนี้เองตอนถูกถาม</div></div>
+      <div class="item"><div class="q"><span class="qn">Q6</span>(SE) Transaction Processing อยู่ตรงไหน?</div><div class="a"><span class="mono">sp_update_iot_location</span> = รับพิกัดจากกล่อง IoT มา UPDATE <span class="mono">IOT_BOXES</span> — ตรวจ <span class="mono">SQL%ROWCOUNT = 0</span> จับรหัสไม่พบ → ERROR, สำเร็จ COMMIT / พลาด ROLLBACK (ทดสอบด้วย PLSQL_Test.txt) · ข้อมูลเหตุการณ์อื่น (กริ่ง/ฉุกเฉิน) บันทึกเป็น INSERT ตรงตามตาราง Transaction</div></div>
+      <div class="item"><div class="q"><span class="qn">Q7</span>(SE) Business Rule ที่อยู่ในระบบ?</div><div class="a">1) กล่อง IoT ที่ส่งพิกัดได้ = อุปกรณ์ออนไลน์ → Procedure บังคับ <span class="mono">status = 'Active'</span> ทุกครั้ง 2) รหัสกล่องไม่พบ → ตรวจด้วย <span class="mono">SQL%ROWCOUNT = 0</span> แล้วคืน ERROR 3) ระดับข้อมูล: PK รวมของ <span class="mono">USER_PHONES(user_id, phone_number)</span> กันเบอร์ซ้ำในคนเดียว และ LOG เก็บ 1 ช่องทางต่อ 1 แถว ตาม 1NF</div></div>
+      <div class="item"><div class="q"><span class="qn">Q8</span>(BA) ทำไมรหัส LOG-033 สร้างด้วย SUBSTR+MAX+1 ไม่ใช้ SEQUENCE?</div><div class="a">เพื่อให้เลขต่อเนื่องอ่านง่ายและไม่มีช่องว่างเมื่อเกิด ROLLBACK (SEQUENCE จะกระโดดข้ามเลขที่ถูก rollback) — ข้อจำกัด: ถ้า 2 session บันทึกพร้อมกันอาจได้เลขซ้ำและโดน PK violation → ROLLBACK (production จริงควรใช้ SEQUENCE) ควรพูดข้อจำกัดนี้เองตอนถูกถาม</div></div>
       <div class="item"><div class="q"><span class="qn">Q9</span>(SE) ER ระบุ ยานพาหนะ M:N กล่อง IoT แต่ทำไมตารางเป็น 1:1?</div><div class="a">ตามการใช้งานจริง 1 คันติดกล่องเดียว จึงทำ <span class="mono">iot_id UNIQUE</span> ใน VEHICLES พอ — ถ้าอาจารย์สั่งแก้หน้างานให้เป็น M:N: สร้างตารางกลาง <span class="mono">VEHICLE_IOT (vehicle_id, iot_id)</span> PK composite แล้วลบ iot_id ออกจาก VEHICLES</div></div>
-      <div class="item"><div class="q"><span class="qn">Q10</span>(SE) "จำนวนคนบนรถ" เป็น Derived Attribute ทำไมยังเก็บคอลัมน์?</div><div class="a">เก็บเป็น <b>ค่า cache</b> ที่อัปเดตผ่าน <span class="mono">sp_update_passenger_count</span> เท่านั้น (ไม่ใช่ข้อมูลดิบที่คีย์ตรง ๆ) เพื่อให้ query สถานะรถเร็ว — ค่าจริงมาจากเหตุการณ์ขึ้น/ลงรถ เทียบเท่าการ denormalize เพื่อ performance</div></div>
+      <div class="item"><div class="q"><span class="qn">Q10</span>(SE) "จำนวนคนบนรถ" เป็น Derived Attribute ทำไมยังเก็บคอลัมน์?</div><div class="a">เก็บเป็น <b>ค่า cache</b> (DEFAULT 0) อัปเดตตามเหตุการณ์ขึ้น/ลงรถจากอุปกรณ์/แอป เพื่อให้ query สถานะรถเร็วโดยไม่ต้องนับจากตารางอื่น — เทียบเท่าการ denormalize เพื่อ performance ไม่ใช่ข้อมูลดิบที่คีย์ตรง ๆ</div></div>
       <div class="item"><div class="q"><span class="qn">Q11</span>(SE) ทำไม ROUTE_STOPS เก็บ PK เป็น (ROUTE_ID, SEQ)?</div><div class="a">รายการจุดจอดเป็น Weak Entity แตกจากความสัมพันธ์ M:N ระหว่างสายกับป้าย — PK = PK เจ้าของ (route_id) + Partial Key (seq = ลำดับที่ป้ายในสายนั้น) เพราะสาย 1 สายมีหลายป้าย / ป้าย 1 ที่มีหลายสายผ่าน</div></div>
       <div class="item"><div class="q"><span class="qn">Q12</span>เบอร์โทร (Multivalued Attribute) แปลงเป็นตารางยังไง?</div><div class="a"><b>ทำแล้วในสคีมาปัจจุบัน</b> — แยกเบอร์ออกจากตารางหลักเป็นตารางย่อย: SE ใช้ <span class="mono">USER_PHONES(user_id, phone_number)</span>, BA ใช้ <span class="mono">DEPT_PHONES / HEAD_PHONES / ADMIN_PHONES / EMP_PHONES</span> — PK รวม = (FK เจ้าของ + เบอร์) ทำให้ 1 คนมีหลายเบอร์ได้และไม่ซ้ำ · ข้อมูลจริงมีคน 4 คนที่มี 2 เบอร์พิสูจน์บน server แล้ว · ตรรกะเดียวกันกับ "ช่องทางที่ส่ง" ของ LOG (1 แถวต่อ 1 ช่องทาง) — ถ้าอาจารย์สั่งแก้ "สาขา" เพิ่ม ก็ใช้รูปแบบเดียวกันนี้ (แตกตารางย่อย BRANCH แล้วลบคอลัมน์)</div></div>
       <div class="item"><div class="q"><span class="qn">Q13</span>ทำไมรายงานใช้ LEFT JOIN บางจุด?</div><div class="a">รองรับข้อมูลที่ยังไม่เกิดเหตุการณ์ เช่น เอกสารที่ยังไม่มีใครกดรับทราบ หรือรถที่ยังไม่มีคนขับ — INNER JOIN จะหล่นแถวพวกนั้นทิ้ง</div></div>
@@ -990,172 +949,7 @@ ORDER BY
     lg.sent_datetime DESC;</pre>
     </details>
 
-    <details class="sql">
-      <summary>SE — PLSQL2.txt : 4 Procedures หลัก (กดกริ่ง / ยืนยัน / ฉุกเฉิน / นับคนบนรถ)</summary>
-      <pre>CREATE OR REPLACE PROCEDURE sp_press_digital_bell (
-    p_user_id    IN Digital_Bells.user_id%TYPE,
-    p_vehicle_id IN Digital_Bells.vehicle_id%TYPE,
-    o_bell_id    OUT VARCHAR2,
-    o_status     OUT VARCHAR2
-) IS
-    v_user_type_id   Users.user_type_id%TYPE;
-    v_user_status    Users.status%TYPE;
-    v_vehicle_status Vehicles.status%TYPE;
-    v_next_num       NUMBER;
-BEGIN
-    SELECT user_type_id, status
-    INTO   v_user_type_id, v_user_status
-    FROM   Users
-    WHERE  user_id = p_user_id;
-
-    IF v_user_status &lt;&gt; 'Active' THEN
-        o_status := 'ERROR: บัญชีผู้ใช้ถูกระงับ ไม่สามารถกดกริ่งได้';
-        RETURN;
-    END IF;
-
-    -- Business Rule: กดกริ่งได้เฉพาะผู้รับบริการ (ผู้โดยสาร)
-    IF v_user_type_id &lt;&gt; 'UT-003' THEN
-        o_status := 'ERROR: เฉพาะผู้โดยสาร (ประเภทผู้รับบริการ) เท่านั้นที่กดกริ่งได้';
-        RETURN;
-    END IF;
-
-    SELECT status
-    INTO   v_vehicle_status
-    FROM   Vehicles
-    WHERE  vehicle_id = p_vehicle_id;
-
-    IF v_vehicle_status &lt;&gt; 'Active' THEN
-        o_status := 'ERROR: ยานพาหนะไม่พร้อมให้บริการ';
-        RETURN;
-    END IF;
-
-    SELECT NVL(MAX(TO_NUMBER(SUBSTR(bell_id, 6))), 0) + 1
-    INTO   v_next_num
-    FROM   Digital_Bells
-    WHERE  REGEXP_LIKE(bell_id, '^BELL-[0-9]+$');
-
-    o_bell_id := 'BELL-' || LPAD(TO_CHAR(v_next_num), 3, '0');
-
-    INSERT INTO Digital_Bells (bell_id, date_time, bell_status, user_id, vehicle_id)
-    VALUES (o_bell_id, SYSTIMESTAMP, 'รอดำเนินการ', p_user_id, p_vehicle_id);
-
-    COMMIT;
-    o_status := 'SUCCESS: กดกริ่งสำเร็จ รหัส ' || o_bell_id;
-
-EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-        ROLLBACK;
-        o_status := 'ERROR: ไม่พบผู้ใช้งานหรือยานพาหนะรหัสนี้ในระบบ';
-    WHEN OTHERS THEN
-        ROLLBACK;
-        o_status := 'ERROR: ' || SQLERRM;
-END sp_press_digital_bell;
-/
-
-CREATE OR REPLACE PROCEDURE sp_confirm_digital_bell (
-    p_bell_id IN Digital_Bells.bell_id%TYPE,
-    o_status  OUT VARCHAR2
-) IS
-BEGIN
-    UPDATE Digital_Bells
-    SET    bell_status = 'รับทราบแล้ว'
-    WHERE  bell_id     = p_bell_id
-    AND    bell_status = 'รอดำเนินการ';
-
-    IF SQL%ROWCOUNT = 0 THEN
-        ROLLBACK;
-        o_status := 'ERROR: ไม่พบรหัสกริ่ง หรือยืนยันได้เฉพาะสถานะ "รอดำเนินการ" เท่านั้น';
-    ELSE
-        COMMIT;
-        o_status := 'SUCCESS: ยืนยันรับสัญญาณกริ่ง ' || p_bell_id || ' เรียบร้อย';
-    END IF;
-
-EXCEPTION
-    WHEN OTHERS THEN
-        ROLLBACK;
-        o_status := 'ERROR: ' || SQLERRM;
-END sp_confirm_digital_bell;
-/
-
-CREATE OR REPLACE PROCEDURE sp_report_emergency_alert (
-    p_button_id IN Emergency_Buttons.button_id%TYPE,
-    o_log_id    OUT VARCHAR2,
-    o_status    OUT VARCHAR2
-) IS
-    v_vehicle_id Vehicles.vehicle_id%TYPE;
-    v_btn_status Emergency_Buttons.status%TYPE;
-    v_next_num   NUMBER;
-BEGIN
-    SELECT vehicle_id, status
-    INTO   v_vehicle_id, v_btn_status
-    FROM   Emergency_Buttons
-    WHERE  button_id = p_button_id;
-
-    IF v_btn_status &lt;&gt; 'Active' THEN
-        o_status := 'ERROR: ปุ่มนี้อยู่ในสถานะชำรุด/ปิดใช้งาน';
-        RETURN;
-    END IF;
-
-    SELECT NVL(MAX(TO_NUMBER(SUBSTR(log_id, 5))), 0) + 1
-    INTO   v_next_num
-    FROM   Alert_Logs
-    WHERE  REGEXP_LIKE(log_id, '^ALT-[0-9]+$');
-
-    o_log_id := 'ALT-' || LPAD(TO_CHAR(v_next_num), 4, '0');
-
-    INSERT INTO Alert_Logs (log_id, vehicle_id, button_id, alert_time, status)
-    VALUES (o_log_id, v_vehicle_id, p_button_id, SYSTIMESTAMP, 'Completed');
-
-    COMMIT;
-    o_status := 'SUCCESS: บันทึกเหตุฉุกเฉิน รหัส ' || o_log_id;
-
-EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-        ROLLBACK;
-        o_status := 'ERROR: ไม่พบปุ่มกดแ้งเตือนรหัสนี้';
-    WHEN OTHERS THEN
-        ROLLBACK;
-        o_status := 'ERROR: ' || SQLERRM;
-END sp_report_emergency_alert;
-/
-
-CREATE OR REPLACE PROCEDURE sp_update_passenger_count (
-    p_vehicle_id IN Vehicles.vehicle_id%TYPE,
-    p_delta      IN NUMBER,
-    o_status     OUT VARCHAR2
-) IS
-    v_current NUMBER;
-BEGIN
-    -- ล็อกแถวรถและอ่านจำนวนคนปัจจุบัน
-    SELECT passenger_count
-    INTO   v_current
-    FROM   Vehicles
-    WHERE  vehicle_id = p_vehicle_id
-    FOR UPDATE;
-
-    IF v_current + p_delta &lt; 0 THEN
-        ROLLBACK;
-        o_status := 'ERROR: จำนวนคนบนรถห้ามติดลบ (ปัจจุบัน = ' || v_current || ' คน)';
-    ELSE
-        UPDATE Vehicles
-        SET    passenger_count = passenger_count + p_delta
-        WHERE  vehicle_id = p_vehicle_id;
-
-        COMMIT;
-        o_status := 'SUCCESS: จำนวนคนบนรถ ' || p_vehicle_id || ' ตอนนี้ = '
-                    || (v_current + p_delta) || ' คน';
-    END IF;
-
-EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-        ROLLBACK;
-        o_status := 'ERROR: ไม่พบยานพาหนะรหัสนี้';
-    WHEN OTHERS THEN
-        ROLLBACK;
-        o_status := 'ERROR: ' || SQLERRM;
-END sp_update_passenger_count;
-/</pre>
-    </details>
+    
 
     <details class="sql">
       <summary>SE — PLSQL1.txt : sp_update_iot_location (อัปเดตพิกัดจากกล่อง IoT)</summary>
@@ -1187,72 +981,7 @@ END sp_update_iot_location;
 /</pre>
     </details>
 
-    <details class="sql">
-      <summary>SE — TestPLSQL2.txt : สาธิตวงจรการทำงานครบ 7 เหตุการณ์ + ทดสอบ Business Rule</summary>
-      <pre>SET SERVEROUTPUT ON;
-
--- 1. สถานะก่อนเกิดเหตุการณ์ (BEFORE EVENT)
-SELECT vehicle_id, license_plate, passenger_count, status
-FROM   Vehicles WHERE vehicle_id = 'VEH-03';
-
-SELECT COUNT(*) AS total_bells FROM Digital_Bells WHERE vehicle_id = 'VEH-03';
-SELECT COUNT(*) AS total_alerts FROM Alert_Logs;
-
--- 2. จำลองเหตุการณ์ (EVENT SIMULATION)
-DECLARE
-    v_bell_id VARCHAR2(20);
-    v_log_id  VARCHAR2(20);
-    v_status  VARCHAR2(255);
-BEGIN
-    DBMS_OUTPUT.PUT_LINE('=== เหตุการณ์ 2.1: ผู้โดยสาร U-1009 กดกริ่งขอลงรถ VEH-03 ===');
-    sp_press_digital_bell(
-        p_user_id    => 'U-1009',
-        p_vehicle_id => 'VEH-03',
-        o_bell_id    => v_bell_id,
-        o_status     => v_status
-    );
-    DBMS_OUTPUT.PUT_LINE(v_status);
-
-    DBMS_OUTPUT.PUT_LINE('=== เหตุการณ์ 2.2: คนขับยืนยันรับสัญญาณกริ่ง ' || v_bell_id || ' ===');
-    sp_confirm_digital_bell(p_bell_id => v_bell_id, o_status => v_status);
-    DBMS_OUTPUT.PUT_LINE(v_status);
-
-    DBMS_OUTPUT.PUT_LINE('=== เหตุการณ์ 2.3: มีผู้โดยสารขึ้นรถที่ป้าย +2 คน ===');
-    sp_update_passenger_count(p_vehicle_id => 'VEH-03', p_delta => 2, o_status => v_status);
-    DBMS_OUTPUT.PUT_LINE(v_status);
-
-    DBMS_OUTPUT.PUT_LINE('=== เหตุการณ์ 2.4: ผู้โดยสารที่กดกริ่งลงรถ -1 คน ===');
-    sp_update_passenger_count(p_vehicle_id => 'VEH-03', p_delta => -1, o_status => v_status);
-    DBMS_OUTPUT.PUT_LINE(v_status);
-
-    DBMS_OUTPUT.PUT_LINE('=== เหตุการณ์ 2.5: กดปุ่มฉุกเฉิน BTN-05 บน VEH-03 ===');
-    sp_report_emergency_alert(p_button_id => 'BTN-05', o_log_id => v_log_id, o_status => v_status);
-    DBMS_OUTPUT.PUT_LINE(v_status);
-
-    DBMS_OUTPUT.PUT_LINE('=== เหตุการณ์ 2.6: คนขับ U-1002 พยายามกดกริ่ง (ต้องไม่สำเร็จ) ===');
-    sp_press_digital_bell(
-        p_user_id    => 'U-1002',
-        p_vehicle_id => 'VEH-03',
-        o_bell_id    => v_bell_id,
-        o_status     => v_status
-    );
-    DBMS_OUTPUT.PUT_LINE(v_status);
-
-    DBMS_OUTPUT.PUT_LINE('=== เหตุการณ์ 2.7: ลงรถ -10 คน ทั้งที่บนรถมี 1 คน (ต้องไม่สำเร็จ) ===');
-    sp_update_passenger_count(p_vehicle_id => 'VEH-03', p_delta => -10, o_status => v_status);
-    DBMS_OUTPUT.PUT_LINE(v_status);
-END;
-/
-
--- 3. ตรวจสอบผลหลังเกิดเหตุการณ์ (AFTER EVENT)
-SELECT bell_id, date_time, bell_status, user_id
-FROM   Digital_Bells WHERE vehicle_id = 'VEH-03' ORDER BY date_time DESC;
-
-SELECT vehicle_id, passenger_count FROM Vehicles WHERE vehicle_id = 'VEH-03';
-
-SELECT log_id, vehicle_id, button_id, alert_time, status
-FROM   Alert_Logs ORDER BY alert_time DESC;</pre>
-    </details>
+    
 
     <details class="sql">
       <summary>SE — Join.txt : รายงาน JOIN 5 ฉบับ (รวม JOIN มากสุด 7 ตาราง + WITH clause)</summary>
